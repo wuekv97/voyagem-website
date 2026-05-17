@@ -1195,6 +1195,10 @@ body > * { position: relative; z-index: 3; }
   width: 100%;
   max-width: 1140px;
 }
+.account-grid-simple #stats-host {
+  display: grid;
+  gap: 56px;
+}
 
 /* ---- Profile header ---- */
 .profile-header {
