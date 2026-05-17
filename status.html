@@ -52,6 +52,12 @@
             <div class="players-list" id="players-list">
               <div class="player-empty">Загрузка…</div>
             </div>
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
+              <h4 style="margin-bottom: 14px; font-size: 14px;">Зарегистрировано <span id="reg-count" style="color: var(--text-muted); font-weight: 400;"></span></h4>
+              <div class="players-list" id="reg-list" style="max-height: 220px;">
+                <div class="player-empty">Загрузка…</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -130,7 +136,29 @@
         document.getElementById('players-list').innerHTML = '<div class="player-empty">Сервер оффлайн</div>';
       }
     }
+    async function loadRegistered() {
+      try {
+        const res = await fetch('/api/players');
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        document.getElementById('reg-count').textContent = `· ${data.total}`;
+        const host = document.getElementById('reg-list');
+        if (!data.players?.length) {
+          host.innerHTML = '<div class="player-empty">Никто ещё не зарегистрировался</div>';
+          return;
+        }
+        host.innerHTML = data.players.map(p => `
+          <div class="player-row">
+            <img class="player-avatar" src="https://mc-heads.net/avatar/${p.username}/28" alt="" onerror="this.style.visibility='hidden'">
+            <span class="player-name">${p.username}</span>
+          </div>`).join('');
+      } catch {
+        document.getElementById('reg-list').innerHTML = '<div class="player-empty">API недоступен</div>';
+      }
+    }
+
     refresh();
+    loadRegistered();
     setInterval(refresh, 30000);
   </script>
 </body>

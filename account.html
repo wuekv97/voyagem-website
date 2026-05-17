@@ -49,23 +49,45 @@
           <input id="nick" type="text" placeholder="Steve" autocomplete="username" required>
           <label for="pwd">Пароль (AuthMe)</label>
           <input id="pwd" type="password" placeholder="••••••••" autocomplete="current-password" required>
+          <p id="login-error" style="color: var(--danger); font-size: 13px; min-height: 20px; margin-top: 8px;"></p>
           <button class="btn btn-primary btn-lg" id="login-btn">Войти</button>
-          <p class="login-hint">Новый игрок? Просто зайдите на сервер и зарегистрируйтесь через /register.</p>
+          <p class="login-hint">Новый игрок? Зайдите на сервер и зарегистрируйтесь через /register.</p>
         </div>`;
-      document.getElementById('login-btn').onclick = () => {
+      document.getElementById('login-btn').onclick = async () => {
         const nick = document.getElementById('nick').value.trim();
         const pwd = document.getElementById('pwd').value;
         if (nick.length < 3) { alert('Ник должен быть не короче 3 символов'); return; }
         if (pwd.length < 4) { alert('Введите пароль'); return; }
-        saveUser({
-          nick,
-          email: '',
-          discord: '',
-          joined: new Date().toISOString().slice(0, 10),
-          group: 'Выживший',
-          stats: { hours: 0, blocks: 0, deaths: 0 }
-        });
-        location.reload();
+        const btn = document.getElementById('login-btn');
+        const errEl = document.getElementById('login-error');
+        btn.disabled = true; btn.textContent = 'Проверка…';
+        errEl.textContent = '';
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: nick, password: pwd })
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            errEl.textContent = data.error || 'Ошибка входа';
+            btn.disabled = false; btn.textContent = 'Войти';
+            return;
+          }
+          saveUser({
+            nick: data.username,
+            token: data.token,
+            email: '',
+            discord: '',
+            joined: data.regdate ? new Date(Number(data.regdate)).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+            group: 'Выживший',
+            stats: { hours: 0, blocks: 0, deaths: 0 }
+          });
+          location.reload();
+        } catch {
+          errEl.textContent = 'Нет соединения с сервером';
+          btn.disabled = false; btn.textContent = 'Войти';
+        }
       };
     }
 

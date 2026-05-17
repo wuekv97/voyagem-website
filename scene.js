@@ -2,6 +2,8 @@ import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
+const DEG2RAD = Math.PI / 180;
+const S = 1 / 16;
 
 // ============================================================
 // PROCEDURAL TEXTURES (background floating blocks)
@@ -42,7 +44,6 @@ function scatter(ctx, n, r, g, b, range) {
   }
 }
 
-// Crystal-themed textures
 const crystalTex = makeTexture(makeCanvas(ctx => {
   noisy(ctx, 0, 0, 16, 16, 90, 220, 200, 28);
   scatter(ctx, 20, 60, 180, 200, 20);
@@ -54,7 +55,6 @@ const crystalTex = makeTexture(makeCanvas(ctx => {
 const voyageOreTex = makeTexture(makeCanvas(ctx => {
   noisy(ctx, 0, 0, 16, 16, 62, 58, 80, 22);
   scatter(ctx, 16, 40, 36, 60, 12);
-  // ore veins
   [[2,3],[3,2],[4,3],[3,4],[11,10],[12,9],[13,10],[12,11],[7,7]].forEach(([x,y]) => {
     ctx.fillStyle = `rgb(${clamp(100+(Math.random()-0.5)*20)},${clamp(60+(Math.random()-0.5)*20)},${clamp(200+(Math.random()-0.5)*20)})`;
     ctx.fillRect(x,y,1,1);
@@ -64,7 +64,6 @@ const voyageOreTex = makeTexture(makeCanvas(ctx => {
 
 const crystalBrickTex = makeTexture(makeCanvas(ctx => {
   noisy(ctx, 0, 0, 16, 16, 70, 190, 175, 20);
-  // brick lines
   for (let x = 0; x < 16; x++) {
     ctx.fillStyle = `rgb(${clamp(40+(Math.random()-0.5)*10)},${clamp(140+(Math.random()-0.5)*10)},${clamp(130+(Math.random()-0.5)*10)})`;
     ctx.fillRect(x, 4, 1, 1);
@@ -217,12 +216,116 @@ function initBackground() {
 }
 
 // ============================================================
-// BBMODEL LOADER
+// ANIMATION SYSTEM
 // ============================================================
 
-async function loadBBModel(url) {
-  const data = await fetch(url).then(r => r.json());
-  return buildBBModelGroup(data);
+function parseFrames(channelObj) {
+  if (!channelObj || typeof channelObj !== 'object') return [];
+  const entries = Object.entries(channelObj);
+  const frames = [];
+  for (const [tKey, val] of entries) {
+    const t = parseFloat(tKey);
+    if (isNaN(t)) continue;
+    let v;
+    if (Array.isArray(val)) v = val;
+    else if (val && Array.isArray(val.vector)) v = val.vector;
+    else continue;
+    frames.push({ t, v });
+  }
+  return frames.sort((a, b) => a.t - b.t);
+}
+
+function lerpFrames(frames, t) {
+  if (!frames.length) return [0, 0, 0];
+  if (t <= frames[0].t) return [...frames[0].v];
+  const last = frames[frames.length - 1];
+  if (t >= last.t) return [...last.v];
+  let i = 0;
+  while (i < frames.length - 1 && frames[i + 1].t <= t) i++;
+  const f0 = frames[i], f1 = frames[i + 1];
+  const a = (t - f0.t) / (f1.t - f0.t);
+  return [
+    f0.v[0] + (f1.v[0] - f0.v[0]) * a,
+    f0.v[1] + (f1.v[1] - f0.v[1]) * a,
+    f0.v[2] + (f1.v[2] - f0.v[2]) * a,
+  ];
+}
+
+class AnimationPlayer {
+  constructor(boneByName, animData, nameMap = {}) {
+    this.length = animData.animation_length;
+    this.entries = [];
+
+    for (const [animBone, boneAnim] of Object.entries(animData.bones)) {
+      const targetName = nameMap[animBone] !== undefined ? nameMap[animBone] : animBone;
+      const bone = boneByName.get(targetName);
+      if (!bone) continue;
+
+      const rotFrames = boneAnim.rotation ? parseFrames(boneAnim.rotation) : null;
+      const posFrames = boneAnim.position ? parseFrames(boneAnim.position) : null;
+      if (rotFrames || posFrames) {
+        this.entries.push({ bone, rotFrames, posFrames });
+      }
+    }
+  }
+
+  update(elapsedTime) {
+    const t = ((elapsedTime % this.length) + this.length) % this.length;
+    for (const { bone, rotFrames, posFrames } of this.entries) {
+      const rest = bone.userData.restPosition;
+      if (rotFrames) {
+        const [rx, ry, rz] = lerpFrames(rotFrames, t);
+        bone.rotation.set(rx * DEG2RAD, ry * DEG2RAD, rz * DEG2RAD, 'ZYX');
+      }
+      if (posFrames && rest) {
+        const [dx, dy, dz] = lerpFrames(posFrames, t);
+        bone.position.set(rest.x + dx * S, rest.y + dy * S, rest.z + dz * S);
+      }
+    }
+  }
+}
+
+// ============================================================
+// BBMODEL BONE LOADER
+// ============================================================
+
+function buildElementGeometry(el, boneOrigin, texW, texH) {
+  if (el.export === false) return null;
+
+  const [ox, oy, oz] = boneOrigin;
+  const x1 = (el.from[0] - ox) * S, y1 = (el.from[1] - oy) * S, z1 = (el.from[2] - oz) * S;
+  const x2 = (el.to[0] - ox) * S, y2 = (el.to[1] - oy) * S, z2 = (el.to[2] - oz) * S;
+
+  const faceDefs = [
+    { key: 'north', norm: [0, 0, -1], v: [[x2,y2,z1],[x1,y2,z1],[x1,y1,z1],[x2,y1,z1]] },
+    { key: 'south', norm: [0, 0,  1], v: [[x1,y2,z2],[x2,y2,z2],[x2,y1,z2],[x1,y1,z2]] },
+    { key: 'east',  norm: [1, 0,  0], v: [[x2,y2,z2],[x2,y2,z1],[x2,y1,z1],[x2,y1,z2]] },
+    { key: 'west',  norm: [-1,0,  0], v: [[x1,y2,z1],[x1,y2,z2],[x1,y1,z2],[x1,y1,z1]] },
+    { key: 'up',    norm: [0, 1,  0], v: [[x1,y2,z1],[x2,y2,z1],[x2,y2,z2],[x1,y2,z2]] },
+    { key: 'down',  norm: [0,-1,  0], v: [[x2,y1,z1],[x1,y1,z1],[x1,y1,z2],[x2,y1,z2]] },
+  ];
+
+  const positions = [], normals = [], uvs = [], idx = [];
+
+  for (const face of faceDefs) {
+    const fd = el.faces?.[face.key];
+    if (!fd || fd.texture == null || fd.texture < 0) continue;
+    const [u1, v1, u2, v2] = fd.uv;
+    const nu1 = u1 / texW, nv1 = v1 / texH, nu2 = u2 / texW, nv2 = v2 / texH;
+    const base = positions.length / 3;
+    for (const [vx, vy, vz] of face.v) { positions.push(vx, vy, vz); normals.push(...face.norm); }
+    uvs.push(nu1, nv1, nu2, nv1, nu2, nv2, nu1, nv2);
+    idx.push(base, base+1, base+2, base, base+2, base+3);
+  }
+
+  if (!positions.length) return null;
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+  geo.setAttribute('normal',   new THREE.BufferAttribute(new Float32Array(normals),   3));
+  geo.setAttribute('uv',       new THREE.BufferAttribute(new Float32Array(uvs),       2));
+  geo.setIndex(idx);
+  return geo;
 }
 
 function buildBBModelGroup(data) {
@@ -245,62 +348,105 @@ function buildBBModelGroup(data) {
     metalness: 0.0,
   });
 
-  const group = new THREE.Group();
-  const S = 1 / 16;
+  // Build element UUID → element lookup
+  const elementByUuid = new Map();
+  for (const el of data.elements) elementByUuid.set(el.uuid, el);
 
-  for (const el of data.elements) {
-    if (el.export === false) continue;
-
-    const [x1,y1,z1] = el.from.map(v => v*S);
-    const [x2,y2,z2] = el.to.map(v => v*S);
-
-    const faceDefs = [
-      { key:'north', norm:[0,0,-1], v:[[x2,y2,z1],[x1,y2,z1],[x1,y1,z1],[x2,y1,z1]] },
-      { key:'south', norm:[0,0, 1], v:[[x1,y2,z2],[x2,y2,z2],[x2,y1,z2],[x1,y1,z2]] },
-      { key:'east',  norm:[1,0, 0], v:[[x2,y2,z2],[x2,y2,z1],[x2,y1,z1],[x2,y1,z2]] },
-      { key:'west',  norm:[-1,0,0], v:[[x1,y2,z1],[x1,y2,z2],[x1,y1,z2],[x1,y1,z1]] },
-      { key:'up',    norm:[0,1, 0], v:[[x1,y2,z1],[x2,y2,z1],[x2,y2,z2],[x1,y2,z2]] },
-      { key:'down',  norm:[0,-1,0], v:[[x2,y1,z1],[x1,y1,z1],[x1,y1,z2],[x2,y1,z2]] },
-    ];
-
-    const positions = [], normals = [], uvs = [], idx = [];
-
-    for (const face of faceDefs) {
-      const fd = el.faces ? el.faces[face.key] : null;
-      if (!fd || fd.texture == null || fd.texture < 0) continue;
-
-      const [u1,v1,u2,v2] = fd.uv;
-      const nu1=u1/texW, nv1=v1/texH, nu2=u2/texW, nv2=v2/texH;
-      const base = positions.length / 3;
-
-      for (const [vx,vy,vz] of face.v) {
-        positions.push(vx, vy, vz);
-        normals.push(...face.norm);
-      }
-      uvs.push(nu1,nv1, nu2,nv1, nu2,nv2, nu1,nv2);
-      idx.push(base,base+1,base+2, base,base+2,base+3);
-    }
-
-    if (!positions.length) continue;
-
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
-    geo.setAttribute('normal',   new THREE.BufferAttribute(new Float32Array(normals),   3));
-    geo.setAttribute('uv',       new THREE.BufferAttribute(new Float32Array(uvs),       2));
-    geo.setIndex(idx);
-
-    group.add(new THREE.Mesh(geo, material));
+  // Build group UUID → group lookup
+  const groupByUuid = new Map();
+  for (const g of data.groups) {
+    if (g && typeof g === 'object' && g.uuid) groupByUuid.set(g.uuid, g);
   }
 
-  // Feet at y=0, centered on XZ
-  const box = new THREE.Box3().setFromObject(group);
-  const center = box.getCenter(new THREE.Vector3());
-  group.position.x -= center.x;
-  group.position.z -= center.z;
-  group.position.y -= box.min.y;
+  const boneByName = new Map();
+  const root = new THREE.Group();
 
-  return group;
+  function addElement(el, boneGroup, boneOrigin) {
+    if (!el || el.export === false) return;
+    const geo = buildElementGeometry(el, boneOrigin, texW, texH);
+    if (geo) boneGroup.add(new THREE.Mesh(geo, material));
+  }
+
+  function processItem(item, parentGroup, parentOrigin) {
+    if (typeof item === 'string') {
+      // Direct element UUID — add to parent bone
+      addElement(elementByUuid.get(item), parentGroup, parentOrigin);
+      return;
+    }
+    if (typeof item !== 'object' || !item.uuid) return;
+
+    // It's a group — create a bone THREE.Group
+    const group = groupByUuid.get(item.uuid);
+    if (!group) return;
+
+    const origin = group.origin || [0, 0, 0];
+    const boneGroup = new THREE.Group();
+    boneGroup.name = group.name;
+
+    // Position relative to parent's origin (bone-local coordinates)
+    boneGroup.position.set(
+      (origin[0] - parentOrigin[0]) * S,
+      (origin[1] - parentOrigin[1]) * S,
+      (origin[2] - parentOrigin[2]) * S
+    );
+    boneGroup.userData.restPosition = boneGroup.position.clone();
+
+    boneByName.set(group.name, boneGroup);
+    parentGroup.add(boneGroup);
+
+    for (const child of (item.children || [])) {
+      processItem(child, boneGroup, origin);
+    }
+  }
+
+  for (const item of (data.outliner || [])) {
+    processItem(item, root, [0, 0, 0]);
+  }
+
+  // Center model: feet at y=0, centered on XZ
+  const box = new THREE.Box3().setFromObject(root);
+  const center = box.getCenter(new THREE.Vector3());
+  root.position.x -= center.x;
+  root.position.z -= center.z;
+  root.position.y -= box.min.y;
+
+  return { group: root, boneByName };
 }
+
+async function loadBBModel(url) {
+  const data = await fetch(url).then(r => r.json());
+  return buildBBModelGroup(data);
+}
+
+// Fatling: animation bone names (Russian) → BBModel group names (English)
+const FATLING_IDLE_MAP = {
+  'тело':         'body',
+  'голова':       'head',
+  'левая рука':   'l arm',
+  'правая рука':  'r arm',
+  'флаг':         'flag',
+  'плащи перед':  'cloack f',
+  'плащи зад':    'cloack b',
+  'левая нога':   'l leg',
+  'правая нога':  'r leg',
+};
+
+// Crusher: animation bone names (Russian) → BBModel group names (English)
+const CRUSHER_IDLE_MAP = {
+  'тело':                     'body',
+  'голова':                   'head',
+  'кисть левая':              'l hand b',
+  'плече левое':              'l hand t',
+  'плече правое':             'r hand t',
+  'кисть правая':             'r hand b',
+  'задний плащ правой ноги':  'r leg cloack b',
+  'задний плащ левой ноги':   'l leg cloack b',
+  'цепь':                     'chain',
+  'левое бедро':              'l leg',
+  'правое бедро':             'r leg',
+  'левая пятка':              'l eg b',
+  'правая пятка':             'r leg b',
+};
 
 // ============================================================
 // HERO SCENE — VoyageM custom mobs
@@ -319,7 +465,7 @@ async function initHero() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-  // Lighting — crystal dungeon atmosphere
+  // Crystal dungeon lighting
   const ambient = new THREE.AmbientLight(0xc0b0f0, 0.45);
   scene.add(ambient);
 
@@ -342,28 +488,23 @@ async function initHero() {
   // Crystal block orbiters
   const orbiters = [];
   const orbitDefs = [
-    { angle: 0,             radius: 2.8, height: 0.9,  speed: 0.35, scale: 0.55 },
-    { angle: Math.PI*0.7,   radius: 2.4, height: 1.6,  speed: 0.28, scale: 0.4  },
-    { angle: Math.PI*1.4,   radius: 3.0, height: 0.4,  speed: 0.42, scale: 0.45 },
+    { angle: 0,           radius: 2.8, height: 0.9, speed: 0.35, scale: 0.55 },
+    { angle: Math.PI*0.7, radius: 2.4, height: 1.6, speed: 0.28, scale: 0.4  },
+    { angle: Math.PI*1.4, radius: 3.0, height: 0.4, speed: 0.42, scale: 0.45 },
   ];
 
-  let crystalMat = null;
-  // Try to load crystal bricks bbmodel, fall back to procedural
   try {
     const crystalData = await fetch('assets/models/crystal_bricks.bbmodel').then(r => r.json());
     for (const def of orbitDefs) {
-      const block = buildBBModelGroup(crystalData);
-      block.scale.setScalar(def.scale);
-      block.userData = { ...def };
-      scene.add(block);
-      orbiters.push(block);
+      const { group } = buildBBModelGroup(crystalData);
+      group.scale.setScalar(def.scale);
+      group.userData = { ...def };
+      scene.add(group);
+      orbiters.push(group);
     }
   } catch {
     for (const def of orbitDefs) {
-      const block = simpleBlock(crystalTex, {
-        emissive: new THREE.Color(0x00ffcc),
-        emissiveIntensity: 0.15,
-      });
+      const block = simpleBlock(crystalTex, { emissive: new THREE.Color(0x00ffcc), emissiveIntensity: 0.15 });
       block.scale.setScalar(def.scale);
       block.userData = { ...def };
       scene.add(block);
@@ -371,103 +512,109 @@ async function initHero() {
     }
   }
 
-  // Ground plane (faint)
-  const groundGeo = new THREE.CircleGeometry(3.5, 32);
-  const groundMat = new THREE.MeshStandardMaterial({
-    color: 0x1a0d2e,
-    transparent: true,
-    opacity: 0.45,
-    roughness: 0.95,
-  });
-  const ground = new THREE.Mesh(groundGeo, groundMat);
+  // Ground plane
+  const ground = new THREE.Mesh(
+    new THREE.CircleGeometry(3.5, 32),
+    new THREE.MeshStandardMaterial({ color: 0x1a0d2e, transparent: true, opacity: 0.45, roughness: 0.95 })
+  );
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -0.01;
   scene.add(ground);
 
   // Glow ring
-  const ringGeo = new THREE.RingGeometry(2.0, 2.3, 64);
-  const ringMat = new THREE.MeshBasicMaterial({
-    color: 0x44ffcc,
-    transparent: true,
-    opacity: 0.12,
-    side: THREE.DoubleSide,
-  });
-  const ring = new THREE.Mesh(ringGeo, ringMat);
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(2.0, 2.3, 64),
+    new THREE.MeshBasicMaterial({ color: 0x44ffcc, transparent: true, opacity: 0.12, side: THREE.DoubleSide })
+  );
   ring.rotation.x = -Math.PI / 2;
   ring.position.y = 0.02;
   scene.add(ring);
 
   // Particle sparkles
   const pCount = 80;
-  const pPositions = new Float32Array(pCount * 3);
+  const pPos = new Float32Array(pCount * 3);
   const pPhases = new Float32Array(pCount);
   for (let i = 0; i < pCount; i++) {
-    pPositions[i*3]   = (Math.random()-0.5)*5;
-    pPositions[i*3+1] = Math.random()*3.5;
-    pPositions[i*3+2] = (Math.random()-0.5)*3;
-    pPhases[i] = Math.random() * Math.PI * 2;
+    pPos[i*3]   = (Math.random()-0.5)*5;
+    pPos[i*3+1] = Math.random()*3.5;
+    pPos[i*3+2] = (Math.random()-0.5)*3;
+    pPhases[i]  = Math.random() * Math.PI * 2;
   }
   const pGeo = new THREE.BufferGeometry();
-  pGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+  const pAttr = new THREE.BufferAttribute(pPos, 3);
+  pGeo.setAttribute('position', pAttr);
   const particles = new THREE.Points(pGeo, new THREE.PointsMaterial({
-    color: 0x88ffee,
-    size: 0.025,
-    transparent: true,
-    opacity: 0.7,
-    sizeAttenuation: true,
+    color: 0x88ffee, size: 0.025, transparent: true, opacity: 0.7, sizeAttenuation: true,
   }));
   scene.add(particles);
 
-  // Load mobs
+  // Mob group container
   const mobs = new THREE.Group();
   scene.add(mobs);
 
-  let fatling = null, crusher = null;
-  const heroCanvas = canvas;
+  let fatlingPlayer = null, crusherPlayer = null;
 
-  // Show spinner-like placeholder while loading
-  heroCanvas.classList.add('loading');
+  canvas.classList.add('loading');
 
   try {
-    [fatling, crusher] = await Promise.all([
+    // Load models and animations in parallel
+    const [fatlingResult, crusherResult, fatlingAnim, crusherAnim] = await Promise.all([
       loadBBModel('assets/models/fatling.bbmodel'),
       loadBBModel('assets/models/crusher.bbmodel'),
+      fetch('assets/models/fatling.animation.json').then(r => r.json()).catch(() => null),
+      fetch('assets/models/crusher.animation.json').then(r => r.json()).catch(() => null),
     ]);
 
-    // Fatling: main character, slightly left and front
+    const fatling = fatlingResult.group;
+    const crusher = crusherResult.group;
+
     fatling.position.set(-0.5, 0, 0.3);
     fatling.rotation.y = Math.PI * 0.1;
     mobs.add(fatling);
 
-    // Crusher: behind-right, slightly smaller
     crusher.position.set(1.4, 0, -0.6);
     crusher.rotation.y = -Math.PI * 0.25;
     crusher.scale.setScalar(0.9);
     mobs.add(crusher);
 
-    heroCanvas.classList.remove('loading');
+    // Set up animation players for idle animations
+    if (fatlingAnim?.animations?.['animation.fatling.idle']) {
+      fatlingPlayer = new AnimationPlayer(
+        fatlingResult.boneByName,
+        fatlingAnim.animations['animation.fatling.idle'],
+        FATLING_IDLE_MAP
+      );
+    }
+
+    if (crusherAnim?.animations?.['animation.crasher.idle']) {
+      crusherPlayer = new AnimationPlayer(
+        crusherResult.boneByName,
+        crusherAnim.animations['animation.crasher.idle'],
+        CRUSHER_IDLE_MAP
+      );
+    }
+
+    canvas.classList.remove('loading');
   } catch (e) {
     console.warn('Mob load failed:', e);
-    heroCanvas.classList.remove('loading');
-    // Fallback: show crystal blocks
-    const fallback = new THREE.Group();
+    canvas.classList.remove('loading');
+    // Fallback: crystal blocks
     [crystalTex, purpleCrystalTex, voyageOreTex].forEach((tex, i) => {
       const b = simpleBlock(tex);
       b.position.set((i-1)*1.3, 0.5, 0);
-      fallback.add(b);
+      mobs.add(b);
     });
-    mobs.add(fallback);
   }
 
   // Mouse tilt
-  const heroPtr = { x:0, y:0, tx:0, ty:0 };
+  const heroPtr = { x: 0, y: 0, tx: 0, ty: 0 };
   const heroWrap = canvas.parentElement;
   heroWrap.addEventListener('pointermove', e => {
     const r = heroWrap.getBoundingClientRect();
-    heroPtr.tx = ((e.clientX-r.left)/r.width)*2-1;
-    heroPtr.ty = ((e.clientY-r.top)/r.height)*2-1;
+    heroPtr.tx = ((e.clientX - r.left) / r.width) * 2 - 1;
+    heroPtr.ty = ((e.clientY - r.top) / r.height) * 2 - 1;
   }, { passive: true });
-  heroWrap.addEventListener('pointerleave', () => { heroPtr.tx=0; heroPtr.ty=0; });
+  heroWrap.addEventListener('pointerleave', () => { heroPtr.tx = 0; heroPtr.ty = 0; });
 
   const applyTheme = () => {
     const light = document.documentElement.dataset.theme === 'light';
@@ -481,7 +628,7 @@ async function initHero() {
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
     renderer.setSize(w, h, false);
-    camera.aspect = w/h;
+    camera.aspect = w / h;
     camera.updateProjectionMatrix();
   }
   resize();
@@ -491,8 +638,6 @@ async function initHero() {
   const clock = new THREE.Clock();
   let running = true;
   document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) clock.start(); });
-
-  const pPos = pGeo.attributes.position;
 
   function loop() {
     requestAnimationFrame(loop);
@@ -510,6 +655,10 @@ async function initHero() {
     mobs.position.y = Math.sin(t * 0.7) * 0.07;
     mobs.position.x = heroPtr.x * 0.12;
 
+    // Idle animations — offset by 1s so they're out of phase
+    if (fatlingPlayer) fatlingPlayer.update(t);
+    if (crusherPlayer) crusherPlayer.update(t + 1.0);
+
     // Crystal block orbiters
     for (const b of orbiters) {
       const d = b.userData;
@@ -517,7 +666,7 @@ async function initHero() {
       b.position.set(
         Math.cos(d.angle) * d.radius,
         d.height + Math.sin(t * 0.9 + d.angle) * 0.2,
-        Math.sin(d.angle) * d.radius,
+        Math.sin(d.angle) * d.radius
       );
       b.rotation.x += dt * 0.7;
       b.rotation.y += dt * 0.9;
@@ -529,16 +678,16 @@ async function initHero() {
     // Ring pulse
     ring.material.opacity = 0.09 + Math.sin(t * 1.5) * 0.04;
 
-    // Particles: drift upward, wrap
+    // Particles drift upward and wrap
     for (let i = 0; i < pCount; i++) {
-      pPos.array[i*3+1] += dt * (0.15 + Math.sin(pPhases[i] + t*0.4) * 0.08);
-      if (pPos.array[i*3+1] > 3.8) {
-        pPos.array[i*3+1] = 0;
-        pPos.array[i*3]   = (Math.random()-0.5)*5;
-        pPos.array[i*3+2] = (Math.random()-0.5)*3;
+      pAttr.array[i*3+1] += dt * (0.15 + Math.sin(pPhases[i] + t * 0.4) * 0.08);
+      if (pAttr.array[i*3+1] > 3.8) {
+        pAttr.array[i*3+1] = 0;
+        pAttr.array[i*3]   = (Math.random()-0.5)*5;
+        pAttr.array[i*3+2] = (Math.random()-0.5)*3;
       }
     }
-    pPos.needsUpdate = true;
+    pAttr.needsUpdate = true;
 
     renderer.render(scene, camera);
   }
