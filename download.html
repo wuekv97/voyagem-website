@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Скачать лаунчер — voyageM!</title>
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
+  </script>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div id="nav-host"></div>
+
+  <main>
+    <section class="hero" style="padding: 64px 0 20px;">
+      <div class="container">
+        <div class="hero-kicker"><span class="hero-kicker-dot"></span><span>Бесплатно</span></div>
+        <h1 style="font-size: clamp(36px, 5vw, 52px);">Скачать <em>лаунчер</em></h1>
+        <p class="lead">Устанавливает Java, моды и нужные файлы автоматически. Запустите и играйте.</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 20px;">
+      <div class="container">
+        <div class="download-grid">
+          <a class="card download-card" href="https://github.com/wuekv97/voyagem-launcher/releases/latest/download/voyageM-Setup.msi">
+            <div class="download-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            </div>
+            <div>
+              <h3>Windows</h3>
+              <p>Установщик .msi · x64</p>
+            </div>
+            <span class="btn btn-primary download-btn">Скачать</span>
+          </a>
+          <a class="card download-card" href="https://github.com/wuekv97/voyagem-launcher/releases/latest/download/voyageM.dmg">
+            <div class="download-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75-.6 3.95-1.5A4.5 4.5 0 0 0 18 15a6 6 0 0 0-6-6 6 6 0 0 0-6 6 4.5 4.5 0 0 0 2.05 4.44C9.25 20.34 10.5 20.94 12 20.94z"/><path d="M12 3v5"/><path d="m8.5 5.5 3.5 2.5 3.5-2.5"/></svg>
+            </div>
+            <div>
+              <h3>macOS</h3>
+              <p>Образ .dmg · Intel &amp; Apple Silicon</p>
+            </div>
+            <span class="btn btn-primary download-btn">Скачать</span>
+          </a>
+        </div>
+        <p style="text-align:center; color: var(--text-dim); font-size: 13px; margin-top: 18px;">
+          Требуется macOS 12+ или Windows 10+. Лицензия Minecraft не нужна — поддерживаем оба режима.
+        </p>
+
+        <div class="card" style="margin-top: 48px; padding: 36px;">
+          <h3 style="font-size: 20px; margin-bottom: 20px;">Что делает лаунчер</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; color: var(--text-muted); font-size: 15px;">
+            <div>
+              <strong style="color: var(--text); display: block; margin-bottom: 6px;">Устанавливает Java 21</strong>
+              Не нужно ничего устанавливать вручную — лаунчер скачает нужную версию.
+            </div>
+            <div>
+              <strong style="color: var(--text); display: block; margin-bottom: 6px;">Моды сервера</strong>
+              Автоматически загружает актуальный пак модов для подключения к voyageM!
+            </div>
+            <div>
+              <strong style="color: var(--text); display: block; margin-bottom: 6px;">Лицензия не нужна</strong>
+              Работает как с лицензионным аккаунтом Minecraft, так и без него.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-host"></div>
+  <script src="partials.js"></script>
+  <script type="module" src="scene.js"></script>
+  <script>mount('download.html');</script>
+</body>
+</html>

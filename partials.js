@@ -6,6 +6,7 @@ const NAV_ITEMS = [
   { href: 'index.html', label: 'Главная' },
   { href: 'news.html', label: 'Новости' },
   { href: 'status.html', label: 'Серверы' },
+  { href: 'download.html', label: 'Лаунчер' },
   { href: 'account.html', label: 'Кабинет' },
 ];
 
@@ -80,7 +81,7 @@ function renderFooter() {
               <a href="account.html">Личный кабинет</a>
               <a href="${BLUEMAP_URL}" target="_blank" rel="noopener noreferrer">Карта мира</a>
               <a href="status.html#rules">Правила</a>
-              <a href="index.html#download">Лаунчер</a>
+              <a href="download.html">Лаунчер</a>
             </div>
             <div class="footer-col">
               <h5>Связь</h5>

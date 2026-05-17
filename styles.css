@@ -475,7 +475,7 @@ body > * { position: relative; z-index: 3; }
 /* Stats strip */
 .stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 0;
   margin: 64px 0;
   border: 1px solid var(--border);
@@ -879,7 +879,7 @@ body > * { position: relative; z-index: 3; }
   .features { grid-template-columns: 1fr; }
   .stats { grid-template-columns: repeat(2, 1fr); }
   .stat:nth-child(2) { border-right: none; }
-  .stat:nth-child(1), .stat:nth-child(2) { border-bottom: 1px solid var(--border); }
+  .stat:nth-child(1), .stat:nth-child(2) { border-bottom: none; }
   .status-grid { grid-template-columns: 1fr; }
   .account-grid { grid-template-columns: 1fr; }
   .account-sidebar { position: static; }
