@@ -4,13 +4,12 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
 
 // ============================================================
-// PROCEDURAL MINECRAFT TEXTURES (16x16 canvas, nearest filter)
+// PROCEDURAL TEXTURES (background floating blocks)
 // ============================================================
 
 function makeCanvas(fillFn) {
   const c = document.createElement('canvas');
-  c.width = 16;
-  c.height = 16;
+  c.width = 16; c.height = 16;
   const ctx = c.getContext('2d');
   ctx.imageSmoothingEnabled = false;
   fillFn(ctx);
@@ -27,126 +26,96 @@ function makeTexture(canvas) {
 }
 
 function noisy(ctx, x0, y0, w, h, r, g, b, range) {
-  for (let y = y0; y < y0 + h; y++) {
+  for (let y = y0; y < y0 + h; y++)
     for (let x = x0; x < x0 + w; x++) {
       const v = (Math.random() - 0.5) * range;
-      ctx.fillStyle = `rgb(${clamp(r + v)},${clamp(g + v)},${clamp(b + v)})`;
+      ctx.fillStyle = `rgb(${clamp(r+v)},${clamp(g+v)},${clamp(b+v)})`;
       ctx.fillRect(x, y, 1, 1);
     }
-  }
 }
 
-function scatter(ctx, count, r, g, b, range) {
-  for (let i = 0; i < count; i++) {
-    const x = Math.floor(Math.random() * 16);
-    const y = Math.floor(Math.random() * 16);
+function scatter(ctx, n, r, g, b, range) {
+  for (let i = 0; i < n; i++) {
     const v = (Math.random() - 0.5) * range;
-    ctx.fillStyle = `rgb(${clamp(r + v)},${clamp(g + v)},${clamp(b + v)})`;
-    ctx.fillRect(x, y, 1, 1);
+    ctx.fillStyle = `rgb(${clamp(r+v)},${clamp(g+v)},${clamp(b+v)})`;
+    ctx.fillRect(Math.floor(Math.random()*16), Math.floor(Math.random()*16), 1, 1);
   }
 }
 
-// --- Grass block faces ---
-const grassTop = makeTexture(makeCanvas((ctx) => {
-  noisy(ctx, 0, 0, 16, 16, 92, 166, 62, 24);
-  scatter(ctx, 26, 110, 190, 70, 18);
-  scatter(ctx, 14, 70, 130, 40, 14);
+// Crystal-themed textures
+const crystalTex = makeTexture(makeCanvas(ctx => {
+  noisy(ctx, 0, 0, 16, 16, 90, 220, 200, 28);
+  scatter(ctx, 20, 60, 180, 200, 20);
+  scatter(ctx, 10, 180, 255, 240, 14);
+  ctx.fillStyle = 'rgba(200,255,250,0.6)';
+  [[4,4],[11,3],[7,9],[3,12],[13,7]].forEach(([x,y]) => ctx.fillRect(x,y,1,1));
 }));
-const grassSide = makeTexture(makeCanvas((ctx) => {
-  noisy(ctx, 0, 0, 16, 4, 92, 166, 62, 22);
+
+const voyageOreTex = makeTexture(makeCanvas(ctx => {
+  noisy(ctx, 0, 0, 16, 16, 62, 58, 80, 22);
+  scatter(ctx, 16, 40, 36, 60, 12);
+  // ore veins
+  [[2,3],[3,2],[4,3],[3,4],[11,10],[12,9],[13,10],[12,11],[7,7]].forEach(([x,y]) => {
+    ctx.fillStyle = `rgb(${clamp(100+(Math.random()-0.5)*20)},${clamp(60+(Math.random()-0.5)*20)},${clamp(200+(Math.random()-0.5)*20)})`;
+    ctx.fillRect(x,y,1,1);
+  });
+  scatter(ctx, 6, 140, 90, 255, 18);
+}));
+
+const crystalBrickTex = makeTexture(makeCanvas(ctx => {
+  noisy(ctx, 0, 0, 16, 16, 70, 190, 175, 20);
+  // brick lines
   for (let x = 0; x < 16; x++) {
-    const grass = Math.random() < 0.55;
-    if (grass) {
-      const v = (Math.random() - 0.5) * 18;
-      ctx.fillStyle = `rgb(${clamp(92 + v)},${clamp(166 + v)},${clamp(62 + v)})`;
-    } else {
-      const v = (Math.random() - 0.5) * 18;
-      ctx.fillStyle = `rgb(${clamp(134 + v)},${clamp(96 + v)},${clamp(67 + v)})`;
-    }
-    ctx.fillRect(x, 3 + Math.floor(Math.random() * 2), 1, 1);
+    ctx.fillStyle = `rgb(${clamp(40+(Math.random()-0.5)*10)},${clamp(140+(Math.random()-0.5)*10)},${clamp(130+(Math.random()-0.5)*10)})`;
+    ctx.fillRect(x, 4, 1, 1);
+    ctx.fillRect(x, 12, 1, 1);
   }
-  noisy(ctx, 0, 5, 16, 11, 134, 96, 67, 26);
-  scatter(ctx, 18, 100, 70, 50, 14);
-}));
-const dirtTex = makeTexture(makeCanvas((ctx) => {
-  noisy(ctx, 0, 0, 16, 16, 134, 96, 67, 26);
-  scatter(ctx, 22, 100, 70, 50, 14);
-}));
-
-// --- Diamond ---
-const diamondTex = makeTexture(makeCanvas((ctx) => {
-  noisy(ctx, 0, 0, 16, 16, 108, 220, 224, 16);
-  ctx.fillStyle = 'rgb(54, 156, 172)';
-  const pattern = [[2, 2], [3, 2], [2, 3], [12, 2], [13, 2], [13, 3], [2, 12], [2, 13], [3, 13], [12, 13], [13, 13], [13, 12], [7, 7], [8, 7], [7, 8], [8, 8]];
-  pattern.forEach(([x, y]) => ctx.fillRect(x, y, 1, 1));
-  ctx.fillStyle = 'rgb(190, 245, 248)';
-  ctx.fillRect(5, 5, 1, 1);
-  ctx.fillRect(10, 10, 1, 1);
+  for (let y = 0; y < 4; y++) {
+    ctx.fillStyle = `rgb(${clamp(40)},${clamp(140)},${clamp(130)})`;
+    ctx.fillRect(8, y, 1, 1);
+    ctx.fillRect(0, y+5, 1, 1);
+    ctx.fillRect(8, y+13, 1, 1);
+  }
+  scatter(ctx, 8, 160, 240, 220, 14);
 }));
 
-// --- Gold ---
-const goldTex = makeTexture(makeCanvas((ctx) => {
-  noisy(ctx, 0, 0, 16, 16, 247, 201, 77, 18);
-  ctx.fillStyle = 'rgb(200, 148, 20)';
-  [[1, 1], [2, 1], [1, 2], [13, 1], [14, 1], [14, 2], [1, 13], [1, 14], [2, 14], [13, 14], [14, 14], [14, 13], [7, 7], [8, 8]].forEach(([x, y]) => ctx.fillRect(x, y, 1, 1));
-  ctx.fillStyle = 'rgb(255, 235, 140)';
-  ctx.fillRect(4, 4, 1, 1);
-  ctx.fillRect(11, 11, 1, 1);
+const purpleCrystalTex = makeTexture(makeCanvas(ctx => {
+  noisy(ctx, 0, 0, 16, 16, 130, 80, 200, 26);
+  scatter(ctx, 18, 100, 50, 180, 20);
+  scatter(ctx, 8, 200, 160, 255, 16);
+  [[5,5],[10,4],[3,10],[12,11]].forEach(([x,y]) => {
+    ctx.fillStyle = 'rgb(230,210,255)';
+    ctx.fillRect(x, y, 1, 1);
+  });
 }));
 
-// --- Emerald ---
-const emeraldTex = makeTexture(makeCanvas((ctx) => {
-  noisy(ctx, 0, 0, 16, 16, 82, 200, 105, 18);
-  ctx.fillStyle = 'rgb(32, 130, 60)';
-  [[2, 2], [3, 2], [2, 3], [12, 2], [13, 2], [2, 12], [2, 13], [13, 12], [13, 13], [7, 7], [8, 8]].forEach(([x, y]) => ctx.fillRect(x, y, 1, 1));
-  ctx.fillStyle = 'rgb(170, 245, 180)';
-  ctx.fillRect(5, 5, 1, 1);
-}));
-
-// --- Stone / Cobblestone ---
-const stoneTex = makeTexture(makeCanvas((ctx) => {
-  noisy(ctx, 0, 0, 16, 16, 130, 130, 130, 30);
-  scatter(ctx, 24, 100, 100, 100, 14);
-  scatter(ctx, 12, 170, 170, 170, 10);
-}));
-
-// --- Netherite (dark) ---
-const netherTex = makeTexture(makeCanvas((ctx) => {
+const netherTex = makeTexture(makeCanvas(ctx => {
   noisy(ctx, 0, 0, 16, 16, 68, 62, 62, 18);
-  ctx.fillStyle = 'rgb(28, 24, 24)';
-  [[2, 3], [3, 2], [12, 3], [13, 2], [2, 12], [3, 13], [12, 12], [13, 13], [6, 6], [7, 7], [8, 7], [9, 8]].forEach(([x, y]) => ctx.fillRect(x, y, 1, 1));
-  ctx.fillStyle = 'rgb(95, 88, 88)';
-  ctx.fillRect(4, 10, 1, 1);
-  ctx.fillRect(11, 4, 1, 1);
+  scatter(ctx, 12, 28, 24, 24, 12);
+  scatter(ctx, 8, 95, 88, 88, 8);
 }));
 
 // ============================================================
-// BLOCK FACTORIES
+// BOX BUILDERS
 // ============================================================
 
-function mat(tex) {
-  return new THREE.MeshStandardMaterial({ map: tex, roughness: 0.78, metalness: 0.04 });
+function mat(tex, opts = {}) {
+  return new THREE.MeshStandardMaterial({ map: tex, roughness: 0.78, metalness: 0.04, ...opts });
 }
 
-function simpleBlock(tex) {
-  const m = mat(tex);
-  return new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), [m, m, m, m, m, m]);
+function simpleBlock(tex, opts) {
+  const m = mat(tex, opts);
+  return new THREE.Mesh(new THREE.BoxGeometry(1,1,1), [m,m,m,m,m,m]);
 }
 
-function grassBlock() {
-  const side = mat(grassSide);
-  const top = mat(grassTop);
-  const bot = mat(dirtTex);
-  return new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), [side, side, top, bot, side, side]);
-}
-
-const BLOCK_FACTORIES = [
-  grassBlock,
-  () => simpleBlock(diamondTex),
-  () => simpleBlock(goldTex),
-  () => simpleBlock(emeraldTex),
-  () => simpleBlock(stoneTex),
+const BG_FACTORIES = [
+  () => simpleBlock(crystalTex),
+  () => simpleBlock(voyageOreTex),
+  () => simpleBlock(crystalBrickTex),
+  () => simpleBlock(purpleCrystalTex),
   () => simpleBlock(netherTex),
+  () => simpleBlock(crystalTex, { emissive: new THREE.Color(0x00ffcc), emissiveIntensity: 0.08 }),
+  () => simpleBlock(purpleCrystalTex, { emissive: new THREE.Color(0x8800ff), emissiveIntensity: 0.06 }),
 ];
 
 // ============================================================
@@ -165,22 +134,19 @@ function initBackground() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-  // Lights
   const ambient = new THREE.AmbientLight(0xffffff, 0.55);
   scene.add(ambient);
   const key = new THREE.DirectionalLight(0xfff2d0, 1.1);
   key.position.set(5, 8, 6);
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0x88aaff, 0.45);
+  const rim = new THREE.DirectionalLight(0x8844cc, 0.5);
   rim.position.set(-6, -2, -4);
   scene.add(rim);
 
-  // Blocks
   const blocks = [];
   const count = window.innerWidth < 720 ? 9 : 16;
   for (let i = 0; i < count; i++) {
-    const factory = BLOCK_FACTORIES[i % BLOCK_FACTORIES.length];
-    const b = factory();
+    const b = BG_FACTORIES[i % BG_FACTORIES.length]();
     const scale = 0.4 + Math.random() * 0.9;
     b.scale.setScalar(scale);
     const radius = 4 + Math.random() * 5;
@@ -191,39 +157,36 @@ function initBackground() {
       Math.sin(phi) * radius + (Math.random() - 0.5) * 2,
       Math.sin(theta) * radius * Math.cos(phi) - 4
     );
-    b.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+    b.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
     b.userData = {
-      rotX: (Math.random() - 0.5) * 0.2,
-      rotY: (Math.random() - 0.5) * 0.25,
-      bobOffset: Math.random() * Math.PI * 2,
-      bobAmp: 0.15 + Math.random() * 0.25,
+      rotX: (Math.random()-0.5)*0.2,
+      rotY: (Math.random()-0.5)*0.25,
+      bobOffset: Math.random()*Math.PI*2,
+      bobAmp: 0.15 + Math.random()*0.25,
     };
     scene.add(b);
     blocks.push(b);
   }
 
-  // Mouse parallax
-  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
-  window.addEventListener('pointermove', (e) => {
-    pointer.tx = (e.clientX / window.innerWidth) * 2 - 1;
-    pointer.ty = (e.clientY / window.innerHeight) * 2 - 1;
+  const pointer = { x:0, y:0, tx:0, ty:0 };
+  window.addEventListener('pointermove', e => {
+    pointer.tx = (e.clientX/window.innerWidth)*2-1;
+    pointer.ty = (e.clientY/window.innerHeight)*2-1;
   }, { passive: true });
 
-  // Fog — theme-aware
   const applyTheme = () => {
-    const isLight = document.documentElement.dataset.theme === 'light';
-    scene.fog = new THREE.Fog(isLight ? 0xF7F6F2 : 0x0B0B0E, 6, 22);
-    ambient.intensity = isLight ? 0.85 : 0.55;
-    key.intensity = isLight ? 0.85 : 1.1;
+    const light = document.documentElement.dataset.theme === 'light';
+    scene.fog = new THREE.Fog(light ? 0xF7F6F2 : 0x0B0B0E, 6, 22);
+    ambient.intensity = light ? 0.85 : 0.55;
+    key.intensity = light ? 0.85 : 1.1;
   };
   applyTheme();
   document.addEventListener('themechange', applyTheme);
 
   function resize() {
-    const w = canvas.clientWidth;
-    const h = canvas.clientHeight;
+    const w = canvas.clientWidth, h = canvas.clientHeight;
     renderer.setSize(w, h, false);
-    camera.aspect = w / h;
+    camera.aspect = w/h;
     camera.updateProjectionMatrix();
   }
   resize();
@@ -238,117 +201,287 @@ function initBackground() {
     if (!running) return;
     const dt = Math.min(clock.getDelta(), 0.05);
     const t = clock.elapsedTime;
-
     pointer.x += (pointer.tx - pointer.x) * 0.04;
     pointer.y += (pointer.ty - pointer.y) * 0.04;
     camera.position.x = pointer.x * 0.6;
     camera.position.y = -pointer.y * 0.4;
     camera.lookAt(0, 0, -4);
-
     for (const b of blocks) {
       b.rotation.x += b.userData.rotX * dt;
       b.rotation.y += b.userData.rotY * dt;
-      b.position.y += Math.sin(t * 0.7 + b.userData.bobOffset) * b.userData.bobAmp * dt * 0.6;
+      b.position.y += Math.sin(t*0.7 + b.userData.bobOffset) * b.userData.bobAmp * dt * 0.6;
     }
-
     renderer.render(scene, camera);
   }
   loop();
 }
 
 // ============================================================
-// HERO SCENE — stacked classic Minecraft earth slice
+// BBMODEL LOADER
 // ============================================================
 
-function initHero() {
+async function loadBBModel(url) {
+  const data = await fetch(url).then(r => r.json());
+  return buildBBModelGroup(data);
+}
+
+function buildBBModelGroup(data) {
+  const texW = data.resolution.width;
+  const texH = data.resolution.height;
+
+  const texSrc = data.textures[0].source;
+  const texture = new THREE.TextureLoader().load(texSrc);
+  texture.magFilter = THREE.NearestFilter;
+  texture.minFilter = THREE.NearestFilter;
+  texture.flipY = false;
+  texture.colorSpace = THREE.SRGBColorSpace;
+
+  const material = new THREE.MeshStandardMaterial({
+    map: texture,
+    transparent: true,
+    alphaTest: 0.05,
+    side: THREE.DoubleSide,
+    roughness: 0.85,
+    metalness: 0.0,
+  });
+
+  const group = new THREE.Group();
+  const S = 1 / 16;
+
+  for (const el of data.elements) {
+    if (el.export === false) continue;
+
+    const [x1,y1,z1] = el.from.map(v => v*S);
+    const [x2,y2,z2] = el.to.map(v => v*S);
+
+    const faceDefs = [
+      { key:'north', norm:[0,0,-1], v:[[x2,y2,z1],[x1,y2,z1],[x1,y1,z1],[x2,y1,z1]] },
+      { key:'south', norm:[0,0, 1], v:[[x1,y2,z2],[x2,y2,z2],[x2,y1,z2],[x1,y1,z2]] },
+      { key:'east',  norm:[1,0, 0], v:[[x2,y2,z2],[x2,y2,z1],[x2,y1,z1],[x2,y1,z2]] },
+      { key:'west',  norm:[-1,0,0], v:[[x1,y2,z1],[x1,y2,z2],[x1,y1,z2],[x1,y1,z1]] },
+      { key:'up',    norm:[0,1, 0], v:[[x1,y2,z1],[x2,y2,z1],[x2,y2,z2],[x1,y2,z2]] },
+      { key:'down',  norm:[0,-1,0], v:[[x2,y1,z1],[x1,y1,z1],[x1,y1,z2],[x2,y1,z2]] },
+    ];
+
+    const positions = [], normals = [], uvs = [], idx = [];
+
+    for (const face of faceDefs) {
+      const fd = el.faces ? el.faces[face.key] : null;
+      if (!fd || fd.texture == null || fd.texture < 0) continue;
+
+      const [u1,v1,u2,v2] = fd.uv;
+      const nu1=u1/texW, nv1=v1/texH, nu2=u2/texW, nv2=v2/texH;
+      const base = positions.length / 3;
+
+      for (const [vx,vy,vz] of face.v) {
+        positions.push(vx, vy, vz);
+        normals.push(...face.norm);
+      }
+      uvs.push(nu1,nv1, nu2,nv1, nu2,nv2, nu1,nv2);
+      idx.push(base,base+1,base+2, base,base+2,base+3);
+    }
+
+    if (!positions.length) continue;
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+    geo.setAttribute('normal',   new THREE.BufferAttribute(new Float32Array(normals),   3));
+    geo.setAttribute('uv',       new THREE.BufferAttribute(new Float32Array(uvs),       2));
+    geo.setIndex(idx);
+
+    group.add(new THREE.Mesh(geo, material));
+  }
+
+  // Feet at y=0, centered on XZ
+  const box = new THREE.Box3().setFromObject(group);
+  const center = box.getCenter(new THREE.Vector3());
+  group.position.x -= center.x;
+  group.position.z -= center.z;
+  group.position.y -= box.min.y;
+
+  return group;
+}
+
+// ============================================================
+// HERO SCENE — VoyageM custom mobs
+// ============================================================
+
+async function initHero() {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas) return;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 50);
-  camera.position.set(0, 0.3, 7);
-  camera.lookAt(0, 0, 0);
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 60);
+  camera.position.set(0, 1.8, 8);
+  camera.lookAt(0, 1.1, 0);
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-  const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+  // Lighting — crystal dungeon atmosphere
+  const ambient = new THREE.AmbientLight(0xc0b0f0, 0.45);
   scene.add(ambient);
-  const key = new THREE.DirectionalLight(0xfff2d0, 1.3);
-  key.position.set(4, 6, 5);
+
+  const key = new THREE.DirectionalLight(0xffd8a8, 1.5);
+  key.position.set(3, 7, 5);
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0xffc880, 0.7);
-  rim.position.set(-4, 3, -2);
+
+  const rim = new THREE.DirectionalLight(0x6622cc, 1.0);
+  rim.position.set(-5, 3, -4);
   scene.add(rim);
 
-  // Stack group — grass → dirt → stone (classic slice)
-  const stack = new THREE.Group();
-  const grass = grassBlock();
-  grass.position.y = 1;
-  const dirt = simpleBlock(dirtTex);
-  dirt.position.y = 0;
-  const stone = simpleBlock(stoneTex);
-  stone.position.y = -1;
-  stack.add(grass, dirt, stone);
-  stack.scale.setScalar(1.15);
-  scene.add(stack);
+  const fill = new THREE.DirectionalLight(0x00ccff, 0.4);
+  fill.position.set(1, -1, 4);
+  scene.add(fill);
 
-  // Orbiting small blocks
+  const crystalGlow = new THREE.PointLight(0x44ffcc, 1.2, 8);
+  crystalGlow.position.set(0, 1.5, 1.5);
+  scene.add(crystalGlow);
+
+  // Crystal block orbiters
   const orbiters = [];
-  [goldTex, diamondTex, emeraldTex].forEach((tex, i) => {
-    const b = simpleBlock(tex);
-    b.scale.setScalar(0.38);
-    b.userData = {
-      angle: (i / 3) * Math.PI * 2,
-      radius: 2.1,
-      height: [0.6, -0.2, 0.2][i],
-      speed: 0.4 + i * 0.05,
-    };
-    scene.add(b);
-    orbiters.push(b);
-  });
+  const orbitDefs = [
+    { angle: 0,             radius: 2.8, height: 0.9,  speed: 0.35, scale: 0.55 },
+    { angle: Math.PI*0.7,   radius: 2.4, height: 1.6,  speed: 0.28, scale: 0.4  },
+    { angle: Math.PI*1.4,   radius: 3.0, height: 0.4,  speed: 0.42, scale: 0.45 },
+  ];
 
-  // Particle dust
-  const particleGeo = new THREE.BufferGeometry();
-  const pCount = 60;
-  const positions = new Float32Array(pCount * 3);
-  for (let i = 0; i < pCount; i++) {
-    positions[i * 3] = (Math.random() - 0.5) * 5;
-    positions[i * 3 + 1] = (Math.random() - 0.5) * 4;
-    positions[i * 3 + 2] = (Math.random() - 0.5) * 3;
+  let crystalMat = null;
+  // Try to load crystal bricks bbmodel, fall back to procedural
+  try {
+    const crystalData = await fetch('assets/models/crystal_bricks.bbmodel').then(r => r.json());
+    for (const def of orbitDefs) {
+      const block = buildBBModelGroup(crystalData);
+      block.scale.setScalar(def.scale);
+      block.userData = { ...def };
+      scene.add(block);
+      orbiters.push(block);
+    }
+  } catch {
+    for (const def of orbitDefs) {
+      const block = simpleBlock(crystalTex, {
+        emissive: new THREE.Color(0x00ffcc),
+        emissiveIntensity: 0.15,
+      });
+      block.scale.setScalar(def.scale);
+      block.userData = { ...def };
+      scene.add(block);
+      orbiters.push(block);
+    }
   }
-  particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  const particles = new THREE.Points(
-    particleGeo,
-    new THREE.PointsMaterial({ color: 0xE8B547, size: 0.04, transparent: true, opacity: 0.55, sizeAttenuation: true })
-  );
+
+  // Ground plane (faint)
+  const groundGeo = new THREE.CircleGeometry(3.5, 32);
+  const groundMat = new THREE.MeshStandardMaterial({
+    color: 0x1a0d2e,
+    transparent: true,
+    opacity: 0.45,
+    roughness: 0.95,
+  });
+  const ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.01;
+  scene.add(ground);
+
+  // Glow ring
+  const ringGeo = new THREE.RingGeometry(2.0, 2.3, 64);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0x44ffcc,
+    transparent: true,
+    opacity: 0.12,
+    side: THREE.DoubleSide,
+  });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.y = 0.02;
+  scene.add(ring);
+
+  // Particle sparkles
+  const pCount = 80;
+  const pPositions = new Float32Array(pCount * 3);
+  const pPhases = new Float32Array(pCount);
+  for (let i = 0; i < pCount; i++) {
+    pPositions[i*3]   = (Math.random()-0.5)*5;
+    pPositions[i*3+1] = Math.random()*3.5;
+    pPositions[i*3+2] = (Math.random()-0.5)*3;
+    pPhases[i] = Math.random() * Math.PI * 2;
+  }
+  const pGeo = new THREE.BufferGeometry();
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+  const particles = new THREE.Points(pGeo, new THREE.PointsMaterial({
+    color: 0x88ffee,
+    size: 0.025,
+    transparent: true,
+    opacity: 0.7,
+    sizeAttenuation: true,
+  }));
   scene.add(particles);
 
+  // Load mobs
+  const mobs = new THREE.Group();
+  scene.add(mobs);
+
+  let fatling = null, crusher = null;
+  const heroCanvas = canvas;
+
+  // Show spinner-like placeholder while loading
+  heroCanvas.classList.add('loading');
+
+  try {
+    [fatling, crusher] = await Promise.all([
+      loadBBModel('assets/models/fatling.bbmodel'),
+      loadBBModel('assets/models/crusher.bbmodel'),
+    ]);
+
+    // Fatling: main character, slightly left and front
+    fatling.position.set(-0.5, 0, 0.3);
+    fatling.rotation.y = Math.PI * 0.1;
+    mobs.add(fatling);
+
+    // Crusher: behind-right, slightly smaller
+    crusher.position.set(1.4, 0, -0.6);
+    crusher.rotation.y = -Math.PI * 0.25;
+    crusher.scale.setScalar(0.9);
+    mobs.add(crusher);
+
+    heroCanvas.classList.remove('loading');
+  } catch (e) {
+    console.warn('Mob load failed:', e);
+    heroCanvas.classList.remove('loading');
+    // Fallback: show crystal blocks
+    const fallback = new THREE.Group();
+    [crystalTex, purpleCrystalTex, voyageOreTex].forEach((tex, i) => {
+      const b = simpleBlock(tex);
+      b.position.set((i-1)*1.3, 0.5, 0);
+      fallback.add(b);
+    });
+    mobs.add(fallback);
+  }
+
   // Mouse tilt
-  const heroPointer = { x: 0, y: 0, tx: 0, ty: 0 };
-  canvas.parentElement.addEventListener('pointermove', (e) => {
-    const r = canvas.getBoundingClientRect();
-    heroPointer.tx = ((e.clientX - r.left) / r.width) * 2 - 1;
-    heroPointer.ty = ((e.clientY - r.top) / r.height) * 2 - 1;
+  const heroPtr = { x:0, y:0, tx:0, ty:0 };
+  const heroWrap = canvas.parentElement;
+  heroWrap.addEventListener('pointermove', e => {
+    const r = heroWrap.getBoundingClientRect();
+    heroPtr.tx = ((e.clientX-r.left)/r.width)*2-1;
+    heroPtr.ty = ((e.clientY-r.top)/r.height)*2-1;
   }, { passive: true });
-  canvas.parentElement.addEventListener('pointerleave', () => {
-    heroPointer.tx = 0; heroPointer.ty = 0;
-  });
+  heroWrap.addEventListener('pointerleave', () => { heroPtr.tx=0; heroPtr.ty=0; });
 
   const applyTheme = () => {
-    const isLight = document.documentElement.dataset.theme === 'light';
-    ambient.intensity = isLight ? 0.85 : 0.6;
-    rim.intensity = isLight ? 0.4 : 0.7;
+    const light = document.documentElement.dataset.theme === 'light';
+    ambient.intensity = light ? 0.6 : 0.45;
+    rim.intensity = light ? 0.5 : 1.0;
+    crystalGlow.intensity = light ? 0.6 : 1.2;
   };
   applyTheme();
   document.addEventListener('themechange', applyTheme);
 
   function resize() {
-    const w = canvas.clientWidth;
-    const h = canvas.clientHeight;
+    const w = canvas.clientWidth, h = canvas.clientHeight;
     renderer.setSize(w, h, false);
-    camera.aspect = w / h;
+    camera.aspect = w/h;
     camera.updateProjectionMatrix();
   }
   resize();
@@ -359,32 +492,53 @@ function initHero() {
   let running = true;
   document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) clock.start(); });
 
+  const pPos = pGeo.attributes.position;
+
   function loop() {
     requestAnimationFrame(loop);
     if (!running) return;
     const dt = Math.min(clock.getDelta(), 0.05);
     const t = clock.elapsedTime;
 
-    heroPointer.x += (heroPointer.tx - heroPointer.x) * 0.06;
-    heroPointer.y += (heroPointer.ty - heroPointer.y) * 0.06;
+    // Smooth mouse tilt
+    heroPtr.x += (heroPtr.tx - heroPtr.x) * 0.06;
+    heroPtr.y += (heroPtr.ty - heroPtr.y) * 0.06;
 
-    stack.rotation.y += dt * 0.3;
-    stack.rotation.x = heroPointer.y * 0.15;
-    stack.position.y = Math.sin(t * 0.8) * 0.08;
-    stack.position.x = heroPointer.x * 0.15;
+    // Mob group: slow Y rotation + mouse tilt + bob
+    mobs.rotation.y += dt * 0.22;
+    mobs.rotation.x = heroPtr.y * 0.1;
+    mobs.position.y = Math.sin(t * 0.7) * 0.07;
+    mobs.position.x = heroPtr.x * 0.12;
 
+    // Crystal block orbiters
     for (const b of orbiters) {
-      b.userData.angle += dt * b.userData.speed;
+      const d = b.userData;
+      d.angle += dt * d.speed;
       b.position.set(
-        Math.cos(b.userData.angle) * b.userData.radius,
-        b.userData.height + Math.sin(t * 0.9 + b.userData.angle) * 0.15,
-        Math.sin(b.userData.angle) * b.userData.radius
+        Math.cos(d.angle) * d.radius,
+        d.height + Math.sin(t * 0.9 + d.angle) * 0.2,
+        Math.sin(d.angle) * d.radius,
       );
-      b.rotation.x += dt * 0.6;
-      b.rotation.y += dt * 0.8;
+      b.rotation.x += dt * 0.7;
+      b.rotation.y += dt * 0.9;
     }
 
-    particles.rotation.y += dt * 0.05;
+    // Crystal glow pulse
+    crystalGlow.intensity = 1.0 + Math.sin(t * 2.1) * 0.3;
+
+    // Ring pulse
+    ring.material.opacity = 0.09 + Math.sin(t * 1.5) * 0.04;
+
+    // Particles: drift upward, wrap
+    for (let i = 0; i < pCount; i++) {
+      pPos.array[i*3+1] += dt * (0.15 + Math.sin(pPhases[i] + t*0.4) * 0.08);
+      if (pPos.array[i*3+1] > 3.8) {
+        pPos.array[i*3+1] = 0;
+        pPos.array[i*3]   = (Math.random()-0.5)*5;
+        pPos.array[i*3+2] = (Math.random()-0.5)*3;
+      }
+    }
+    pPos.needsUpdate = true;
 
     renderer.render(scene, camera);
   }
