@@ -86,7 +86,7 @@ function renderFooter() {
               <h5>${t('footer.player')}</h5>
               <a href="account.html">${t('footer.account')}</a>
               <a href="${BLUEMAP_URL}" target="_blank" rel="noopener noreferrer">${t('footer.map')}</a>
-              <a href="status.html#rules">${t('footer.rules')}</a>
+              <a href="shop.html">${t('nav.shop')}</a>
               <a href="download.html">${t('footer.launcher')}</a>
             </div>
             <div class="footer-col">

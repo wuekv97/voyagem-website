@@ -20,9 +20,9 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=6"></script>
-  <script src="partials.js?v=6"></script>
-  <script type="module" src="scene.js?v=6"></script>
+  <script src="i18n.js?v=7"></script>
+  <script src="partials.js?v=7"></script>
+  <script type="module" src="scene.js?v=7"></script>
   <script>
     mount('account.html');
 
@@ -285,6 +285,39 @@
         ].join('')
       );
 
+      // ---- Skin ----
+      const skin = `
+        <section class="stats-section">
+          <header class="stats-section-head">
+            <span class="stats-section-eyebrow">${t('skin.eyebrow')}</span>
+            <h3>${t('skin.title')}</h3>
+          </header>
+          <div class="skin-grid">
+            <div class="skin-preview">
+              <div class="skin-preview-head">
+                <img id="skin-current" src="https://mc-heads.net/body/${user.nick}/96?nocache=${Date.now()}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'skin-preview-placeholder',textContent:'?'}))">
+              </div>
+              <div class="skin-preview-meta">
+                <strong>${user.nick}</strong>
+                <span id="skin-status">${t('skin.current')}</span>
+              </div>
+            </div>
+            <div class="skin-upload">
+              <label class="skin-drop" id="skin-drop">
+                <input type="file" id="skin-file" accept="image/png" hidden>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <strong>${t('skin.drop_title')}</strong>
+                <span>${t('skin.drop_hint')}</span>
+              </label>
+              <div class="skin-actions">
+                <button class="btn btn-primary" id="skin-submit" disabled>${t('skin.submit')}</button>
+                <button class="btn btn-ghost" id="skin-reset">${t('skin.reset')}</button>
+              </div>
+              <p class="skin-msg" id="skin-msg"></p>
+            </div>
+          </div>
+        </section>`;
+
       // ---- Quick access ----
       const quick = `
         <section class="stats-section">
@@ -300,7 +333,82 @@
           </div>
         </section>`;
 
-      statsHost.innerHTML = summary + combat + movement + world + life + quick;
+      statsHost.innerHTML = summary + combat + movement + world + life + skin + quick;
+      wireSkinUpload(user);
+    }
+
+    function wireSkinUpload(user) {
+      const drop = document.getElementById('skin-drop');
+      const fileIn = document.getElementById('skin-file');
+      const submit = document.getElementById('skin-submit');
+      const reset = document.getElementById('skin-reset');
+      const msg = document.getElementById('skin-msg');
+      let chosen = null;
+
+      function setMsg(text, kind) {
+        msg.textContent = text || '';
+        msg.dataset.kind = kind || '';
+      }
+
+      function setFile(f) {
+        if (!f) { chosen = null; submit.disabled = true; drop.classList.remove('has-file'); setMsg(''); return; }
+        if (f.type !== 'image/png') { setMsg(t('skin.err_format'), 'err'); return; }
+        if (f.size > 200_000) { setMsg(t('skin.err_size'), 'err'); return; }
+        const img = new Image();
+        img.onload = () => {
+          if (!((img.width === 64 && img.height === 64) || (img.width === 64 && img.height === 32))) {
+            setMsg(t('skin.err_dims'), 'err'); return;
+          }
+          chosen = f; submit.disabled = false;
+          drop.classList.add('has-file');
+          drop.querySelector('strong').textContent = f.name;
+          drop.querySelector('span').textContent = `${img.width}×${img.height} · ${(f.size/1024).toFixed(1)} KB`;
+          setMsg(t('skin.ready'), 'ok');
+        };
+        img.onerror = () => setMsg(t('skin.err_format'), 'err');
+        img.src = URL.createObjectURL(f);
+      }
+
+      fileIn.onchange = () => setFile(fileIn.files[0]);
+      drop.ondragover = (e) => { e.preventDefault(); drop.classList.add('drag'); };
+      drop.ondragleave = () => drop.classList.remove('drag');
+      drop.ondrop = (e) => {
+        e.preventDefault();
+        drop.classList.remove('drag');
+        setFile(e.dataTransfer.files[0]);
+      };
+
+      reset.onclick = () => {
+        fileIn.value = ''; setFile(null);
+        drop.querySelector('strong').textContent = t('skin.drop_title');
+        drop.querySelector('span').textContent = t('skin.drop_hint');
+      };
+
+      submit.onclick = async () => {
+        if (!chosen) return;
+        submit.disabled = true; submit.textContent = t('skin.uploading');
+        setMsg('');
+        try {
+          const fd = new FormData();
+          fd.append('skin', chosen);
+          fd.append('token', user.token || '');
+          const res = await fetch('/api/skin', { method: 'POST', body: fd });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            setMsg(data.error || t('skin.err_upload'), 'err');
+            submit.disabled = false; submit.textContent = t('skin.submit');
+            return;
+          }
+          setMsg(t('skin.uploaded'), 'ok');
+          submit.textContent = t('skin.submit');
+          // Refresh preview
+          const cur = document.getElementById('skin-current');
+          if (cur && cur.tagName === 'IMG') cur.src = `https://mc-heads.net/body/${user.nick}/96?nocache=${Date.now()}`;
+        } catch {
+          setMsg(t('skin.err_conn'), 'err');
+          submit.disabled = false; submit.textContent = t('skin.submit');
+        }
+      };
     }
 
     const u = getUser();
