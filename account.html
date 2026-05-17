@@ -6,7 +6,7 @@
   <title data-i18n="account.title_tag">Личный кабинет — voyageM!</title>
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=2">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=2">
-  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="styles.css?v=11">
   <script>
     (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
   </script>
@@ -20,9 +20,13 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=10"></script>
-  <script src="partials.js?v=10"></script>
-  <script type="module" src="scene.js?v=10"></script>
+  <script src="i18n.js?v=11"></script>
+  <script src="partials.js?v=11"></script>
+  <script type="module" src="scene.js?v=11"></script>
+  <script type="module">
+    import * as skinview3d from 'https://cdn.jsdelivr.net/npm/skinview3d@3.0.1/+esm';
+    window.skinview3d = skinview3d;
+  </script>
   <script>
     mount('account.html');
 
@@ -337,85 +341,46 @@
       wireSkinUpload(user);
     }
 
-    // Render a Minecraft 64×64 or 64×32 skin texture as a front-facing body on canvas
-    function renderSkinToCanvas(canvas, img) {
-      const ctx = canvas.getContext('2d');
-      ctx.imageSmoothingEnabled = false;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // Logical body: 16 wide × 32 tall (head=8×8, body=8×12, arms=4×12, legs=4×12)
-      const LW = 16, LH = 32;
-      const px = Math.floor(Math.min(canvas.width / LW, canvas.height / LH));
-      const offX = Math.floor((canvas.width - LW * px) / 2);
-      const offY = Math.floor((canvas.height - LH * px) / 2);
-      const slim = false;
-
-      function blit(sx, sy, sw, sh, dx, dy, flip) {
-        if (flip) {
-          ctx.save();
-          ctx.translate((offX + (dx + sw) * px), 0);
-          ctx.scale(-1, 1);
-          ctx.drawImage(img, sx, sy, sw, sh, 0, offY + dy * px, sw * px, sh * px);
-          ctx.restore();
-        } else {
-          ctx.drawImage(img, sx, sy, sw, sh, offX + dx * px, offY + dy * px, sw * px, sh * px);
-        }
+    // 3D skin viewer via skinview3d (lazy-init, reused across uploads)
+    let _skinViewer = null;
+    async function waitForSkinView3d() {
+      for (let i = 0; i < 40; i++) {
+        if (window.skinview3d?.SkinViewer) return window.skinview3d;
+        await new Promise(r => setTimeout(r, 80));
       }
-
-      // Base layers
-      blit(8, 8, 8, 8, 4, 0);            // head front
-      blit(20, 20, 8, 12, 4, 8);         // body front
-      blit(44, 20, 4, 12, 0, 8);         // right arm front
-      blit(4, 20, 4, 12, 4, 20);         // right leg front
-      const has64h = img.height === 64;
-      if (has64h) {
-        blit(36, 52, 4, 12, 12, 8);      // left arm front
-        blit(20, 52, 4, 12, 8, 20);      // left leg front
-      } else {
-        // 64×32 legacy: mirror right side
-        blit(44, 20, 4, 12, 12, 8, true);
-        blit(4, 20, 4, 12, 8, 20, true);
-      }
-      // Overlay layers (hat / jacket / sleeves / pants) — only for 64×64
-      if (has64h) {
-        blit(40, 8, 8, 8, 4, 0);         // hat
-        blit(20, 36, 8, 12, 4, 8);       // jacket
-        blit(44, 36, 4, 12, 0, 8);       // right sleeve
-        blit(52, 52, 4, 12, 12, 8);      // left sleeve
-        blit(4, 36, 4, 12, 4, 20);       // right pant
-        blit(4, 52, 4, 12, 8, 20);       // left pant
-      }
+      return null;
     }
-
-    async function loadImg(src) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = src;
+    async function getSkinViewer(canvas) {
+      if (_skinViewer && _skinViewer.canvas === canvas) return _skinViewer;
+      const lib = await waitForSkinView3d();
+      if (!lib) return null;
+      _skinViewer = new lib.SkinViewer({
+        canvas,
+        width: canvas.width || 160,
+        height: canvas.height || 320,
       });
+      _skinViewer.fov = 22;
+      _skinViewer.zoom = 0.7;
+      _skinViewer.animation = new lib.IdleAnimation();
+      _skinViewer.autoRotate = true;
+      _skinViewer.autoRotateSpeed = 0.6;
+      return _skinViewer;
     }
 
     async function refreshPreview(user, sourceUrl) {
       const canvas = document.getElementById('skin-canvas');
       if (!canvas) return;
+      const viewer = await getSkinViewer(canvas);
+      if (!viewer) return;
       const urls = sourceUrl
         ? [sourceUrl]
         : [`/api/skin/${user.nick}.png?t=${Date.now()}`, `https://mc-heads.net/skin/${user.nick}`];
       for (const url of urls) {
         try {
-          const img = await loadImg(url);
-          renderSkinToCanvas(canvas, img);
+          await viewer.loadSkin(url);
           return;
         } catch {}
       }
-      // Fallback: leave canvas empty with placeholder text
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#a1a1aa';
-      ctx.font = '72px serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('?', canvas.width / 2, canvas.height / 2);
     }
 
     function wireSkinUpload(user) {
@@ -435,13 +400,13 @@
 
       refreshPreview(user);
 
-      function setFile(f) {
+      async function setFile(f) {
         if (chosenObjectUrl) { URL.revokeObjectURL(chosenObjectUrl); chosenObjectUrl = null; }
         if (!f) { chosen = null; submit.disabled = true; drop.classList.remove('has-file'); setMsg(''); return; }
         if (f.type !== 'image/png') { setMsg(t('skin.err_format'), 'err'); return; }
         if (f.size > 200_000) { setMsg(t('skin.err_size'), 'err'); return; }
         const img = new Image();
-        img.onload = () => {
+        img.onload = async () => {
           if (!((img.width === 64 && img.height === 64) || (img.width === 64 && img.height === 32))) {
             setMsg(t('skin.err_dims'), 'err'); return;
           }
@@ -450,8 +415,11 @@
           drop.querySelector('strong').textContent = f.name;
           drop.querySelector('span').textContent = `${img.width}×${img.height} · ${(f.size/1024).toFixed(1)} KB`;
           setMsg(t('skin.ready'), 'ok');
-          // Live preview of the chosen file before submit
-          renderSkinToCanvas(document.getElementById('skin-canvas'), img);
+          // Live 3D preview of the chosen file before submit
+          const viewer = await getSkinViewer(document.getElementById('skin-canvas'));
+          if (viewer) {
+            try { await viewer.loadSkin(chosenObjectUrl); } catch {}
+          }
           status.textContent = t('skin.preview_pending');
         };
         img.onerror = () => setMsg(t('skin.err_format'), 'err');
