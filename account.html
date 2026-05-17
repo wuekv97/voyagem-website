@@ -20,9 +20,9 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=7"></script>
-  <script src="partials.js?v=7"></script>
-  <script type="module" src="scene.js?v=7"></script>
+  <script src="i18n.js?v=8"></script>
+  <script src="partials.js?v=8"></script>
+  <script type="module" src="scene.js?v=8"></script>
   <script>
     mount('account.html');
 
@@ -399,7 +399,7 @@
             submit.disabled = false; submit.textContent = t('skin.submit');
             return;
           }
-          setMsg(t('skin.uploaded'), 'ok');
+          setMsg(data.applied ? t('skin.applied') : (data.hint || t('skin.uploaded')), 'ok');
           submit.textContent = t('skin.submit');
           // Refresh preview
           const cur = document.getElementById('skin-current');
