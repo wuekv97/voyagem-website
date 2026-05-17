@@ -20,9 +20,9 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=8"></script>
-  <script src="partials.js?v=8"></script>
-  <script type="module" src="scene.js?v=9"></script>
+  <script src="i18n.js?v=10"></script>
+  <script src="partials.js?v=10"></script>
+  <script type="module" src="scene.js?v=10"></script>
   <script>
     mount('account.html');
 
@@ -295,7 +295,7 @@
           <div class="skin-grid">
             <div class="skin-preview">
               <div class="skin-preview-head">
-                <img id="skin-current" src="https://mc-heads.net/body/${user.nick}/96?nocache=${Date.now()}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'skin-preview-placeholder',textContent:'?'}))">
+                <canvas id="skin-canvas" width="160" height="320"></canvas>
               </div>
               <div class="skin-preview-meta">
                 <strong>${user.nick}</strong>
@@ -337,20 +337,106 @@
       wireSkinUpload(user);
     }
 
+    // Render a Minecraft 64×64 or 64×32 skin texture as a front-facing body on canvas
+    function renderSkinToCanvas(canvas, img) {
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Logical body: 16 wide × 32 tall (head=8×8, body=8×12, arms=4×12, legs=4×12)
+      const LW = 16, LH = 32;
+      const px = Math.floor(Math.min(canvas.width / LW, canvas.height / LH));
+      const offX = Math.floor((canvas.width - LW * px) / 2);
+      const offY = Math.floor((canvas.height - LH * px) / 2);
+      const slim = false;
+
+      function blit(sx, sy, sw, sh, dx, dy, flip) {
+        if (flip) {
+          ctx.save();
+          ctx.translate((offX + (dx + sw) * px), 0);
+          ctx.scale(-1, 1);
+          ctx.drawImage(img, sx, sy, sw, sh, 0, offY + dy * px, sw * px, sh * px);
+          ctx.restore();
+        } else {
+          ctx.drawImage(img, sx, sy, sw, sh, offX + dx * px, offY + dy * px, sw * px, sh * px);
+        }
+      }
+
+      // Base layers
+      blit(8, 8, 8, 8, 4, 0);            // head front
+      blit(20, 20, 8, 12, 4, 8);         // body front
+      blit(44, 20, 4, 12, 0, 8);         // right arm front
+      blit(4, 20, 4, 12, 4, 20);         // right leg front
+      const has64h = img.height === 64;
+      if (has64h) {
+        blit(36, 52, 4, 12, 12, 8);      // left arm front
+        blit(20, 52, 4, 12, 8, 20);      // left leg front
+      } else {
+        // 64×32 legacy: mirror right side
+        blit(44, 20, 4, 12, 12, 8, true);
+        blit(4, 20, 4, 12, 8, 20, true);
+      }
+      // Overlay layers (hat / jacket / sleeves / pants) — only for 64×64
+      if (has64h) {
+        blit(40, 8, 8, 8, 4, 0);         // hat
+        blit(20, 36, 8, 12, 4, 8);       // jacket
+        blit(44, 36, 4, 12, 0, 8);       // right sleeve
+        blit(52, 52, 4, 12, 12, 8);      // left sleeve
+        blit(4, 36, 4, 12, 4, 20);       // right pant
+        blit(4, 52, 4, 12, 8, 20);       // left pant
+      }
+    }
+
+    async function loadImg(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
+
+    async function refreshPreview(user, sourceUrl) {
+      const canvas = document.getElementById('skin-canvas');
+      if (!canvas) return;
+      const urls = sourceUrl
+        ? [sourceUrl]
+        : [`/api/skin/${user.nick}.png?t=${Date.now()}`, `https://mc-heads.net/skin/${user.nick}`];
+      for (const url of urls) {
+        try {
+          const img = await loadImg(url);
+          renderSkinToCanvas(canvas, img);
+          return;
+        } catch {}
+      }
+      // Fallback: leave canvas empty with placeholder text
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#a1a1aa';
+      ctx.font = '72px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('?', canvas.width / 2, canvas.height / 2);
+    }
+
     function wireSkinUpload(user) {
       const drop = document.getElementById('skin-drop');
       const fileIn = document.getElementById('skin-file');
       const submit = document.getElementById('skin-submit');
       const reset = document.getElementById('skin-reset');
       const msg = document.getElementById('skin-msg');
+      const status = document.getElementById('skin-status');
       let chosen = null;
+      let chosenObjectUrl = null;
 
       function setMsg(text, kind) {
         msg.textContent = text || '';
         msg.dataset.kind = kind || '';
       }
 
+      refreshPreview(user);
+
       function setFile(f) {
+        if (chosenObjectUrl) { URL.revokeObjectURL(chosenObjectUrl); chosenObjectUrl = null; }
         if (!f) { chosen = null; submit.disabled = true; drop.classList.remove('has-file'); setMsg(''); return; }
         if (f.type !== 'image/png') { setMsg(t('skin.err_format'), 'err'); return; }
         if (f.size > 200_000) { setMsg(t('skin.err_size'), 'err'); return; }
@@ -364,9 +450,13 @@
           drop.querySelector('strong').textContent = f.name;
           drop.querySelector('span').textContent = `${img.width}×${img.height} · ${(f.size/1024).toFixed(1)} KB`;
           setMsg(t('skin.ready'), 'ok');
+          // Live preview of the chosen file before submit
+          renderSkinToCanvas(document.getElementById('skin-canvas'), img);
+          status.textContent = t('skin.preview_pending');
         };
         img.onerror = () => setMsg(t('skin.err_format'), 'err');
-        img.src = URL.createObjectURL(f);
+        chosenObjectUrl = URL.createObjectURL(f);
+        img.src = chosenObjectUrl;
       }
 
       fileIn.onchange = () => setFile(fileIn.files[0]);
@@ -382,6 +472,8 @@
         fileIn.value = ''; setFile(null);
         drop.querySelector('strong').textContent = t('skin.drop_title');
         drop.querySelector('span').textContent = t('skin.drop_hint');
+        status.textContent = t('skin.current');
+        refreshPreview(user);
       };
 
       submit.onclick = async () => {
@@ -401,9 +493,9 @@
           }
           setMsg(data.applied ? t('skin.applied') : (data.hint || t('skin.uploaded')), 'ok');
           submit.textContent = t('skin.submit');
-          // Refresh preview
-          const cur = document.getElementById('skin-current');
-          if (cur && cur.tagName === 'IMG') cur.src = `https://mc-heads.net/body/${user.nick}/96?nocache=${Date.now()}`;
+          // Refresh preview from the server's stored copy
+          await refreshPreview(user, `/api/skin/${user.nick}.png?t=${Date.now()}`);
+          status.textContent = data.applied ? t('skin.applied_label') : t('skin.queued_label');
         } catch {
           setMsg(t('skin.err_conn'), 'err');
           submit.disabled = false; submit.textContent = t('skin.submit');

@@ -1370,27 +1370,28 @@ body > * { position: relative; z-index: 3; }
 /* ---- Skin upload ---- */
 .skin-grid {
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 260px 1fr;
   gap: 18px;
 }
 .skin-preview {
   border: 1px solid var(--border);
   border-radius: 18px;
   background: var(--surface);
-  padding: 20px;
+  padding: 24px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 .skin-preview-head {
-  width: 96px; height: 144px;
+  width: 160px; height: 320px;
   display: grid; place-items: center;
   background: radial-gradient(60% 80% at 50% 40%, rgba(232,181,71,0.10), transparent 70%), var(--surface-2);
   border-radius: 14px;
   overflow: hidden;
 }
 .skin-preview-head img { width: 96px; height: auto; image-rendering: pixelated; }
+#skin-canvas { display: block; image-rendering: pixelated; }
 .skin-preview-placeholder { font-family: 'Bodoni Moda', serif; font-size: 64px; color: var(--text-dim); }
 .skin-preview-meta { text-align: center; }
 .skin-preview-meta strong { display: block; font-family: 'Bodoni Moda', serif; font-size: 18px; }
