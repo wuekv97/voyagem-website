@@ -1191,8 +1191,9 @@ body > * { position: relative; z-index: 3; }
 .account-grid-simple {
   display: grid;
   gap: 56px;
-  margin: 48px 0 96px;
-  max-width: 1180px;
+  margin: 48px auto 96px;
+  width: 100%;
+  max-width: 1140px;
 }
 
 /* ---- Profile header ---- */
@@ -1235,8 +1236,8 @@ body > * { position: relative; z-index: 3; }
 /* ---- Hero summary row (3 feature stats) ---- */
 .stats-summary {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
 }
 .stat-feature {
   display: flex;
@@ -1436,7 +1437,6 @@ body > * { position: relative; z-index: 3; }
 
 /* ---- Responsive ---- */
 @media (max-width: 1000px) {
-  .stats-summary { grid-template-columns: 1fr; gap: 14px; }
   .stat-feature { padding: 22px 24px; }
 }
 @media (max-width: 600px) {
