@@ -8,7 +8,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg?v=3">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=3">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=3">
-  <link rel="stylesheet" href="styles.css?v=14">
+  <link rel="stylesheet" href="styles.css?v=15">
   <script>
     (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
   </script>
@@ -156,42 +156,90 @@
           </div>
         </div>
 
-        <div class="features">
-          <div class="card feature">
-            <div class="feature-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <div class="bento-grid">
+
+          <article class="bento-card bento-launcher" data-tilt>
+            <span class="bento-num">01</span>
+            <div class="bento-deco bento-deco-launcher" aria-hidden="true">
+              <svg viewBox="0 0 200 200" fill="none">
+                <circle cx="100" cy="100" r="80" stroke="currentColor" stroke-width="0.7" opacity="0.18"/>
+                <circle cx="100" cy="100" r="55" stroke="currentColor" stroke-width="0.7" opacity="0.22"/>
+                <circle cx="100" cy="100" r="30" stroke="currentColor" stroke-width="0.7" opacity="0.3"/>
+                <path d="M100 60v50m0 0 14-14m-14 14-14-14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="74" y="124" width="52" height="4" rx="2" fill="currentColor"/>
+              </svg>
             </div>
-            <h3 data-i18n="features.launcher_title">Свой лаунчер</h3>
-            <p data-i18n="features.launcher_desc">Java, моды и нужные файлы устанавливаются автоматически. Ничего не настраивать — нажал и играешь.</p>
-          </div>
-          <div class="card feature">
-            <div class="feature-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><path d="M16 8 2 22"/><path d="M17.5 15H9"/></svg>
+            <div class="bento-body">
+              <h3 data-i18n="features.launcher_title">Свой лаунчер</h3>
+              <p data-i18n="features.launcher_desc">Java, моды и нужные файлы устанавливаются автоматически. Ничего не настраивать — нажал и играешь.</p>
+              <div class="bento-chips">
+                <span class="bento-chip">Windows .msi</span>
+                <span class="bento-chip">macOS .dmg</span>
+                <span class="bento-chip bento-chip-mono">~30s install</span>
+              </div>
+              <a href="download.html" class="bento-link" data-i18n="hero.cta_download">Скачать лаунчер →</a>
             </div>
+          </article>
+
+          <article class="bento-card bento-coreprotect" data-tilt>
+            <span class="bento-num">02</span>
             <h3 data-i18n="features.coreprotect_title">CoreProtect</h3>
             <p data-i18n="features.coreprotect_desc">Каждое действие логируется. Грифер пойман — откат за пару кликов. Ваше строительство в безопасности.</p>
-          </div>
-          <div class="card feature">
-            <div class="feature-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <div class="bento-rollback" aria-hidden="true">
+              <div class="bento-rollback-track">
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div class="bento-rollback-cursor">◀ rollback</div>
             </div>
+          </article>
+
+          <article class="bento-card bento-discord" data-tilt>
+            <span class="bento-num">03</span>
             <h3 data-i18n="features.discord_title">Discord сообщество</h3>
-            <p data-i18n="features.discord_desc">Голосовые каналы, общий чат, ивенты и помощь от админов в один клик. Никто не играет в одиночку.</p>
-          </div>
-          <div class="card feature">
-            <div class="feature-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22 16 8"/><path d="M17.5 6.5 22 2"/><path d="m14 6 4 4"/><path d="M7 17 3 21"/><path d="m10 14 4 4"/></svg>
+            <p data-i18n="features.discord_desc">Голосовые каналы, общий чат, ивенты и помощь от админов в один клик.</p>
+            <div class="bento-avatars" aria-hidden="true">
+              <span class="bento-av" style="--i:0">U</span>
+              <span class="bento-av" style="--i:1">M</span>
+              <span class="bento-av" style="--i:2">A</span>
+              <span class="bento-av" style="--i:3">+</span>
+              <span class="bento-online-dot"></span>
             </div>
+          </article>
+
+          <article class="bento-card bento-dungeons" data-tilt>
+            <span class="bento-num">04</span>
             <h3 data-i18n="features.dungeons_title">voyage dungeons</h3>
             <p data-i18n="features.dungeons_desc">Кастомное измерение с собственными мобами, боссами и лутом. Свой мод от команды сервера — не ванила.</p>
-          </div>
-          <div class="card feature">
-            <div class="feature-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg>
+            <div class="bento-mobs" aria-hidden="true">
+              <div class="bento-mob" title="Fatling">
+                <div class="bento-mob-head"></div>
+                <div class="bento-mob-body" style="background:#7a4ae0"></div>
+              </div>
+              <div class="bento-mob" title="Crusher">
+                <div class="bento-mob-head"></div>
+                <div class="bento-mob-body" style="background:#5a32a8"></div>
+              </div>
+              <div class="bento-mob bento-mob-boss" title="Grim Seraph">
+                <div class="bento-mob-head" style="box-shadow: 0 0 12px var(--accent)"></div>
+                <div class="bento-mob-body" style="background:linear-gradient(180deg,#e8b547,#8a5a18)"></div>
+              </div>
             </div>
+          </article>
+
+          <article class="bento-card bento-p2w" data-tilt>
+            <span class="bento-num">05</span>
             <h3 data-i18n="features.p2w_title">Никакого P2W</h3>
             <p data-i18n="features.p2w_desc">Все ресурсы добываются руками. Мы не продаём киты, флай и алмазы — только донатим на сервер, если хочется помочь.</p>
-          </div>
+            <div class="bento-p2w-display" aria-hidden="true">
+              <span class="bento-p2w-zero">0₽</span>
+              <span class="bento-p2w-label">pay · to · win</span>
+              <svg class="bento-p2w-cross" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                <line x1="20" y1="20" x2="80" y2="80"/>
+                <line x1="80" y1="20" x2="20" y2="80"/>
+              </svg>
+            </div>
+          </article>
+
         </div>
       </div>
     </section>
@@ -211,9 +259,9 @@
 
   <div id="footer-host"></div>
 
-  <script src="i18n.js?v=14"></script>
-  <script src="partials.js?v=14"></script>
-  <script type="module" src="scene.js?v=14"></script>
+  <script src="i18n.js?v=15"></script>
+  <script src="partials.js?v=15"></script>
+  <script type="module" src="scene.js?v=15"></script>
   <script>
     mount('index.html');
     (async () => {
