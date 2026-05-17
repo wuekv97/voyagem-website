@@ -355,12 +355,6 @@ function buildBBModelGroup(data) {
   const elementByUuid = new Map();
   for (const el of data.elements) elementByUuid.set(el.uuid, el);
 
-  // Build group UUID → group lookup
-  const groupByUuid = new Map();
-  for (const g of data.groups) {
-    if (g && typeof g === 'object' && g.uuid) groupByUuid.set(g.uuid, g);
-  }
-
   const boneByName = new Map();
   const root = new THREE.Group();
 
@@ -372,21 +366,16 @@ function buildBBModelGroup(data) {
 
   function processItem(item, parentGroup, parentOrigin) {
     if (typeof item === 'string') {
-      // Direct element UUID — add to parent bone
       addElement(elementByUuid.get(item), parentGroup, parentOrigin);
       return;
     }
     if (typeof item !== 'object' || !item.uuid) return;
 
-    // It's a group — create a bone THREE.Group
-    const group = groupByUuid.get(item.uuid);
-    if (!group) return;
-
-    const origin = group.origin || [0, 0, 0];
+    // Group object is inline in outliner — use it directly
+    const origin = item.origin || [0, 0, 0];
     const boneGroup = new THREE.Group();
-    boneGroup.name = group.name;
+    boneGroup.name = item.name || item.uuid;
 
-    // Position relative to parent's origin (bone-local coordinates)
     boneGroup.position.set(
       (origin[0] - parentOrigin[0]) * S,
       (origin[1] - parentOrigin[1]) * S,
@@ -394,7 +383,7 @@ function buildBBModelGroup(data) {
     );
     boneGroup.userData.restPosition = boneGroup.position.clone();
 
-    boneByName.set(group.name, boneGroup);
+    boneByName.set(boneGroup.name, boneGroup);
     parentGroup.add(boneGroup);
 
     for (const child of (item.children || [])) {
