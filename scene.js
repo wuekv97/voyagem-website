@@ -781,6 +781,24 @@ async function initMobPortrait(canvasId, mobKey) {
     group.position.y = baseY;
     scene.add(group);
     mobGroup = group;
+
+    // Auto-fit camera so the whole model is visible with padding.
+    // Aspect is forced to 1 because mob portrait wraps are roughly square (1/0.95).
+    group.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(group);
+    if (isFinite(box.min.y) && box.max.y > box.min.y) {
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      const padding = def.fitPadding ?? 1.5;
+      const fovRad = (def.fov || 32) * Math.PI / 180;
+      const aspect = 1; // canvas wrap is ~1:1; safe even if clientWidth not yet laid out
+      // Effective visible height needs to accommodate both Y and X (X scaled by aspect)
+      const effectiveHeight = Math.max(size.y, size.x / aspect) * padding;
+      const distance = (effectiveHeight / 2) / Math.tan(fovRad / 2);
+      camera.position.set(0, center.y, distance);
+      camera.lookAt(0, center.y, 0);
+    }
+
     const animData = await fetch(def.anim).then(r => r.json()).catch(() => null);
     if (animData?.animations?.[def.animKey]) {
       animPlayer = new AnimationPlayer(boneByName, animData.animations[def.animKey], def.map);
