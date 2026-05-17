@@ -342,10 +342,13 @@ function buildBBModelGroup(data) {
   const material = new THREE.MeshStandardMaterial({
     map: texture,
     transparent: true,
-    alphaTest: 0.05,
-    side: THREE.DoubleSide,
+    alphaTest: 0.1,
+    side: THREE.FrontSide,
     roughness: 0.85,
     metalness: 0.0,
+    polygonOffset: true,
+    polygonOffsetFactor: 1,
+    polygonOffsetUnits: 1,
   });
 
   // Build element UUID → element lookup

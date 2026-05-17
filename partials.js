@@ -1,6 +1,5 @@
 // Shared nav/footer renderer + server status + theme + account state
 const SERVER_IP = '158.220.89.78';
-const SERVER_PORT = 25565;
 const BLUEMAP_URL = `http://${SERVER_IP}:8100`;
 
 const NAV_ITEMS = [
@@ -79,8 +78,9 @@ function renderFooter() {
             <div class="footer-col">
               <h5>Игроку</h5>
               <a href="account.html">Личный кабинет</a>
-              <a href="${BLUEMAP_URL}" target="_blank" rel="noopener">Карта мира</a>
+              <a href="${BLUEMAP_URL}" target="_blank" rel="noopener noreferrer">Карта мира</a>
               <a href="status.html#rules">Правила</a>
+              <a href="index.html#download">Лаунчер</a>
             </div>
             <div class="footer-col">
               <h5>Связь</h5>
@@ -92,7 +92,7 @@ function renderFooter() {
         </div>
         <div class="footer-bottom">
           <span>© 2026 voyageM!</span>
-          <span>${SERVER_IP}</span>
+          <span>voyage<em>M!</em></span>
         </div>
       </div>
     </footer>`;

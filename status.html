@@ -31,7 +31,7 @@
               <div class="status-icon"><img src="assets/server-icon.png" alt="" onerror="this.style.display='none'"></div>
               <div class="status-main-title">
                 <h3>voyageM! Main <span class="pill online" id="main-pill"><span class="dot"></span><span id="main-pill-text">проверка…</span></span></h3>
-                <p>158.220.89.78</p>
+                <p>Основной выживач · Terra</p>
               </div>
             </div>
             <p style="color: var(--text-muted); font-size: 14px;" id="motd">Загружаем MOTD…</p>
@@ -42,8 +42,8 @@
               <div class="status-stat"><div class="status-stat-label">Генератор</div><div class="status-stat-value">Terra</div></div>
             </div>
             <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
-              <button class="btn btn-primary" onclick="copyIp()"><span id="copy-btn">Копировать IP</span></button>
-              <a class="btn btn-ghost" href="http://158.220.89.78:8100" target="_blank" rel="noopener">Открыть карту</a>
+              <a href="index.html#download" class="btn btn-primary">Скачать лаунчер</a>
+              <a class="btn btn-ghost bluemap-link" target="_blank" rel="noopener noreferrer">Открыть карту</a>
             </div>
           </div>
 
@@ -79,11 +79,11 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
             </div>
             <div>
-              <h5>BlueMap Web</h5>
-              <p>158.220.89.78:8100</p>
+              <h5>BlueMap — карта мира</h5>
+              <p>3D-карта в браузере</p>
             </div>
             <span class="pill online"><span class="dot"></span>online</span>
-            <a class="btn btn-ghost" href="http://158.220.89.78:8100" target="_blank" rel="noopener">Открыть</a>
+            <a class="btn btn-ghost bluemap-link" target="_blank" rel="noopener noreferrer">Открыть</a>
           </div>
         </div>
 
@@ -106,6 +106,7 @@
   <script type="module" src="scene.js"></script>
   <script>
     mount('status.html');
+    document.querySelectorAll('.bluemap-link').forEach(a => a.href = BLUEMAP_URL);
 
     async function refresh() {
       const s = await fetchServerStatus();

@@ -859,6 +859,17 @@ body > * { position: relative; z-index: 3; }
 .footer-bottom { border-top: 1px solid var(--border); padding-top: 22px; display: flex; justify-content: space-between; color: var(--text-dim); font-size: 13px; }
 
 /* =========================================
+   DOWNLOAD SECTION
+   ========================================= */
+.download-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+.download-card { display: flex; align-items: center; gap: 20px; padding: 28px 28px; text-decoration: none; transition: border-color .2s var(--ease), transform .2s var(--ease); cursor: pointer; }
+.download-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.download-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.download-card p { color: var(--text-muted); font-size: 13px; }
+.download-icon { width: 52px; height: 52px; min-width: 52px; display: flex; align-items: center; justify-content: center; background: var(--accent-soft); border-radius: 14px; color: var(--accent); }
+.download-btn { margin-left: auto; white-space: nowrap; }
+
+/* =========================================
    RESPONSIVE
    ========================================= */
 @media (max-width: 960px) {
