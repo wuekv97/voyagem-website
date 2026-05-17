@@ -1,0 +1,386 @@
+// Lightweight i18n: ru/en with auto-detect by browser locale + manual toggle.
+// Mark up HTML with data-i18n="key", data-i18n-html="key", data-i18n-placeholder="key".
+
+const T = {
+  ru: {
+    // Nav
+    'nav.home': 'Главная',
+    'nav.news': 'Новости',
+    'nav.servers': 'Серверы',
+    'nav.launcher': 'Лаунчер',
+    'nav.account': 'Кабинет',
+    'nav.login': 'Войти',
+    'theme.title': 'Переключить тему',
+    'lang.toggle': 'EN',
+    'lang.title': 'English / Русский',
+    // Footer
+    'footer.about': 'Ванильно-выживший мир с генератором Terra. Без платных привилегий — только честная игра и живое сообщество.',
+    'footer.project': 'Проект',
+    'footer.player': 'Игроку',
+    'footer.contact': 'Связь',
+    'footer.home': 'Главная',
+    'footer.news': 'Новости',
+    'footer.servers': 'Серверы',
+    'footer.account': 'Личный кабинет',
+    'footer.map': 'Карта мира',
+    'footer.rules': 'Правила',
+    'footer.launcher': 'Лаунчер',
+    // Index hero
+    'hero.kicker_check': 'Проверка статуса…',
+    'hero.kicker_online': (n) => `Онлайн · ${n} игроков сейчас`,
+    'hero.kicker_offline': 'Сервер оффлайн — зайдите позже',
+    'hero.title': 'Путешествие<br>в <em>новый</em> мир<br>Minecraft',
+    'hero.lead': 'Премиум survival с генератором Terra. Без платных привилегий, без pay-to-win — только честная игра, продуманный мир и живое сообщество.',
+    'hero.cta_download': 'Скачать лаунчер',
+    'hero.cta_status': 'Статус серверов',
+    'hero.badge_tag': 'voyage dungeons · 2026',
+    'hero.badge_mobs_strong': 'Fatling & Crusher',
+    'hero.badge_mobs_desc': 'кастомные мобы',
+    // Stats
+    'stats.online': 'Игроков онлайн',
+    'stats.version': 'Версия Paper',
+    // Features
+    'features.title': 'Что делает сервер <em>особенным</em>',
+    'features.subtitle': 'Мы убрали всё лишнее и оставили главное: чистый выживач, красивый мир и удобные инструменты.',
+    'features.pirates_title': 'Поддержка пиратов',
+    'features.pirates_desc': 'FastLogin + AuthMe: подключайтесь с лицензии или без — всё работает одинаково безопасно.',
+    'features.coreprotect_title': 'CoreProtect',
+    'features.coreprotect_desc': 'Каждое действие логируется. Грифер пойман — откат за пару кликов. Ваше строительство в безопасности.',
+    'features.bluemap_title': 'Живая карта BlueMap',
+    'features.bluemap_desc': 'Открытая 3D-карта в браузере — смотрите построения друзей, прокладывайте маршруты, делитесь координатами.',
+    'features.daylight_title': 'Вечный день',
+    'features.daylight_desc': 'doDaylightCycle отключён. Играем с красивым освещением без ночных набегов зомби, когда не хочется.',
+    'features.p2w_title': 'Никакого P2W',
+    'features.p2w_desc': 'Все ресурсы добываются руками. Мы не продаём киты, флай и алмазы — только донатим на сервер, если хочется помочь.',
+    // Download
+    'download.title_tag': 'Скачать лаунчер — voyageM!',
+    'download.kicker': 'Бесплатно',
+    'download.title': 'Скачать <em>лаунчер</em>',
+    'download.lead': 'Устанавливает Java, моды и нужные файлы автоматически. Запустите и играйте.',
+    'download.windows_desc': 'Установщик .msi · x64',
+    'download.macos_desc': 'Образ .dmg · Intel & Apple Silicon',
+    'download.btn': 'Скачать',
+    'download.requirements': 'Требуется macOS 12+ или Windows 10+. Лицензия Minecraft не нужна — поддерживаем оба режима.',
+    'download.about_title': 'Что делает лаунчер',
+    'download.java_title': 'Устанавливает Java 21',
+    'download.java_desc': 'Не нужно ничего устанавливать вручную — лаунчер скачает нужную версию.',
+    'download.mods_title': 'Моды сервера',
+    'download.mods_desc': 'Автоматически загружает актуальный пак модов для подключения к voyageM!',
+    'download.license_title': 'Лицензия не нужна',
+    'download.license_desc': 'Работает как с лицензионным аккаунтом Minecraft, так и без него.',
+    // Status
+    'status.title_tag': 'Статус серверов — voyageM!',
+    'status.kicker': 'Обновляется в реальном времени',
+    'status.title': 'Статус <em>серверов</em>',
+    'status.lead': 'Онлайн-игроков, TPS, пинг и список участников — всё в одном месте.',
+    'status.main_subtitle': 'Основной выживач · Terra',
+    'status.motd_loading': 'Загружаем MOTD…',
+    'status.motd_default': 'Ванильный survival на генераторе Terra',
+    'status.motd_offline': 'Сервер сейчас недоступен. Админы уже на связи — попробуйте через пару минут.',
+    'status.players': 'Игроков',
+    'status.version': 'Версия',
+    'status.seed': 'Сид',
+    'status.generator': 'Генератор',
+    'status.players_online': 'Игроки онлайн',
+    'status.players_empty': 'Сейчас никого нет — будьте первыми!',
+    'status.players_offline': 'Сервер оффлайн',
+    'status.players_loading': 'Загрузка…',
+    'status.registered': 'Зарегистрировано',
+    'status.no_registered': 'Никто ещё не зарегистрировался',
+    'status.api_down': 'API недоступен',
+    'status.other': 'Другие серверы',
+    'status.dungeons_sub': 'dungeons.voyagem.net · закрытое бета',
+    'status.bluemap_t': 'BlueMap — карта мира',
+    'status.bluemap_sub': '3D-карта в браузере',
+    'status.coming': 'Скоро',
+    'status.open': 'Открыть',
+    'status.open_map': 'Открыть карту',
+    'status.cta_download': 'Скачать лаунчер',
+    'status.pill_check': 'проверка…',
+    'status.rules_title': 'Правила сервера',
+    'status.rule_1': 'Уважительное общение в чате — без оскорблений и спама.',
+    'status.rule_2': 'Запрещён грифинг чужих построек и территории.',
+    'status.rule_3': 'Читы, макросы, x-ray — мгновенный бан.',
+    'status.rule_4': 'Дюпы и эксплойты сообщайте администрации, не используйте.',
+    'status.rule_5': 'Не занимайте территорию у спавна для своих баз.',
+    // News
+    'news.title_tag': 'Новости — voyageM!',
+    'news.kicker': 'Блог проекта',
+    'news.title': 'Новости <em>voyageM!</em>',
+    'news.lead': 'Обновления сервера, анонсы ивентов, патч-ноуты и всё, что происходит в мире.',
+    'news.tag_announce': 'Анонс',
+    'news.tag_patch': 'Патч',
+    'news.tag_feat': 'Фича',
+    'news.tag_event': 'Ивент',
+    'news.tag_release': 'Релиз',
+    'news.tag_admin': 'Админ',
+    'news.tag_community': 'Сообщество',
+    // Account
+    'account.title_tag': 'Личный кабинет — voyageM!',
+    'account.login_title': 'Войти в <em>voyageM!</em>',
+    'account.login_lead': 'Введите ник из Minecraft — кабинет привяжется к вашему игровому профилю.',
+    'account.nick_label': 'Ник',
+    'account.nick_ph': 'Steve',
+    'account.pwd_label': 'Пароль (AuthMe)',
+    'account.pwd_ph': '••••••••',
+    'account.login_btn': 'Войти',
+    'account.login_check': 'Проверка…',
+    'account.login_hint': 'Новый игрок? Зайдите на сервер и зарегистрируйтесь через /register.',
+    'account.err_short': 'Ник должен быть не короче 3 символов',
+    'account.err_pwd': 'Введите пароль',
+    'account.err_login': 'Ошибка входа',
+    'account.err_conn': 'Нет соединения с сервером',
+    'account.group_default': 'Выживший',
+    'account.tab_overview': 'Обзор',
+    'account.tab_profile': 'Профиль',
+    'account.tab_security': 'Безопасность',
+    'account.tab_logout': 'Выйти',
+    'account.stats_title': 'Статистика игры',
+    'account.hours_label': 'Часов в игре',
+    'account.blocks_label': 'Блоков поставлено',
+    'account.deaths_label': 'Смертей',
+    'account.quick_title': 'Быстрый доступ',
+    'account.quick_map': 'Карта мира',
+    'account.quick_status': 'Статус серверов',
+    'account.quick_news': 'Свежие новости',
+    'account.quick_dl': 'Скачать лаунчер',
+    'account.activity_title': 'Активность',
+    'account.reg_date': 'Дата регистрации',
+    'account.last_login': 'Последний вход',
+    'account.today': 'Сегодня',
+    'account.group_label': 'Группа',
+    'account.profile_title': 'Профиль',
+    'account.nick_field': 'Игровой ник',
+    'account.save_btn': 'Сохранить',
+    'account.saved': 'Сохранено ✓',
+    'account.security_title': 'Безопасность',
+    'account.cur_pwd': 'Текущий пароль',
+    'account.new_pwd': 'Новый пароль',
+    'account.new_pwd_ph': 'не меньше 6 символов',
+    'account.repeat_pwd': 'Повторите новый',
+    'account.change_pwd': 'Сменить пароль',
+    'account.2fa_title': 'Двухфакторная защита',
+    'account.2fa_desc': 'Подключите AuthMe 2FA, чтобы защитить аккаунт от угона.',
+    'account.2fa_btn': 'Настроить 2FA',
+    'hero.players_label': 'игроков сейчас',
+  },
+  en: {
+    // Nav
+    'nav.home': 'Home',
+    'nav.news': 'News',
+    'nav.servers': 'Servers',
+    'nav.launcher': 'Launcher',
+    'nav.account': 'Account',
+    'nav.login': 'Sign in',
+    'theme.title': 'Toggle theme',
+    'lang.toggle': 'RU',
+    'lang.title': 'Русский / English',
+    // Footer
+    'footer.about': 'A vanilla survival world on the Terra generator. No paid perks — just fair play and a real community.',
+    'footer.project': 'Project',
+    'footer.player': 'Player',
+    'footer.contact': 'Contact',
+    'footer.home': 'Home',
+    'footer.news': 'News',
+    'footer.servers': 'Servers',
+    'footer.account': 'Account',
+    'footer.map': 'Live map',
+    'footer.rules': 'Rules',
+    'footer.launcher': 'Launcher',
+    // Index hero
+    'hero.kicker_check': 'Checking status…',
+    'hero.kicker_online': (n) => `Online · ${n} players right now`,
+    'hero.kicker_offline': 'Server offline — try again later',
+    'hero.title': 'Journey<br>into a <em>new</em><br>Minecraft world',
+    'hero.lead': 'Premium survival on the Terra generator. No paid perks, no pay-to-win — only fair play, a thoughtful world, and a real community.',
+    'hero.cta_download': 'Download launcher',
+    'hero.cta_status': 'Server status',
+    'hero.badge_tag': 'voyage dungeons · 2026',
+    'hero.badge_mobs_strong': 'Fatling & Crusher',
+    'hero.badge_mobs_desc': 'custom mobs',
+    // Stats
+    'stats.online': 'Players online',
+    'stats.version': 'Paper version',
+    // Features
+    'features.title': 'What makes the server <em>special</em>',
+    'features.subtitle': 'We cut out the noise and kept what matters: pure survival, a gorgeous world, and the right tools.',
+    'features.pirates_title': 'Cracked client support',
+    'features.pirates_desc': 'FastLogin + AuthMe: connect with a Mojang account or without — both work safely.',
+    'features.coreprotect_title': 'CoreProtect',
+    'features.coreprotect_desc': 'Every action is logged. Griefer caught → rollback in a couple of clicks. Your builds are safe.',
+    'features.bluemap_title': 'Live BlueMap',
+    'features.bluemap_desc': 'Open 3D world map in your browser — explore friends\' builds, plan routes, share coordinates.',
+    'features.daylight_title': 'Eternal day',
+    'features.daylight_desc': 'doDaylightCycle is off. Play under beautiful light with no surprise nighttime zombie raids.',
+    'features.p2w_title': 'No pay-to-win',
+    'features.p2w_desc': 'All resources are earned by hand. We don\'t sell kits, fly, or diamonds — donations only support the server.',
+    // Download
+    'download.title_tag': 'Download launcher — voyageM!',
+    'download.kicker': 'Free',
+    'download.title': 'Download the <em>launcher</em>',
+    'download.lead': 'Installs Java, mods, and required files automatically. Launch and play.',
+    'download.windows_desc': 'Installer .msi · x64',
+    'download.macos_desc': '.dmg image · Intel & Apple Silicon',
+    'download.btn': 'Download',
+    'download.requirements': 'Requires macOS 12+ or Windows 10+. A Minecraft license is not required — both modes supported.',
+    'download.about_title': 'What the launcher does',
+    'download.java_title': 'Installs Java 21',
+    'download.java_desc': 'No need to install anything manually — the launcher downloads the right version.',
+    'download.mods_title': 'Server mods',
+    'download.mods_desc': 'Automatically fetches the current mod pack needed to connect to voyageM!',
+    'download.license_title': 'No license required',
+    'download.license_desc': 'Works with a legit Minecraft account or without it.',
+    // Status
+    'status.title_tag': 'Server status — voyageM!',
+    'status.kicker': 'Live, in real time',
+    'status.title': 'Server <em>status</em>',
+    'status.lead': 'Online players, TPS, ping, and the player list — all in one place.',
+    'status.main_subtitle': 'Main survival · Terra',
+    'status.motd_loading': 'Loading MOTD…',
+    'status.motd_default': 'Vanilla survival on the Terra generator',
+    'status.motd_offline': 'Server is currently down. Admins are on it — try again in a few minutes.',
+    'status.players': 'Players',
+    'status.version': 'Version',
+    'status.seed': 'Seed',
+    'status.generator': 'Generator',
+    'status.players_online': 'Players online',
+    'status.players_empty': 'Nobody is online — be the first!',
+    'status.players_offline': 'Server offline',
+    'status.players_loading': 'Loading…',
+    'status.registered': 'Registered',
+    'status.no_registered': 'No one has registered yet',
+    'status.api_down': 'API unavailable',
+    'status.other': 'Other servers',
+    'status.dungeons_sub': 'dungeons.voyagem.net · closed beta',
+    'status.bluemap_t': 'BlueMap — world map',
+    'status.bluemap_sub': '3D map in your browser',
+    'status.coming': 'Soon',
+    'status.open': 'Open',
+    'status.open_map': 'Open map',
+    'status.cta_download': 'Download launcher',
+    'status.pill_check': 'checking…',
+    'status.rules_title': 'Server rules',
+    'status.rule_1': 'Respectful chat — no insults, no spam.',
+    'status.rule_2': 'No griefing of other players\' builds or territory.',
+    'status.rule_3': 'Cheats, macros, x-ray — instant ban.',
+    'status.rule_4': 'Report dupes and exploits to admins; do not abuse them.',
+    'status.rule_5': 'Do not claim land near spawn for your bases.',
+    // News
+    'news.title_tag': 'News — voyageM!',
+    'news.kicker': 'Project blog',
+    'news.title': 'voyageM! <em>news</em>',
+    'news.lead': 'Server updates, event announcements, patch notes, and everything happening in the world.',
+    'news.tag_announce': 'Announce',
+    'news.tag_patch': 'Patch',
+    'news.tag_feat': 'Feature',
+    'news.tag_event': 'Event',
+    'news.tag_release': 'Release',
+    'news.tag_admin': 'Admin',
+    'news.tag_community': 'Community',
+    // Account
+    'account.title_tag': 'Account — voyageM!',
+    'account.login_title': 'Sign in to <em>voyageM!</em>',
+    'account.login_lead': 'Enter your Minecraft username — your account will link to your in-game profile.',
+    'account.nick_label': 'Username',
+    'account.nick_ph': 'Steve',
+    'account.pwd_label': 'Password (AuthMe)',
+    'account.pwd_ph': '••••••••',
+    'account.login_btn': 'Sign in',
+    'account.login_check': 'Checking…',
+    'account.login_hint': 'New player? Join the server and register with /register.',
+    'account.err_short': 'Username must be at least 3 characters',
+    'account.err_pwd': 'Enter a password',
+    'account.err_login': 'Login error',
+    'account.err_conn': 'No connection to the server',
+    'account.group_default': 'Survivor',
+    'account.tab_overview': 'Overview',
+    'account.tab_profile': 'Profile',
+    'account.tab_security': 'Security',
+    'account.tab_logout': 'Sign out',
+    'account.stats_title': 'Game stats',
+    'account.hours_label': 'Hours played',
+    'account.blocks_label': 'Blocks placed',
+    'account.deaths_label': 'Deaths',
+    'account.quick_title': 'Quick access',
+    'account.quick_map': 'World map',
+    'account.quick_status': 'Server status',
+    'account.quick_news': 'Latest news',
+    'account.quick_dl': 'Download launcher',
+    'account.activity_title': 'Activity',
+    'account.reg_date': 'Registration date',
+    'account.last_login': 'Last login',
+    'account.today': 'Today',
+    'account.group_label': 'Group',
+    'account.profile_title': 'Profile',
+    'account.nick_field': 'In-game username',
+    'account.save_btn': 'Save',
+    'account.saved': 'Saved ✓',
+    'account.security_title': 'Security',
+    'account.cur_pwd': 'Current password',
+    'account.new_pwd': 'New password',
+    'account.new_pwd_ph': 'at least 6 characters',
+    'account.repeat_pwd': 'Repeat new password',
+    'account.change_pwd': 'Change password',
+    'account.2fa_title': 'Two-factor protection',
+    'account.2fa_desc': 'Enable AuthMe 2FA to protect your account from theft.',
+    'account.2fa_btn': 'Set up 2FA',
+    'hero.players_label': 'players right now',
+  },
+};
+
+function detectLang() {
+  const saved = localStorage.getItem('vm_lang');
+  if (saved === 'ru' || saved === 'en') return saved;
+  const l = (navigator.language || 'en').toLowerCase();
+  return /^(ru|uk|be|kk)/.test(l) ? 'ru' : 'en';
+}
+
+let LANG = detectLang();
+document.documentElement.lang = LANG;
+
+function t(key, ...args) {
+  const val = (T[LANG] && T[LANG][key]) ?? T.ru[key];
+  if (typeof val === 'function') return val(...args);
+  return val ?? key;
+}
+
+function setLang(l) {
+  if (l !== 'ru' && l !== 'en') return;
+  localStorage.setItem('vm_lang', l);
+  location.reload();
+}
+
+function toggleLang() {
+  setLang(LANG === 'ru' ? 'en' : 'ru');
+}
+
+function applyI18n(root) {
+  root = root || document;
+  root.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    if (typeof val === 'string') el.textContent = val;
+  });
+  root.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    const val = t(key);
+    if (typeof val === 'string') el.innerHTML = val;
+  });
+  root.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    const val = t(key);
+    if (typeof val === 'string') el.placeholder = val;
+  });
+  root.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title');
+    const val = t(key);
+    if (typeof val === 'string') el.title = val;
+  });
+  // <title> tag if marked
+  const titleEl = document.querySelector('title[data-i18n]');
+  if (titleEl) {
+    const k = titleEl.getAttribute('data-i18n');
+    const v = t(k);
+    if (v) document.title = v;
+  }
+}

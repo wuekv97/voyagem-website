@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Личный кабинет — voyageM!</title>
+  <title data-i18n="account.title_tag">Личный кабинет — voyageM!</title>
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=2">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="styles.css">
@@ -20,8 +20,9 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="partials.js?v=2"></script>
-  <script type="module" src="scene.js?v=2"></script>
+  <script src="i18n.js?v=3"></script>
+  <script src="partials.js?v=3"></script>
+  <script type="module" src="scene.js?v=3"></script>
   <script>
     mount('account.html');
 
@@ -44,24 +45,24 @@
     function renderLogin() {
       host.innerHTML = `
         <div class="login-wrap">
-          <h2>Войти в <em style="color:var(--accent); font-style:normal;">voyageM!</em></h2>
-          <p>Введите ник из Minecraft — кабинет привяжется к вашему игровому профилю.</p>
-          <label for="nick">Ник</label>
-          <input id="nick" type="text" placeholder="Steve" autocomplete="username" required>
-          <label for="pwd">Пароль (AuthMe)</label>
-          <input id="pwd" type="password" placeholder="••••••••" autocomplete="current-password" required>
+          <h2>${t('account.login_title')}</h2>
+          <p>${t('account.login_lead')}</p>
+          <label for="nick">${t('account.nick_label')}</label>
+          <input id="nick" type="text" placeholder="${t('account.nick_ph')}" autocomplete="username" required>
+          <label for="pwd">${t('account.pwd_label')}</label>
+          <input id="pwd" type="password" placeholder="${t('account.pwd_ph')}" autocomplete="current-password" required>
           <p id="login-error" style="color: var(--danger); font-size: 13px; min-height: 20px; margin-top: 8px;"></p>
-          <button class="btn btn-primary btn-lg" id="login-btn">Войти</button>
-          <p class="login-hint">Новый игрок? Зайдите на сервер и зарегистрируйтесь через /register.</p>
+          <button class="btn btn-primary btn-lg" id="login-btn">${t('account.login_btn')}</button>
+          <p class="login-hint">${t('account.login_hint')}</p>
         </div>`;
       document.getElementById('login-btn').onclick = async () => {
         const nick = document.getElementById('nick').value.trim();
         const pwd = document.getElementById('pwd').value;
-        if (nick.length < 3) { alert('Ник должен быть не короче 3 символов'); return; }
-        if (pwd.length < 4) { alert('Введите пароль'); return; }
+        if (nick.length < 3) { alert(t('account.err_short')); return; }
+        if (pwd.length < 4) { alert(t('account.err_pwd')); return; }
         const btn = document.getElementById('login-btn');
         const errEl = document.getElementById('login-error');
-        btn.disabled = true; btn.textContent = 'Проверка…';
+        btn.disabled = true; btn.textContent = t('account.login_check');
         errEl.textContent = '';
         try {
           const res = await fetch('/api/auth/login', {
@@ -71,8 +72,8 @@
           });
           const data = await res.json();
           if (!res.ok) {
-            errEl.textContent = data.error || 'Ошибка входа';
-            btn.disabled = false; btn.textContent = 'Войти';
+            errEl.textContent = data.error || t('account.err_login');
+            btn.disabled = false; btn.textContent = t('account.login_btn');
             return;
           }
           saveUser({
@@ -81,13 +82,13 @@
             email: '',
             discord: '',
             joined: data.regdate ? new Date(Number(data.regdate)).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
-            group: 'Выживший',
+            group: t('account.group_default'),
             stats: { hours: 0, blocks: 0, deaths: 0 }
           });
           location.reload();
         } catch {
-          errEl.textContent = 'Нет соединения с сервером';
-          btn.disabled = false; btn.textContent = 'Войти';
+          errEl.textContent = t('account.err_conn');
+          btn.disabled = false; btn.textContent = t('account.login_btn');
         }
       };
     }
@@ -106,19 +107,19 @@
             <div class="account-nav" id="acc-nav">
               <button data-tab="overview" class="active">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-                Обзор
+                ${t('account.tab_overview')}
               </button>
               <button data-tab="profile">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                Профиль
+                ${t('account.tab_profile')}
               </button>
               <button data-tab="security">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                Безопасность
+                ${t('account.tab_security')}
               </button>
               <button data-tab="logout" style="color: var(--danger); margin-top: 16px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                Выйти
+                ${t('account.tab_logout')}
               </button>
             </div>
           </aside>
@@ -128,50 +129,50 @@
       const tabs = {
         overview: () => `
           <div class="card account-section">
-            <h3>Статистика игры</h3>
+            <h3>${t('account.stats_title')}</h3>
             <div class="playtime-grid">
-              <div class="playtime-card"><div class="playtime-value">${user.stats.hours}ч</div><div class="playtime-label">Часов в игре</div></div>
-              <div class="playtime-card"><div class="playtime-value">${user.stats.blocks.toLocaleString('ru')}</div><div class="playtime-label">Блоков поставлено</div></div>
-              <div class="playtime-card"><div class="playtime-value">${user.stats.deaths}</div><div class="playtime-label">Смертей</div></div>
+              <div class="playtime-card"><div class="playtime-value">${user.stats.hours}${LANG === 'en' ? 'h' : 'ч'}</div><div class="playtime-label">${t('account.hours_label')}</div></div>
+              <div class="playtime-card"><div class="playtime-value">${user.stats.blocks.toLocaleString('ru')}</div><div class="playtime-label">${t('account.blocks_label')}</div></div>
+              <div class="playtime-card"><div class="playtime-value">${user.stats.deaths}</div><div class="playtime-label">${t('account.deaths_label')}</div></div>
             </div>
           </div>
           <div class="card account-section">
-            <h3>Быстрый доступ</h3>
+            <h3>${t('account.quick_title')}</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-              <a class="btn btn-ghost" href="status.html">Карта мира</a>
-              <a class="btn btn-ghost" href="status.html">Статус серверов</a>
-              <a class="btn btn-ghost" href="news.html">Свежие новости</a>
-              <a class="btn btn-ghost" href="download.html">Скачать лаунчер</a>
+              <a class="btn btn-ghost" href="status.html">${t('account.quick_map')}</a>
+              <a class="btn btn-ghost" href="status.html">${t('account.quick_status')}</a>
+              <a class="btn btn-ghost" href="news.html">${t('account.quick_news')}</a>
+              <a class="btn btn-ghost" href="download.html">${t('account.quick_dl')}</a>
             </div>
           </div>
           <div class="card account-section">
-            <h3>Активность</h3>
-            <div class="field-row"><span class="field-label">Дата регистрации</span><span class="field-value">${user.joined}</span></div>
-            <div class="field-row"><span class="field-label">Последний вход</span><span class="field-value">Сегодня</span></div>
-            <div class="field-row"><span class="field-label">Группа</span><span class="field-value"><span class="news-tag" style="background: var(--accent-soft); color: var(--accent);">${user.group}</span></span></div>
+            <h3>${t('account.activity_title')}</h3>
+            <div class="field-row"><span class="field-label">${t('account.reg_date')}</span><span class="field-value">${user.joined}</span></div>
+            <div class="field-row"><span class="field-label">${t('account.last_login')}</span><span class="field-value">${t('account.today')}</span></div>
+            <div class="field-row"><span class="field-label">${t('account.group_label')}</span><span class="field-value"><span class="news-tag" style="background: var(--accent-soft); color: var(--accent);">${user.group}</span></span></div>
           </div>
         `,
         profile: () => `
           <div class="card account-section">
-            <h3>Профиль</h3>
-            <div class="field-row"><span class="field-label">Игровой ник</span><span class="field-value"><input id="f-nick" value="${user.nick}" readonly></span></div>
+            <h3>${t('account.profile_title')}</h3>
+            <div class="field-row"><span class="field-label">${t('account.nick_field')}</span><span class="field-value"><input id="f-nick" value="${user.nick}" readonly></span></div>
             <div class="field-row"><span class="field-label">Email</span><span class="field-value"><input id="f-email" type="email" value="${user.email}" placeholder="you@example.com"></span></div>
             <div class="field-row"><span class="field-label">Discord</span><span class="field-value"><input id="f-discord" value="${user.discord}" placeholder="username"></span></div>
-            <div class="field-row"><span class="field-label"></span><span class="field-value"><button class="btn btn-primary" id="save-profile">Сохранить</button></span></div>
+            <div class="field-row"><span class="field-label"></span><span class="field-value"><button class="btn btn-primary" id="save-profile">${t('account.save_btn')}</button></span></div>
           </div>
         `,
         security: () => `
           <div class="card account-section">
-            <h3>Безопасность</h3>
-            <div class="field-row"><span class="field-label">Текущий пароль</span><span class="field-value"><input type="password" placeholder="••••••••"></span></div>
-            <div class="field-row"><span class="field-label">Новый пароль</span><span class="field-value"><input type="password" placeholder="не меньше 6 символов"></span></div>
-            <div class="field-row"><span class="field-label">Повторите новый</span><span class="field-value"><input type="password"></span></div>
-            <div class="field-row"><span class="field-label"></span><span class="field-value"><button class="btn btn-primary">Сменить пароль</button></span></div>
+            <h3>${t('account.security_title')}</h3>
+            <div class="field-row"><span class="field-label">${t('account.cur_pwd')}</span><span class="field-value"><input type="password" placeholder="${t('account.pwd_ph')}"></span></div>
+            <div class="field-row"><span class="field-label">${t('account.new_pwd')}</span><span class="field-value"><input type="password" placeholder="${t('account.new_pwd_ph')}"></span></div>
+            <div class="field-row"><span class="field-label">${t('account.repeat_pwd')}</span><span class="field-value"><input type="password"></span></div>
+            <div class="field-row"><span class="field-label"></span><span class="field-value"><button class="btn btn-primary">${t('account.change_pwd')}</button></span></div>
           </div>
           <div class="card account-section">
-            <h3>Двухфакторная защита</h3>
-            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">Подключите AuthMe 2FA, чтобы защитить аккаунт от угона.</p>
-            <button class="btn btn-ghost">Настроить 2FA</button>
+            <h3>${t('account.2fa_title')}</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">${t('account.2fa_desc')}</p>
+            <button class="btn btn-ghost">${t('account.2fa_btn')}</button>
           </div>
         `,
       };
@@ -187,8 +188,8 @@
             user.discord = document.getElementById('f-discord').value;
             saveUser(user);
             const btn = document.getElementById('save-profile');
-            btn.textContent = 'Сохранено ✓';
-            setTimeout(() => (btn.textContent = 'Сохранить'), 1500);
+            btn.textContent = t('account.saved');
+            setTimeout(() => (btn.textContent = t('account.save_btn')), 1500);
           };
         }
       }

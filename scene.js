@@ -341,14 +341,11 @@ function buildBBModelGroup(data) {
 
   const material = new THREE.MeshStandardMaterial({
     map: texture,
-    transparent: true,
-    alphaTest: 0.1,
-    side: THREE.FrontSide,
+    transparent: false,
+    alphaTest: 0.5,
+    side: THREE.DoubleSide,
     roughness: 0.85,
     metalness: 0.0,
-    polygonOffset: true,
-    polygonOffsetFactor: 1,
-    polygonOffsetUnits: 1,
   });
 
   // Build element UUID → element lookup
@@ -641,11 +638,9 @@ async function initHero() {
     heroPtr.x += (heroPtr.tx - heroPtr.x) * 0.06;
     heroPtr.y += (heroPtr.ty - heroPtr.y) * 0.06;
 
-    // Mob group: slow Y rotation + mouse tilt + bob
-    mobs.rotation.y += dt * 0.22;
-    mobs.rotation.x = heroPtr.y * 0.1;
-    mobs.position.y = Math.sin(t * 0.7) * 0.07;
-    mobs.position.x = heroPtr.x * 0.12;
+    // Mob group: static with subtle mouse parallax — no auto-rotation
+    mobs.rotation.x = heroPtr.y * 0.06;
+    mobs.rotation.y = heroPtr.x * 0.08;
 
     // Idle animations — offset by 1s so they're out of phase
     if (fatlingPlayer) fatlingPlayer.update(t);
