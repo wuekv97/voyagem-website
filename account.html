@@ -20,9 +20,9 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=3"></script>
-  <script src="partials.js?v=3"></script>
-  <script type="module" src="scene.js?v=3"></script>
+  <script src="i18n.js?v=4"></script>
+  <script src="partials.js?v=4"></script>
+  <script type="module" src="scene.js?v=4"></script>
   <script>
     mount('account.html');
 
@@ -79,11 +79,8 @@
           saveUser({
             nick: data.username,
             token: data.token,
-            email: '',
-            discord: '',
             joined: data.regdate ? new Date(Number(data.regdate)).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
-            group: t('account.group_default'),
-            stats: { hours: 0, blocks: 0, deaths: 0 }
+            lastlogin: data.lastlogin ? new Date(Number(data.lastlogin)).toISOString().slice(0, 10) : null,
           });
           location.reload();
         } catch {
@@ -93,110 +90,125 @@
       };
     }
 
-    function renderDashboard(user) {
+    // ---------- Formatters ----------
+    const nf = new Intl.NumberFormat(LANG === 'en' ? 'en-US' : 'ru-RU');
+    const fmt = (n) => nf.format(Math.round(n || 0));
+    function fmtKm(cm) {
+      const km = (cm || 0) / 100000;
+      if (km >= 10) return fmt(km) + ' ' + t('account.km');
+      if (km >= 1) return km.toFixed(2) + ' ' + t('account.km');
+      const m = Math.round((cm || 0) / 100);
+      return fmt(m) + ' ' + t('account.m');
+    }
+    function fmtDuration(seconds) {
+      const s = seconds || 0;
+      const d = Math.floor(s / 86400);
+      const h = Math.floor((s % 86400) / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      if (d > 0) return `${d}${t('account.d')} ${h}${t('account.h')}`;
+      if (h > 0) return `${h}${t('account.h')} ${m}${t('account.m_time')}`;
+      return `${m}${t('account.m_time')}`;
+    }
+    function fmtMcKey(key) {
+      if (!key) return '—';
+      return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function statCard(value, label, sub) {
+      return `<div class="stat-card">
+        <div class="stat-card-value">${value}</div>
+        <div class="stat-card-label">${label}</div>
+        ${sub ? `<div class="stat-card-sub">${sub}</div>` : ''}
+      </div>`;
+    }
+
+    async function renderDashboard(user) {
+      // Skeleton first
       host.innerHTML = `
-        <div class="account-grid">
-          <aside class="account-sidebar">
-            <div class="account-profile">
-              <div class="account-avatar" id="avatar-box">
-                <img src="https://mc-heads.net/avatar/${user.nick}/80" alt="" style="width:80px;height:80px;border-radius:16px;" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'${user.nick[0].toUpperCase()}'}))">
-              </div>
-              <h3>${user.nick}</h3>
-              <p>${user.group}</p>
+        <div class="account-grid-simple">
+          <div class="profile-header card">
+            <img class="profile-avatar" src="https://mc-heads.net/avatar/${user.nick}/96" alt=""
+              onerror="this.style.display='none'">
+            <div class="profile-meta">
+              <h2>${user.nick}</h2>
+              <p class="profile-sub" id="profile-sub">${t('account.loading_stats')}</p>
             </div>
-            <div class="account-nav" id="acc-nav">
-              <button data-tab="overview" class="active">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-                ${t('account.tab_overview')}
-              </button>
-              <button data-tab="profile">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                ${t('account.tab_profile')}
-              </button>
-              <button data-tab="security">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                ${t('account.tab_security')}
-              </button>
-              <button data-tab="logout" style="color: var(--danger); margin-top: 16px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                ${t('account.tab_logout')}
-              </button>
-            </div>
-          </aside>
-          <section class="account-main" id="acc-main"></section>
+            <button class="btn btn-ghost btn-logout" id="btn-logout">${t('account.tab_logout')}</button>
+          </div>
+          <div id="stats-host"></div>
         </div>`;
+      document.getElementById('btn-logout').onclick = logout;
 
-      const tabs = {
-        overview: () => `
-          <div class="card account-section">
-            <h3>${t('account.stats_title')}</h3>
-            <div class="playtime-grid">
-              <div class="playtime-card"><div class="playtime-value">${user.stats.hours}${LANG === 'en' ? 'h' : 'ч'}</div><div class="playtime-label">${t('account.hours_label')}</div></div>
-              <div class="playtime-card"><div class="playtime-value">${user.stats.blocks.toLocaleString('ru')}</div><div class="playtime-label">${t('account.blocks_label')}</div></div>
-              <div class="playtime-card"><div class="playtime-value">${user.stats.deaths}</div><div class="playtime-label">${t('account.deaths_label')}</div></div>
-            </div>
-          </div>
-          <div class="card account-section">
-            <h3>${t('account.quick_title')}</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-              <a class="btn btn-ghost" href="status.html">${t('account.quick_map')}</a>
-              <a class="btn btn-ghost" href="status.html">${t('account.quick_status')}</a>
-              <a class="btn btn-ghost" href="news.html">${t('account.quick_news')}</a>
-              <a class="btn btn-ghost" href="download.html">${t('account.quick_dl')}</a>
-            </div>
-          </div>
-          <div class="card account-section">
-            <h3>${t('account.activity_title')}</h3>
-            <div class="field-row"><span class="field-label">${t('account.reg_date')}</span><span class="field-value">${user.joined}</span></div>
-            <div class="field-row"><span class="field-label">${t('account.last_login')}</span><span class="field-value">${t('account.today')}</span></div>
-            <div class="field-row"><span class="field-label">${t('account.group_label')}</span><span class="field-value"><span class="news-tag" style="background: var(--accent-soft); color: var(--accent);">${user.group}</span></span></div>
-          </div>
-        `,
-        profile: () => `
-          <div class="card account-section">
-            <h3>${t('account.profile_title')}</h3>
-            <div class="field-row"><span class="field-label">${t('account.nick_field')}</span><span class="field-value"><input id="f-nick" value="${user.nick}" readonly></span></div>
-            <div class="field-row"><span class="field-label">Email</span><span class="field-value"><input id="f-email" type="email" value="${user.email}" placeholder="you@example.com"></span></div>
-            <div class="field-row"><span class="field-label">Discord</span><span class="field-value"><input id="f-discord" value="${user.discord}" placeholder="username"></span></div>
-            <div class="field-row"><span class="field-label"></span><span class="field-value"><button class="btn btn-primary" id="save-profile">${t('account.save_btn')}</button></span></div>
-          </div>
-        `,
-        security: () => `
-          <div class="card account-section">
-            <h3>${t('account.security_title')}</h3>
-            <div class="field-row"><span class="field-label">${t('account.cur_pwd')}</span><span class="field-value"><input type="password" placeholder="${t('account.pwd_ph')}"></span></div>
-            <div class="field-row"><span class="field-label">${t('account.new_pwd')}</span><span class="field-value"><input type="password" placeholder="${t('account.new_pwd_ph')}"></span></div>
-            <div class="field-row"><span class="field-label">${t('account.repeat_pwd')}</span><span class="field-value"><input type="password"></span></div>
-            <div class="field-row"><span class="field-label"></span><span class="field-value"><button class="btn btn-primary">${t('account.change_pwd')}</button></span></div>
-          </div>
-          <div class="card account-section">
-            <h3>${t('account.2fa_title')}</h3>
-            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">${t('account.2fa_desc')}</p>
-            <button class="btn btn-ghost">${t('account.2fa_btn')}</button>
-          </div>
-        `,
-      };
+      let s = null;
+      try {
+        const res = await fetch('/api/stats/' + encodeURIComponent(user.nick));
+        if (res.ok) s = await res.json();
+      } catch {}
 
-      const main = document.getElementById('acc-main');
-      function setTab(tab) {
-        if (tab === 'logout') { logout(); return; }
-        main.innerHTML = tabs[tab]();
-        document.querySelectorAll('#acc-nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-        if (tab === 'profile') {
-          document.getElementById('save-profile').onclick = () => {
-            user.email = document.getElementById('f-email').value;
-            user.discord = document.getElementById('f-discord').value;
-            saveUser(user);
-            const btn = document.getElementById('save-profile');
-            btn.textContent = t('account.saved');
-            setTimeout(() => (btn.textContent = t('account.save_btn')), 1500);
-          };
-        }
+      const subParts = [];
+      if (s?.regdate) subParts.push(`${t('account.reg_date')}: ${new Date(s.regdate).toLocaleDateString(LANG === 'en' ? 'en-US' : 'ru-RU')}`);
+      if (s?.lastlogin) subParts.push(`${t('account.last_login')}: ${new Date(s.lastlogin).toLocaleDateString(LANG === 'en' ? 'en-US' : 'ru-RU')}`);
+      else if (user.joined) subParts.push(`${t('account.reg_date')}: ${user.joined}`);
+      document.getElementById('profile-sub').textContent = subParts.join(' · ') || '—';
+
+      const statsHost = document.getElementById('stats-host');
+      if (!s) {
+        statsHost.innerHTML = `<div class="card account-section"><p style="color: var(--text-muted);">${t('account.stats_offline')}</p></div>`;
+        return;
       }
-      document.querySelectorAll('#acc-nav button').forEach(b => {
-        b.onclick = () => setTab(b.dataset.tab);
-      });
-      setTab('overview');
+      if (!s.exists) {
+        statsHost.innerHTML = `
+          <div class="card account-section">
+            <h3>${t('account.no_stats_title')}</h3>
+            <p style="color: var(--text-muted); margin-top: 8px;">${t('account.no_stats_lead')}</p>
+            <div style="margin-top: 16px;">
+              <a class="btn btn-primary" href="download.html">${t('account.quick_dl')}</a>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const cards = [];
+      // Primary: time and survival
+      cards.push(statCard(fmtDuration(s.playSeconds), t('stat.play_time'), s.leftGame ? `${fmt(s.leftGame)} ${t('stat.sessions')}` : null));
+      cards.push(statCard(fmt(s.deaths), t('stat.deaths'), s.timeSinceDeath ? `${t('stat.since_last')} ${fmtDuration(s.timeSinceDeath)}` : null));
+      cards.push(statCard(fmt(s.mobsKilledTotal || s.mobKills), t('stat.mobs_killed'), s.topKilled ? `${fmtMcKey(s.topKilled)} ×${fmt(s.topKilledCount)}` : null));
+      cards.push(statCard(fmt(s.playerKills), t('stat.player_kills')));
+
+      // Movement
+      cards.push(statCard(fmtKm(s.walkCm + s.sprintCm), t('stat.walked'), `${t('stat.sprinted')}: ${fmtKm(s.sprintCm)}`));
+      cards.push(statCard(fmtKm(s.flyCm), t('stat.flown')));
+      cards.push(statCard(fmtKm(s.swimCm), t('stat.swam')));
+      cards.push(statCard(fmtKm(s.boatCm + s.horseCm), t('stat.rode')));
+
+      // World interaction
+      cards.push(statCard(fmt(s.blocksMined), t('stat.blocks_mined'), s.topMined ? `${fmtMcKey(s.topMined)} ×${fmt(s.topMinedCount)}` : null));
+      cards.push(statCard(fmt(s.blocksPlaced), t('stat.blocks_placed'), s.topUsed ? `${fmtMcKey(s.topUsed)} ×${fmt(s.topUsedCount)}` : null));
+      cards.push(statCard(fmt(s.itemsCrafted), t('stat.items_crafted')));
+      cards.push(statCard(fmt(s.itemsPickedUp), t('stat.items_picked_up')));
+
+      // Combat / misc
+      cards.push(statCard(fmt(s.damageDealt), t('stat.damage_dealt'), `${t('stat.taken')}: ${fmt(s.damageTaken)}`));
+      cards.push(statCard(fmt(s.jumps), t('stat.jumps')));
+      cards.push(statCard(fmt(s.fishCaught), t('stat.fish')));
+      cards.push(statCard(fmt(s.animalsBred), t('stat.bred')));
+      cards.push(statCard(fmt(s.bedsSlept), t('stat.beds')));
+      cards.push(statCard(fmtDuration(s.timeSinceRest), t('stat.since_rest')));
+
+      statsHost.innerHTML = `
+        <div class="card account-section">
+          <h3>${t('account.stats_title')}</h3>
+          <div class="stats-grid">${cards.join('')}</div>
+        </div>
+        <div class="card account-section">
+          <h3>${t('account.quick_title')}</h3>
+          <div class="quick-grid">
+            <a class="btn btn-ghost" href="status.html">${t('account.quick_map')}</a>
+            <a class="btn btn-ghost" href="status.html">${t('account.quick_status')}</a>
+            <a class="btn btn-ghost" href="news.html">${t('account.quick_news')}</a>
+            <a class="btn btn-ghost" href="download.html">${t('account.quick_dl')}</a>
+          </div>
+        </div>`;
     }
 
     const u = getUser();
