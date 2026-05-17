@@ -557,13 +557,13 @@ async function initHero() {
     const fatling = fatlingResult.group;
     const crusher = crusherResult.group;
 
-    // Both facing the camera (south / +Z), composed for depth
+    // Both facing the camera; BBModel "front" sits at -Z, so rotate 180°
     fatling.position.set(-1.1, 0, 0.6);
-    fatling.rotation.y = 0;
+    fatling.rotation.y = Math.PI;
     mobs.add(fatling);
 
     crusher.position.set(1.15, 0, -0.3);
-    crusher.rotation.y = 0;
+    crusher.rotation.y = Math.PI;
     crusher.scale.setScalar(0.95);
     mobs.add(crusher);
 
