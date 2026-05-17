@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Статус серверов — voyageM!</title>
-  <link rel="icon" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=2">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="styles.css">
   <script>
     (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
@@ -42,7 +43,7 @@
               <div class="status-stat"><div class="status-stat-label">Генератор</div><div class="status-stat-value">Terra</div></div>
             </div>
             <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
-              <a href="index.html#download" class="btn btn-primary">Скачать лаунчер</a>
+              <a href="download.html" class="btn btn-primary">Скачать лаунчер</a>
               <a class="btn btn-ghost bluemap-link" target="_blank" rel="noopener noreferrer">Открыть карту</a>
             </div>
           </div>
@@ -102,8 +103,8 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="partials.js"></script>
-  <script type="module" src="scene.js"></script>
+  <script src="partials.js?v=2"></script>
+  <script type="module" src="scene.js?v=2"></script>
   <script>
     mount('status.html');
     document.querySelectorAll('.bluemap-link').forEach(a => a.href = BLUEMAP_URL);

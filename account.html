@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Личный кабинет — voyageM!</title>
-  <link rel="icon" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=2">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="styles.css">
   <script>
     (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
@@ -19,8 +20,8 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="partials.js"></script>
-  <script type="module" src="scene.js"></script>
+  <script src="partials.js?v=2"></script>
+  <script type="module" src="scene.js?v=2"></script>
   <script>
     mount('account.html');
 
@@ -140,7 +141,7 @@
               <a class="btn btn-ghost" href="status.html">Карта мира</a>
               <a class="btn btn-ghost" href="status.html">Статус серверов</a>
               <a class="btn btn-ghost" href="news.html">Свежие новости</a>
-              <a class="btn btn-ghost" href="index.html#download">Скачать лаунчер</a>
+              <a class="btn btn-ghost" href="download.html">Скачать лаунчер</a>
             </div>
           </div>
           <div class="card account-section">

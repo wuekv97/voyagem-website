@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>voyageM! — Minecraft Server</title>
   <meta name="description" content="voyageM! — премиум survival-сервер Minecraft на Terra-генераторе. Без доната, с живым сообществом.">
-  <link rel="icon" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=2">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="styles.css">
   <script>
     (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
@@ -99,8 +100,8 @@
 
   <div id="footer-host"></div>
 
-  <script src="partials.js"></script>
-  <script type="module" src="scene.js"></script>
+  <script src="partials.js?v=2"></script>
+  <script type="module" src="scene.js?v=2"></script>
   <script>
     mount('index.html');
     (async () => {
