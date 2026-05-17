@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="crispEdges">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F1C55F"/>
+      <stop offset="1" stop-color="#C88E2C"/>
+    </linearGradient>
+  </defs>
+  <!-- Black rounded background -->
+  <rect width="64" height="64" rx="12" fill="#0B0B0E"/>
+  <!-- Star above M -->
+  <path d="M32 8l1.8 4.4 4.7.4-3.6 3.1 1.1 4.6L32 17.9 27.9 20.5l1.1-4.6-3.6-3.1 4.7-.4z" fill="url(#g)"/>
+  <!-- Bold M letter (gold) — two angled strokes forming an "M" -->
+  <path d="M14 50V26l8 8 4-4 4 4 4-4 4 4 8-8v24" stroke="url(#g)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+</svg>
