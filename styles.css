@@ -1213,7 +1213,9 @@ body > * { position: relative; z-index: 3; }
   image-rendering: pixelated;
   background: var(--surface-2);
   border: 1px solid var(--border);
+  display: block;
 }
+canvas.profile-avatar { background: linear-gradient(135deg, var(--surface-2), var(--surface-3)); }
 .profile-meta { flex: 1; min-width: 0; }
 .profile-meta h2 {
   font-family: 'Bodoni Moda', serif;

@@ -6,7 +6,7 @@
   <title data-i18n="account.title_tag">Личный кабинет — voyageM!</title>
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=2">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=2">
-  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="styles.css?v=13">
   <script>
     (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
   </script>
@@ -20,9 +20,9 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=12"></script>
-  <script src="partials.js?v=12"></script>
-  <script type="module" src="scene.js?v=12"></script>
+  <script src="i18n.js?v=13"></script>
+  <script src="partials.js?v=13"></script>
+  <script type="module" src="scene.js?v=13"></script>
   <script type="module">
     import * as skinview3d from 'https://cdn.jsdelivr.net/npm/skinview3d@3.0.1/+esm';
     window.skinview3d = skinview3d;
@@ -183,8 +183,7 @@
       host.innerHTML = `
         <div class="account-grid-simple">
           <div class="profile-header card">
-            <img class="profile-avatar" src="https://mc-heads.net/avatar/${user.nick}/96" alt=""
-              onerror="this.style.display='none'">
+            <canvas class="profile-avatar" id="profile-avatar-canvas" width="96" height="96"></canvas>
             <div class="profile-meta">
               <h2>${user.nick}</h2>
               <p class="profile-sub" id="profile-sub">${t('account.loading_stats')}</p>
@@ -194,6 +193,7 @@
           <div id="stats-host"></div>
         </div>`;
       document.getElementById('btn-logout').onclick = logout;
+      refreshAvatar(user);
 
       let s = null;
       try {
@@ -367,6 +367,39 @@
       return _skinViewer;
     }
 
+    function renderAvatarFromSkin(canvas, img) {
+      if (!canvas || !img) return;
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Head front face (8,8)-(16,16) + hat overlay (40,8)-(48,16) — fill the whole 96×96
+      ctx.drawImage(img, 8, 8, 8, 8, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 40, 8, 8, 8, 0, 0, canvas.width, canvas.height);
+    }
+
+    async function refreshAvatar(user, sourceUrl) {
+      const canvas = document.getElementById('profile-avatar-canvas');
+      if (!canvas) return;
+      const urls = sourceUrl ? [sourceUrl]
+        : [`/api/skin/${user.nick}.png?t=${Date.now()}`, `https://mc-heads.net/skin/${user.nick}`];
+      for (const url of urls) {
+        try {
+          const img = await loadAvatarImg(url);
+          renderAvatarFromSkin(canvas, img);
+          return;
+        } catch {}
+      }
+    }
+    function loadAvatarImg(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
+
     async function refreshPreview(user, sourceUrl) {
       const canvas = document.getElementById('skin-canvas');
       if (!canvas) return;
@@ -420,6 +453,8 @@
           if (viewer) {
             try { await viewer.loadSkin(chosenObjectUrl); } catch {}
           }
+          // Also live-update the small profile avatar
+          renderAvatarFromSkin(document.getElementById('profile-avatar-canvas'), img);
           status.textContent = t('skin.preview_pending');
         };
         img.onerror = () => setMsg(t('skin.err_format'), 'err');
@@ -461,8 +496,10 @@
           }
           setMsg(data.applied ? t('skin.applied') : (data.hint || t('skin.uploaded')), 'ok');
           submit.textContent = t('skin.submit');
-          // Refresh preview from the server's stored copy
-          await refreshPreview(user, `/api/skin/${user.nick}.png?t=${Date.now()}`);
+          // Refresh preview AND profile avatar from the server's stored copy
+          const freshUrl = `/api/skin/${user.nick}.png?t=${Date.now()}`;
+          await refreshPreview(user, freshUrl);
+          await refreshAvatar(user, freshUrl);
           status.textContent = data.applied ? t('skin.applied_label') : t('skin.queued_label');
         } catch {
           setMsg(t('skin.err_conn'), 'err');
