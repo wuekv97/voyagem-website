@@ -727,9 +727,10 @@ const MOB_REGISTRY = {
     animKey: 'grim_seraph_idle',
     map:     SERAPH_IDLE_MAP,
     scale:   0.8,
-    camPos:  [0, 1.9, 5.2],
-    target:  [0, 1.5, 0],
+    camPos:  [0, 2.1, 5.6],
+    target:  [0, 1.7, 0],
     fov:     34,
+    floating: { amp: 0.12, speed: 1.1, baseY: 0.35 },
   },
 };
 
@@ -770,11 +771,16 @@ async function initMobPortrait(canvasId, mobKey) {
   scene.add(ring);
 
   let animPlayer = null;
+  let mobGroup = null;
+  let baseY = 0;
   try {
     const { group, boneByName } = await loadBBModel(def.model);
-    group.rotation.y = 0;
+    group.rotation.y = Math.PI; // BBModel "front" sits at -Z; flip to face +Z camera
     group.scale.setScalar(def.scale);
+    baseY = group.position.y + (def.floating?.baseY || 0);
+    group.position.y = baseY;
     scene.add(group);
+    mobGroup = group;
     const animData = await fetch(def.anim).then(r => r.json()).catch(() => null);
     if (animData?.animations?.[def.animKey]) {
       animPlayer = new AnimationPlayer(boneByName, animData.animations[def.animKey], def.map);
@@ -817,6 +823,11 @@ async function initMobPortrait(canvasId, mobKey) {
     if (animPlayer) animPlayer.update(t);
     scene.rotation.y = ptr.x * 0.25;
     scene.rotation.x = ptr.y * 0.08;
+    if (mobGroup && def.floating) {
+      const f = def.floating;
+      mobGroup.position.y = baseY + Math.sin(t * f.speed) * f.amp;
+      mobGroup.rotation.z = Math.sin(t * f.speed * 0.7) * 0.04;
+    }
     ring.material.opacity = 0.14 + Math.sin(t * 1.7) * 0.05;
     renderer.render(scene, camera);
   }
