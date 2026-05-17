@@ -1,14 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="crispEdges">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="auto">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#F1C55F"/>
-      <stop offset="1" stop-color="#C88E2C"/>
+      <stop offset="1" stop-color="#C28B26"/>
     </linearGradient>
   </defs>
   <!-- Black rounded background -->
   <rect width="64" height="64" rx="12" fill="#0B0B0E"/>
-  <!-- Star above M -->
-  <path d="M32 8l1.8 4.4 4.7.4-3.6 3.1 1.1 4.6L32 17.9 27.9 20.5l1.1-4.6-3.6-3.1 4.7-.4z" fill="url(#g)"/>
-  <!-- Bold M letter (gold) — two angled strokes forming an "M" -->
-  <path d="M14 50V26l8 8 4-4 4 4 4-4 4 4 8-8v24" stroke="url(#g)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+  <!-- 4-point star above the wings -->
+  <path d="M32 7
+           L34 13
+           L40 15
+           L34 17
+           L32 23
+           L30 17
+           L24 15
+           L30 13 Z" fill="url(#g)"/>
+  <!-- Two divergent "wing" strokes (the stylized M of voyageM!) -->
+  <path d="M32 22 L13 55" stroke="url(#g)" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+  <path d="M32 22 L51 55" stroke="url(#g)" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+  <!-- Central beaded column between the wings -->
+  <circle cx="32" cy="34" r="1.4" fill="#F5F5F7"/>
+  <circle cx="32" cy="40" r="1.4" fill="#F5F5F7"/>
+  <circle cx="32" cy="46" r="1.4" fill="#F5F5F7"/>
 </svg>
