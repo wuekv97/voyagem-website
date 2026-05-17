@@ -1009,6 +1009,79 @@ body > * { position: relative; z-index: 3; }
 }
 .mobs-grid-3 { grid-template-columns: repeat(3, 1fr); }
 @media (max-width: 1100px) { .mobs-grid-3 { grid-template-columns: repeat(2, 1fr); } }
+
+/* ---- Boss divider + boss card (Seraph stands apart from regular mobs) ---- */
+.boss-divider {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 48px 0 28px;
+}
+.boss-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
+}
+.boss-divider-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+  padding: 6px 16px;
+  border: 1px solid var(--accent-glow);
+  background: var(--accent-soft);
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.boss-card {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  border: 1.5px solid var(--accent-glow);
+  border-radius: 28px;
+  background:
+    radial-gradient(60% 80% at 30% 50%, rgba(232, 181, 71, 0.14), transparent 65%),
+    radial-gradient(60% 80% at 100% 0%, rgba(102, 34, 204, 0.20), transparent 70%),
+    linear-gradient(155deg, rgba(40, 28, 70, 0.55), rgba(15, 12, 25, 0.7));
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-lg), 0 0 80px rgba(232, 181, 71, 0.12);
+  overflow: hidden;
+  position: relative;
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+[data-theme="light"] .boss-card {
+  background:
+    radial-gradient(60% 80% at 30% 50%, rgba(232, 181, 71, 0.18), transparent 65%),
+    radial-gradient(60% 80% at 100% 0%, rgba(120, 60, 220, 0.10), transparent 70%),
+    linear-gradient(155deg, rgba(255,255,255,0.85), rgba(240, 235, 222, 0.7));
+}
+.boss-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg), 0 0 120px rgba(232, 181, 71, 0.20); }
+.boss-canvas-wrap {
+  aspect-ratio: auto;
+  min-height: 420px;
+  border-bottom: none !important;
+  border-right: 1px solid var(--border);
+}
+[data-theme="light"] .boss-canvas-wrap { border-right-color: var(--border); }
+.boss-info { padding: 36px 36px 32px; display: flex; flex-direction: column; justify-content: center; }
+.boss-info h3 {
+  font-size: clamp(36px, 4vw, 52px) !important;
+  letter-spacing: -0.03em !important;
+  margin-bottom: 16px !important;
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.boss-info p { font-size: 16px !important; line-height: 1.6 !important; max-width: 480px; }
+.boss-stats { padding: 20px !important; }
+.boss-stats strong { font-size: 28px !important; }
+
+@media (max-width: 880px) {
+  .boss-card { grid-template-columns: 1fr; }
+  .boss-canvas-wrap { min-height: 360px; border-right: none !important; border-bottom: 1px solid var(--border) !important; }
+}
 .mob-canvas-soon {
   display: flex;
   flex-direction: column;

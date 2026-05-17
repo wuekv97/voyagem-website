@@ -8,7 +8,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg?v=3">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=3">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=3">
-  <link rel="stylesheet" href="styles.css?v=13">
+  <link rel="stylesheet" href="styles.css?v=14">
   <script>
     (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
   </script>
@@ -72,7 +72,7 @@
             <p data-i18n="mobs.subtitle">Двое из главных обитателей кастомного измерения voyage dungeons. С каждым обновлением — больше существ, лута и историй.</p>
           </div>
         </div>
-        <div class="mobs-grid mobs-grid-3">
+        <div class="mobs-grid">
           <article class="mob-card mob-card-fatling">
             <div class="mob-canvas-wrap">
               <canvas id="mob-fatling-canvas" class="mob-canvas"></canvas>
@@ -115,28 +115,35 @@
               </div>
             </div>
           </article>
-          <article class="mob-card mob-card-seraph">
-            <div class="mob-canvas-wrap">
-              <canvas id="mob-seraph-canvas" class="mob-canvas"></canvas>
-              <div class="mob-vignette"></div>
-            </div>
-            <div class="mob-info">
-              <span class="mob-tag mob-tag-boss" data-i18n="mobs.seraph_tag">финальный босс</span>
-              <h3>Grim Seraph</h3>
-              <p data-i18n="mobs.seraph_desc">Хранительница кристальных подземелий. Призывает осколки света, ставит барьеры и наносит чистый магический урон. Победителя ждёт лучший лут сезона.</p>
-              <div class="mob-stats">
-                <div><span data-i18n="mobs.stat_hp">HP</span><strong>420</strong></div>
-                <div><span data-i18n="mobs.stat_dmg">Урон</span><strong>26</strong></div>
-                <div><span data-i18n="mobs.stat_xp">XP</span><strong>150</strong></div>
-              </div>
-              <div class="mob-drops">
-                <span class="mob-drops-label" data-i18n="mobs.drops">Дроп</span>
-                <span class="mob-drop">Seraph Feather</span>
-                <span class="mob-drop">Boss Token</span>
-              </div>
-            </div>
-          </article>
         </div>
+
+        <div class="boss-divider">
+          <span class="boss-divider-line"></span>
+          <span class="boss-divider-label" data-i18n="mobs.boss_eyebrow">final boss · sezon ✦</span>
+          <span class="boss-divider-line"></span>
+        </div>
+
+        <article class="boss-card mob-card mob-card-seraph">
+          <div class="mob-canvas-wrap boss-canvas-wrap">
+            <canvas id="mob-seraph-canvas" class="mob-canvas"></canvas>
+            <div class="mob-vignette"></div>
+          </div>
+          <div class="mob-info boss-info">
+            <span class="mob-tag mob-tag-boss" data-i18n="mobs.seraph_tag">финальный босс</span>
+            <h3>Grim Seraph</h3>
+            <p data-i18n="mobs.seraph_desc">Хранительница кристальных подземелий. Призывает осколки света, ставит барьеры и наносит чистый магический урон. Победителя ждёт лучший лут сезона.</p>
+            <div class="mob-stats boss-stats">
+              <div><span data-i18n="mobs.stat_hp">HP</span><strong>420</strong></div>
+              <div><span data-i18n="mobs.stat_dmg">Урон</span><strong>26</strong></div>
+              <div><span data-i18n="mobs.stat_xp">XP</span><strong>150</strong></div>
+            </div>
+            <div class="mob-drops">
+              <span class="mob-drops-label" data-i18n="mobs.drops">Дроп</span>
+              <span class="mob-drop">Seraph Feather</span>
+              <span class="mob-drop">Boss Token</span>
+            </div>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -204,9 +211,9 @@
 
   <div id="footer-host"></div>
 
-  <script src="i18n.js?v=13"></script>
-  <script src="partials.js?v=13"></script>
-  <script type="module" src="scene.js?v=13"></script>
+  <script src="i18n.js?v=14"></script>
+  <script src="partials.js?v=14"></script>
+  <script type="module" src="scene.js?v=14"></script>
   <script>
     mount('index.html');
     (async () => {
