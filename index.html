@@ -17,9 +17,10 @@
   <div id="nav-host"></div>
 
   <main>
-    <section class="hero">
+    <section class="hero hero-cinema">
+      <div class="hero-aura"></div>
       <div class="container hero-grid">
-        <div>
+        <div class="hero-copy">
           <div class="hero-kicker">
             <span class="hero-kicker-dot"></span>
             <span id="hero-status" data-i18n="hero.kicker_check">Проверка статуса…</span>
@@ -27,11 +28,17 @@
           <h1 data-i18n-html="hero.title">Путешествие<br>в <em>новый</em> мир<br>Minecraft</h1>
           <p class="lead" data-i18n="hero.lead">Премиум survival с генератором Terra. Без платных привилегий, без pay-to-win — только честная игра, продуманный мир и живое сообщество.</p>
           <div class="hero-cta">
-            <a href="download.html" class="btn btn-primary btn-lg" data-i18n="hero.cta_download">Скачать лаунчер</a>
+            <a href="download.html" class="btn btn-primary btn-lg btn-glow" data-i18n="hero.cta_download">Скачать лаунчер</a>
             <a href="status.html" class="btn btn-ghost btn-lg" data-i18n="hero.cta_status">Статус серверов</a>
           </div>
+          <ul class="hero-meta">
+            <li><span class="hero-meta-dot"></span><span data-i18n="hero.meta_paper">Paper 1.21.4</span></li>
+            <li><span class="hero-meta-dot"></span><span data-i18n="hero.meta_terra">Terra generator</span></li>
+            <li><span class="hero-meta-dot"></span><span data-i18n="hero.meta_authme">AuthMe + FastLogin</span></li>
+          </ul>
         </div>
         <div class="hero-showcase">
+          <div class="hero-showcase-glow"></div>
           <span class="hero-showcase-tag" data-i18n="hero.badge_tag">voyage dungeons · 2026</span>
           <canvas id="hero-canvas"></canvas>
           <div class="hero-showcase-badge">
@@ -40,15 +47,79 @@
           </div>
         </div>
       </div>
+      <a href="#mobs" class="scroll-indicator" aria-label="Scroll down">
+        <span data-i18n="hero.scroll">Прокрутить</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+      </a>
     </section>
 
-    <section class="section">
+    <section class="section section-stats">
       <div class="container">
         <div class="stats">
           <div class="stat"><div class="stat-value" id="stat-online"><em>—</em></div><div class="stat-label" data-i18n="stats.online">Игроков онлайн</div></div>
           <div class="stat"><div class="stat-value">1.21.<em>4</em></div><div class="stat-label" data-i18n="stats.version">Версия Paper</div></div>
         </div>
+      </div>
+    </section>
 
+    <section class="section mob-section" id="mobs">
+      <div class="container">
+        <div class="section-head section-head-center">
+          <div>
+            <span class="section-eyebrow" data-i18n="mobs.eyebrow">voyage dungeons</span>
+            <h2 data-i18n-html="mobs.title">Хранители <em>подземелий</em></h2>
+            <p data-i18n="mobs.subtitle">Двое из главных обитателей кастомного измерения voyage dungeons. С каждым обновлением — больше существ, лута и историй.</p>
+          </div>
+        </div>
+        <div class="mobs-grid">
+          <article class="mob-card mob-card-fatling">
+            <div class="mob-canvas-wrap">
+              <canvas id="mob-fatling-canvas" class="mob-canvas"></canvas>
+              <div class="mob-vignette"></div>
+            </div>
+            <div class="mob-info">
+              <span class="mob-tag" data-i18n="mobs.fatling_tag">мини-босс</span>
+              <h3>Fatling</h3>
+              <p data-i18n="mobs.fatling_desc">Огромный страж сокровищниц с тяжёлой поступью. Медленный, но один удар своей булавой может стоить вам половины здоровья и нескольких драгоценных секунд.</p>
+              <div class="mob-stats">
+                <div><span data-i18n="mobs.stat_hp">HP</span><strong>180</strong></div>
+                <div><span data-i18n="mobs.stat_dmg">Урон</span><strong>12</strong></div>
+                <div><span data-i18n="mobs.stat_xp">XP</span><strong>45</strong></div>
+              </div>
+              <div class="mob-drops">
+                <span class="mob-drops-label" data-i18n="mobs.drops">Дроп</span>
+                <span class="mob-drop">Golden Pelt</span>
+                <span class="mob-drop">Crystal Shard</span>
+              </div>
+            </div>
+          </article>
+          <article class="mob-card mob-card-crusher">
+            <div class="mob-canvas-wrap">
+              <canvas id="mob-crusher-canvas" class="mob-canvas"></canvas>
+              <div class="mob-vignette"></div>
+            </div>
+            <div class="mob-info">
+              <span class="mob-tag mob-tag-boss" data-i18n="mobs.crusher_tag">босс</span>
+              <h3>Crusher</h3>
+              <p data-i18n="mobs.crusher_desc">Финальный босс кристальных подземелий. Швыряет цепями на расстоянии, призывает помощь из тёмных закоулков и не даёт перевести дух. Победителя ждёт лучший лут сезона.</p>
+              <div class="mob-stats">
+                <div><span data-i18n="mobs.stat_hp">HP</span><strong>320</strong></div>
+                <div><span data-i18n="mobs.stat_dmg">Урон</span><strong>22</strong></div>
+                <div><span data-i18n="mobs.stat_xp">XP</span><strong>110</strong></div>
+              </div>
+              <div class="mob-drops">
+                <span class="mob-drops-label" data-i18n="mobs.drops">Дроп</span>
+                <span class="mob-drop">Voidforged Chain</span>
+                <span class="mob-drop">Boss Token</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
         <div class="section-head">
           <div>
             <h2 data-i18n-html="features.title">Что делает сервер <em>особенным</em></h2>
@@ -95,13 +166,25 @@
         </div>
       </div>
     </section>
+
+    <section class="section cta-section">
+      <div class="container">
+        <div class="cta-card">
+          <div>
+            <h2 data-i18n-html="cta.title">Готов <em>исследовать</em>?</h2>
+            <p data-i18n="cta.lead">Скачай лаунчер — Java и моды установятся автоматически. Запусти и начни своё путешествие в Terra.</p>
+          </div>
+          <a href="download.html" class="btn btn-primary btn-lg btn-glow" data-i18n="hero.cta_download">Скачать лаунчер</a>
+        </div>
+      </div>
+    </section>
   </main>
 
   <div id="footer-host"></div>
 
-  <script src="i18n.js?v=3"></script>
-  <script src="partials.js?v=3"></script>
-  <script type="module" src="scene.js?v=3"></script>
+  <script src="i18n.js?v=4"></script>
+  <script src="partials.js?v=4"></script>
+  <script type="module" src="scene.js?v=4"></script>
   <script>
     mount('index.html');
     (async () => {
@@ -117,6 +200,15 @@
         stat.innerHTML = '<em>0</em>';
       }
     })();
+    // Mob portraits — load after first paint
+    requestAnimationFrame(() => {
+      const tryInit = () => {
+        if (typeof window.initMobPortrait !== 'function') return setTimeout(tryInit, 80);
+        window.initMobPortrait('mob-fatling-canvas', 'fatling');
+        window.initMobPortrait('mob-crusher-canvas', 'crusher');
+      };
+      tryInit();
+    });
   </script>
 </body>
 </html>

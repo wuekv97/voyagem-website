@@ -446,9 +446,9 @@ async function initHero() {
   if (!canvas) return;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 60);
-  camera.position.set(0, 1.8, 8);
-  camera.lookAt(0, 1.1, 0);
+  const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 60);
+  camera.position.set(0, 1.7, 6.8);
+  camera.lookAt(0, 1.15, 0);
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -557,13 +557,14 @@ async function initHero() {
     const fatling = fatlingResult.group;
     const crusher = crusherResult.group;
 
-    fatling.position.set(-0.5, 0, 0.3);
-    fatling.rotation.y = Math.PI * 0.1;
+    // Both facing the camera (south / +Z), composed for depth
+    fatling.position.set(-1.1, 0, 0.6);
+    fatling.rotation.y = 0;
     mobs.add(fatling);
 
-    crusher.position.set(1.4, 0, -0.6);
-    crusher.rotation.y = -Math.PI * 0.25;
-    crusher.scale.setScalar(0.9);
+    crusher.position.set(1.15, 0, -0.3);
+    crusher.rotation.y = 0;
+    crusher.scale.setScalar(0.95);
     mobs.add(crusher);
 
     // Set up animation players for idle animations
@@ -680,6 +681,126 @@ async function initHero() {
   }
   loop();
 }
+
+// ============================================================
+// MOB PORTRAIT — single-mob isolated canvas for spotlight cards
+// ============================================================
+
+const MOB_REGISTRY = {
+  fatling: {
+    model:   'assets/models/fatling.bbmodel',
+    anim:    'assets/models/fatling.animation.json',
+    animKey: 'animation.fatling.idle',
+    map:     FATLING_IDLE_MAP,
+    scale:   1.0,
+    camPos:  [0, 1.4, 4.0],
+    target:  [0, 1.1, 0],
+    fov:     34,
+  },
+  crusher: {
+    model:   'assets/models/crusher.bbmodel',
+    anim:    'assets/models/crusher.animation.json',
+    animKey: 'animation.crasher.idle',
+    map:     CRUSHER_IDLE_MAP,
+    scale:   0.85,
+    camPos:  [0, 1.7, 4.4],
+    target:  [0, 1.3, 0],
+    fov:     34,
+  },
+};
+
+async function initMobPortrait(canvasId, mobKey) {
+  const def = MOB_REGISTRY[mobKey];
+  const canvas = document.getElementById(canvasId);
+  if (!def || !canvas) return;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(def.fov || 32, 1, 0.1, 30);
+  camera.position.set(...(def.camPos || [0, 1.4, 4.2]));
+  camera.lookAt(...(def.target || [0, 1.1, 0]));
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  // Dramatic single-subject lighting
+  const ambient = new THREE.AmbientLight(0xa090d0, 0.5);
+  scene.add(ambient);
+  const key = new THREE.DirectionalLight(0xffd8a8, 1.6);
+  key.position.set(3, 6, 4);
+  scene.add(key);
+  const rim = new THREE.DirectionalLight(0x6622cc, 1.1);
+  rim.position.set(-4, 3, -3);
+  scene.add(rim);
+  const fill = new THREE.DirectionalLight(0x44ccff, 0.45);
+  fill.position.set(0, -1, 3);
+  scene.add(fill);
+
+  // Pedestal ring
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(0.95, 1.05, 64),
+    new THREE.MeshBasicMaterial({ color: 0x44ffcc, transparent: true, opacity: 0.18, side: THREE.DoubleSide })
+  );
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.y = 0.01;
+  scene.add(ring);
+
+  let animPlayer = null;
+  try {
+    const { group, boneByName } = await loadBBModel(def.model);
+    group.rotation.y = 0;
+    group.scale.setScalar(def.scale);
+    scene.add(group);
+    const animData = await fetch(def.anim).then(r => r.json()).catch(() => null);
+    if (animData?.animations?.[def.animKey]) {
+      animPlayer = new AnimationPlayer(boneByName, animData.animations[def.animKey], def.map);
+    }
+  } catch (e) {
+    console.warn(`Mob portrait ${mobKey} load failed:`, e);
+  }
+
+  const ptr = { x: 0, y: 0, tx: 0, ty: 0 };
+  canvas.parentElement.addEventListener('pointermove', e => {
+    const r = canvas.parentElement.getBoundingClientRect();
+    ptr.tx = ((e.clientX - r.left) / r.width) * 2 - 1;
+    ptr.ty = ((e.clientY - r.top) / r.height) * 2 - 1;
+  }, { passive: true });
+  canvas.parentElement.addEventListener('pointerleave', () => { ptr.tx = 0; ptr.ty = 0; });
+
+  function resize() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  new ResizeObserver(resize).observe(canvas);
+
+  const clock = new THREE.Clock();
+  let running = true;
+  document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) clock.start(); });
+
+  // Pause when off-screen
+  let visible = true;
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0.05 }).observe(canvas);
+
+  function loop() {
+    requestAnimationFrame(loop);
+    if (!running || !visible) return;
+    const t = clock.elapsedTime;
+    ptr.x += (ptr.tx - ptr.x) * 0.08;
+    ptr.y += (ptr.ty - ptr.y) * 0.08;
+    if (animPlayer) animPlayer.update(t);
+    scene.rotation.y = ptr.x * 0.25;
+    scene.rotation.x = ptr.y * 0.08;
+    ring.material.opacity = 0.14 + Math.sin(t * 1.7) * 0.05;
+    renderer.render(scene, camera);
+  }
+  loop();
+}
+
+// Expose to inline scripts
+window.initMobPortrait = initMobPortrait;
 
 // ============================================================
 // BOOT
