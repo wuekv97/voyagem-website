@@ -5,9 +5,9 @@ const BLUEMAP_URL = `http://${SERVER_IP}:8100`;
 const NAV_KEYS = [
   { href: 'index.html',    key: 'nav.home' },
   { href: 'news.html',     key: 'nav.news' },
-  { href: 'status.html',   key: 'nav.servers' },
+  { href: 'status.html',   key: 'nav.stats' },
   { href: 'download.html', key: 'nav.launcher' },
-  { href: 'account.html',  key: 'nav.account' },
+  { href: 'shop.html',     key: 'nav.shop' },
 ];
 
 // ---- Theme ----

@@ -1122,6 +1122,41 @@ body > * { position: relative; z-index: 3; }
 .cta-card p { color: var(--text-muted); font-size: 15px; max-width: 460px; }
 
 /* =========================================
+   SHOP — COMING SOON
+   ========================================= */
+.shop-soon { padding: 96px 0; }
+.shop-soon-card {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 64px 48px;
+  border: 1px solid var(--accent-glow);
+  border-radius: 28px;
+  background:
+    radial-gradient(60% 80% at 50% 0%, rgba(232, 181, 71, 0.14), transparent 65%),
+    linear-gradient(160deg, rgba(40, 28, 70, 0.4), rgba(15, 12, 25, 0.6));
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-lg), 0 0 80px rgba(232, 181, 71, 0.08);
+}
+[data-theme="light"] .shop-soon-card {
+  background:
+    radial-gradient(60% 80% at 50% 0%, rgba(232, 181, 71, 0.18), transparent 65%),
+    linear-gradient(160deg, rgba(255,255,255,0.85), rgba(240, 235, 222, 0.7));
+}
+.shop-soon-glyph { width: 80px; height: 80px; margin: 0 auto 24px; display: grid; place-items: center; border-radius: 22px; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-glow); }
+.shop-soon-card h1 { font-family: 'Bodoni Moda', serif; font-size: clamp(36px, 4.5vw, 56px); font-weight: 600; letter-spacing: -0.02em; margin: 16px 0 14px; line-height: 1.05; }
+.shop-soon-card h1 em { font-style: italic; background: linear-gradient(135deg, var(--accent), var(--accent-hover)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.shop-soon-card .lead { max-width: 540px; margin: 0 auto 36px; color: var(--text-muted); font-size: 16px; line-height: 1.55; }
+.shop-soon-list { display: grid; gap: 14px; text-align: left; margin: 0 auto 36px; max-width: 520px; }
+.shop-soon-item { display: flex; align-items: start; gap: 16px; padding: 18px 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface-2); }
+.shop-soon-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--accent); padding-top: 2px; min-width: 24px; }
+.shop-soon-item strong { display: block; font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.shop-soon-item p { color: var(--text-muted); font-size: 13px; line-height: 1.5; }
+@media (max-width: 600px) {
+  .shop-soon-card { padding: 40px 24px; }
+}
+
+/* =========================================
    ACCOUNT DASHBOARD (grouped layout)
    ========================================= */
 .account-grid-simple { display: grid; gap: 36px; margin: 40px 0 80px; }

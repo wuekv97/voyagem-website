@@ -352,6 +352,15 @@ function buildBBModelGroup(data) {
   const elementByUuid = new Map();
   for (const el of data.elements) elementByUuid.set(el.uuid, el);
 
+  // BBModel comes in two flavours:
+  //   A) outliner items are full group objects with name/origin/children
+  //   B) outliner items are just {uuid, children}, full group data lives in a
+  //      separate top-level `groups` array indexed by uuid
+  const groupByUuid = new Map();
+  for (const g of (data.groups || [])) {
+    if (g && typeof g === 'object' && g.uuid) groupByUuid.set(g.uuid, g);
+  }
+
   const boneByName = new Map();
   const root = new THREE.Group();
 
@@ -368,10 +377,12 @@ function buildBBModelGroup(data) {
     }
     if (typeof item !== 'object' || !item.uuid) return;
 
-    // Group object is inline in outliner — use it directly
-    const origin = item.origin || [0, 0, 0];
+    // Merge inline item with the separate groups[] entry (whichever exists)
+    const stored = groupByUuid.get(item.uuid);
+    const g = { ...(stored || {}), ...item };
+    const origin = g.origin || [0, 0, 0];
     const boneGroup = new THREE.Group();
-    boneGroup.name = item.name || item.uuid;
+    boneGroup.name = g.name || item.uuid;
 
     boneGroup.position.set(
       (origin[0] - parentOrigin[0]) * S,
@@ -383,7 +394,7 @@ function buildBBModelGroup(data) {
     boneByName.set(boneGroup.name, boneGroup);
     parentGroup.add(boneGroup);
 
-    for (const child of (item.children || [])) {
+    for (const child of (item.children || g.children || [])) {
       processItem(child, boneGroup, origin);
     }
   }
@@ -437,6 +448,9 @@ const CRUSHER_IDLE_MAP = {
   'правая пятка':             'r leg b',
 };
 
+// Seraph: bone names in animation already match BBModel group names
+const SERAPH_IDLE_MAP = {};
+
 // ============================================================
 // HERO SCENE — VoyageM custom mobs
 // ============================================================
@@ -446,9 +460,9 @@ async function initHero() {
   if (!canvas) return;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 60);
-  camera.position.set(0, 1.7, 6.8);
-  camera.lookAt(0, 1.15, 0);
+  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 60);
+  camera.position.set(0, 1.9, 9);
+  camera.lookAt(0, 1.2, 0);
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -705,6 +719,16 @@ const MOB_REGISTRY = {
     scale:   0.85,
     camPos:  [0, 1.7, 4.4],
     target:  [0, 1.3, 0],
+    fov:     34,
+  },
+  seraph: {
+    model:   'assets/models/seraph.bbmodel',
+    anim:    'assets/models/seraph.animation.json',
+    animKey: 'grim_seraph_idle',
+    map:     SERAPH_IDLE_MAP,
+    scale:   0.8,
+    camPos:  [0, 1.9, 5.2],
+    target:  [0, 1.5, 0],
     fov:     34,
   },
 };
