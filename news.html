@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Новости — voyageM!</title>
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
+  </script>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div id="nav-host"></div>
+
+  <main>
+    <section class="hero" style="padding: 64px 0 20px;">
+      <div class="container">
+        <div class="hero-kicker"><span class="hero-kicker-dot"></span><span>Блог проекта</span></div>
+        <h1 style="font-size: clamp(36px, 5vw, 52px);">Новости <em>voyageM!</em></h1>
+        <p class="lead">Обновления сервера, анонсы ивентов, патч-ноуты и всё, что происходит в мире.</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 20px;">
+      <div class="container">
+        <div class="news-list">
+          <article class="news-item">
+            <div class="news-date">17 апр 2026</div>
+            <div>
+              <div class="news-title">Запуск сезона «Terra»</div>
+              <div class="news-excerpt">Новый мир с уникальным генератором Terra, спавн у координат 0,0 и стартовые киты для первых 100 игроков. Сид 42 — тот самый ответ на всё.</div>
+            </div>
+            <span class="news-tag">Анонс</span>
+          </article>
+          <article class="news-item">
+            <div class="news-date">12 апр 2026</div>
+            <div>
+              <div class="news-title">Обновление до Paper 1.21.4-232</div>
+              <div class="news-excerpt">Перешли на свежую сборку. Исправили баги с загрузкой чанков на view-distance 16, улучшили производительность при 20+ игроках.</div>
+            </div>
+            <span class="news-tag">Патч</span>
+          </article>
+          <article class="news-item">
+            <div class="news-date">10 апр 2026</div>
+            <div>
+              <div class="news-title">BlueMap теперь в реальном времени</div>
+              <div class="news-excerpt">Живая карта мира обновляется автоматически. Смотрите построения друзей прямо в браузере на порту :8100.</div>
+            </div>
+            <span class="news-tag">Фича</span>
+          </article>
+          <article class="news-item">
+            <div class="news-date">05 апр 2026</div>
+            <div>
+              <div class="news-title">Турнир «Мастер выживания»</div>
+              <div class="news-excerpt">Каждую субботу в 20:00 — испытания на скорость и смекалку. Призы: VIP на месяц и место в Зале Славы.</div>
+            </div>
+            <span class="news-tag">Ивент</span>
+          </article>
+          <article class="news-item">
+            <div class="news-date">01 апр 2026</div>
+            <div>
+              <div class="news-title">FastLogin: поддержка пиратов включена</div>
+              <div class="news-excerpt">Теперь на сервер можно заходить как с лицензионного аккаунта, так и без. Имена защищены паролем через AuthMe.</div>
+            </div>
+            <span class="news-tag">Релиз</span>
+          </article>
+          <article class="news-item">
+            <div class="news-date">28 мар 2026</div>
+            <div>
+              <div class="news-title">LuckPerms + группы игроков</div>
+              <div class="news-excerpt">Настроили систему прав. Админский состав получил отдельную группу, остальные игроки — стандартные права выживания.</div>
+            </div>
+            <span class="news-tag">Админ</span>
+          </article>
+          <article class="news-item">
+            <div class="news-date">24 мар 2026</div>
+            <div>
+              <div class="news-title">Запуск воркшопа по редстоуну</div>
+              <div class="news-excerpt">Присоединяйтесь к мастер-классам по автоматизации ферм. Делимся схемами в Discord-канале.</div>
+            </div>
+            <span class="news-tag">Сообщество</span>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-host"></div>
+  <script src="partials.js"></script>
+  <script type="module" src="scene.js"></script>
+  <script>mount('news.html');</script>
+</body>
+</html>

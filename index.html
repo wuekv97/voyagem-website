@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>voyageM! — Minecraft Server</title>
+  <meta name="description" content="voyageM! — премиум survival-сервер Minecraft на Terra-генераторе. Без доната, с живым сообществом.">
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
+  </script>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div id="nav-host"></div>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="hero-kicker">
+            <span class="hero-kicker-dot"></span>
+            <span id="hero-status">Проверка статуса…</span>
+          </div>
+          <h1>Путешествие<br>в <em>новый</em> мир<br>Minecraft</h1>
+          <p class="lead">Премиум survival с генератором Terra. Без платных привилегий, без pay-to-win — только честная игра, продуманный мир и живое сообщество.</p>
+          <div class="hero-cta">
+            <a href="account.html" class="btn btn-primary btn-lg">Начать играть</a>
+            <a href="status.html" class="btn btn-ghost btn-lg">Статус серверов</a>
+          </div>
+          <div class="hero-ip">
+            <code>158.220.89.78</code>
+            <button id="copy-btn" onclick="copyIp()">Копировать IP</button>
+          </div>
+        </div>
+        <div class="hero-showcase">
+          <span class="hero-showcase-tag">season · 2026</span>
+          <canvas id="hero-canvas"></canvas>
+          <div class="hero-showcase-badge">
+            <span class="dot"></span>
+            <span><strong>Paper 1.21.4</strong> · Terra · seed 42</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="stats">
+          <div class="stat"><div class="stat-value" id="stat-online"><em>—</em></div><div class="stat-label">Игроков онлайн</div></div>
+          <div class="stat"><div class="stat-value">1.21.<em>4</em></div><div class="stat-label">Версия Paper</div></div>
+          <div class="stat"><div class="stat-value">Terra</div><div class="stat-label">Генератор</div></div>
+          <div class="stat"><div class="stat-value">24<em>/</em>7</div><div class="stat-label">Без вайпов</div></div>
+        </div>
+
+        <div class="section-head">
+          <div>
+            <h2>Что делает сервер <em>особенным</em></h2>
+            <p>Мы убрали всё лишнее и оставили главное: чистый выживач, красивый мир и удобные инструменты.</p>
+          </div>
+        </div>
+
+        <div class="features">
+          <div class="card feature">
+            <div class="feature-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22 16 8"/><path d="M17.5 6.5 22 2"/><path d="m14 6 4 4"/><path d="M7 17 3 21"/><path d="m10 14 4 4"/></svg>
+            </div>
+            <h3>Генератор Terra</h3>
+            <p>Реалистичные биомы, горы, пещеры и острова — мир, в котором хочется исследовать каждый чанк.</p>
+          </div>
+          <div class="card feature">
+            <div class="feature-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"/><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5.5 4.5 1.2"/></svg>
+            </div>
+            <h3>Поддержка пиратов</h3>
+            <p>FastLogin + AuthMe: подключайтесь с лицензии или без — всё работает одинаково безопасно.</p>
+          </div>
+          <div class="card feature">
+            <div class="feature-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><path d="M16 8 2 22"/><path d="M17.5 15H9"/></svg>
+            </div>
+            <h3>CoreProtect</h3>
+            <p>Каждое действие логируется. Грифер пойман — откат за пару кликов. Ваше строительство в безопасности.</p>
+          </div>
+          <div class="card feature">
+            <div class="feature-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <h3>Живая карта BlueMap</h3>
+            <p>Открытая 3D-карта в браузере — смотрите построения друзей, прокладывайте маршруты, делитесь координатами.</p>
+          </div>
+          <div class="card feature">
+            <div class="feature-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
+            </div>
+            <h3>Вечный день</h3>
+            <p>doDaylightCycle отключён. Играем с красивым освещением без ночных набегов зомби, когда не хочется.</p>
+          </div>
+          <div class="card feature">
+            <div class="feature-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg>
+            </div>
+            <h3>Никакого P2W</h3>
+            <p>Все ресурсы добываются руками. Мы не продаём киты, флай и алмазы — только донатим на сервер, если хочется помочь.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Последние <em>новости</em></h2>
+            <p>Обновления, ивенты и анонсы — всё самое важное первыми узнают игроки voyageM!</p>
+          </div>
+          <a href="news.html" class="btn btn-ghost">Все новости →</a>
+        </div>
+        <div class="news-list">
+          <article class="news-item">
+            <div class="news-date">17.04.2026</div>
+            <div>
+              <div class="news-title">Запуск сезона «Terra»</div>
+              <div class="news-excerpt">Новый мир с уникальным генератором, спавн у 0,0 и стартовые киты для первых 100 игроков.</div>
+            </div>
+            <span class="news-tag">Анонс</span>
+          </article>
+          <article class="news-item">
+            <div class="news-date">12.04.2026</div>
+            <div>
+              <div class="news-title">Обновление до Paper 1.21.4</div>
+              <div class="news-excerpt">Перешли на свежую сборку. Исправили баги с чанками, улучшили производительность.</div>
+            </div>
+            <span class="news-tag">Патч</span>
+          </article>
+          <article class="news-item">
+            <div class="news-date">05.04.2026</div>
+            <div>
+              <div class="news-title">Турнир «Мастер выживания»</div>
+              <div class="news-excerpt">Каждую субботу — испытания на скорость и смекалку. Призы от администрации.</div>
+            </div>
+            <span class="news-tag">Ивент</span>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-host"></div>
+
+  <script src="partials.js"></script>
+  <script type="module" src="scene.js"></script>
+  <script>
+    mount('index.html');
+    (async () => {
+      const s = await fetchServerStatus();
+      const hero = document.getElementById('hero-status');
+      const stat = document.getElementById('stat-online');
+      if (s.online) {
+        hero.textContent = `Онлайн · ${s.players?.online ?? 0} игроков сейчас`;
+        stat.innerHTML = `<em>${s.players?.online ?? 0}</em>`;
+      } else {
+        hero.textContent = 'Сервер оффлайн — зайдите позже';
+        stat.innerHTML = '<em>0</em>';
+      }
+    })();
+  </script>
+</body>
+</html>

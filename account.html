@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Личный кабинет — voyageM!</title>
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
+  </script>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div id="nav-host"></div>
+
+  <main>
+    <div class="container" id="account-host"></div>
+  </main>
+
+  <div id="footer-host"></div>
+  <script src="partials.js"></script>
+  <script type="module" src="scene.js"></script>
+  <script>
+    mount('account.html');
+
+    const host = document.getElementById('account-host');
+
+    function getUser() {
+      const raw = localStorage.getItem('vm_user_data');
+      return raw ? JSON.parse(raw) : null;
+    }
+    function saveUser(data) {
+      localStorage.setItem('vm_user', data.nick);
+      localStorage.setItem('vm_user_data', JSON.stringify(data));
+    }
+    function logout() {
+      localStorage.removeItem('vm_user');
+      localStorage.removeItem('vm_user_data');
+      location.reload();
+    }
+
+    function renderLogin() {
+      host.innerHTML = `
+        <div class="login-wrap">
+          <h2>Войти в <em style="color:var(--accent); font-style:normal;">voyageM!</em></h2>
+          <p>Введите ник из Minecraft — кабинет привяжется к вашему игровому профилю.</p>
+          <label for="nick">Ник</label>
+          <input id="nick" type="text" placeholder="Steve" autocomplete="username" required>
+          <label for="pwd">Пароль (AuthMe)</label>
+          <input id="pwd" type="password" placeholder="••••••••" autocomplete="current-password" required>
+          <button class="btn btn-primary btn-lg" id="login-btn">Войти</button>
+          <p class="login-hint">Новый игрок? Просто зайдите на сервер и зарегистрируйтесь через /register.</p>
+        </div>`;
+      document.getElementById('login-btn').onclick = () => {
+        const nick = document.getElementById('nick').value.trim();
+        const pwd = document.getElementById('pwd').value;
+        if (nick.length < 3) { alert('Ник должен быть не короче 3 символов'); return; }
+        if (pwd.length < 4) { alert('Введите пароль'); return; }
+        saveUser({
+          nick,
+          email: '',
+          discord: '',
+          joined: new Date().toISOString().slice(0, 10),
+          group: 'Выживший',
+          stats: { hours: 0, blocks: 0, deaths: 0 }
+        });
+        location.reload();
+      };
+    }
+
+    function renderDashboard(user) {
+      host.innerHTML = `
+        <div class="account-grid">
+          <aside class="account-sidebar">
+            <div class="account-profile">
+              <div class="account-avatar" id="avatar-box">
+                <img src="https://mc-heads.net/avatar/${user.nick}/80" alt="" style="width:80px;height:80px;border-radius:16px;" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'${user.nick[0].toUpperCase()}'}))">
+              </div>
+              <h3>${user.nick}</h3>
+              <p>${user.group}</p>
+            </div>
+            <div class="account-nav" id="acc-nav">
+              <button data-tab="overview" class="active">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                Обзор
+              </button>
+              <button data-tab="profile">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Профиль
+              </button>
+              <button data-tab="security">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Безопасность
+              </button>
+              <button data-tab="logout" style="color: var(--danger); margin-top: 16px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Выйти
+              </button>
+            </div>
+          </aside>
+          <section class="account-main" id="acc-main"></section>
+        </div>`;
+
+      const tabs = {
+        overview: () => `
+          <div class="card account-section">
+            <h3>Статистика игры</h3>
+            <div class="playtime-grid">
+              <div class="playtime-card"><div class="playtime-value">${user.stats.hours}ч</div><div class="playtime-label">Часов в игре</div></div>
+              <div class="playtime-card"><div class="playtime-value">${user.stats.blocks.toLocaleString('ru')}</div><div class="playtime-label">Блоков поставлено</div></div>
+              <div class="playtime-card"><div class="playtime-value">${user.stats.deaths}</div><div class="playtime-label">Смертей</div></div>
+            </div>
+          </div>
+          <div class="card account-section">
+            <h3>Быстрый доступ</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+              <a class="btn btn-ghost" href="http://158.220.89.78:8100" target="_blank" rel="noopener">Открыть карту мира</a>
+              <a class="btn btn-ghost" href="status.html">Статус серверов</a>
+              <a class="btn btn-ghost" href="news.html">Свежие новости</a>
+              <button class="btn btn-ghost" onclick="copyIp()"><span id="copy-btn">Копировать IP</span></button>
+            </div>
+          </div>
+          <div class="card account-section">
+            <h3>Активность</h3>
+            <div class="field-row"><span class="field-label">Дата регистрации</span><span class="field-value">${user.joined}</span></div>
+            <div class="field-row"><span class="field-label">Последний вход</span><span class="field-value">Сегодня</span></div>
+            <div class="field-row"><span class="field-label">Группа</span><span class="field-value"><span class="news-tag" style="background: var(--accent-soft); color: var(--accent);">${user.group}</span></span></div>
+          </div>
+        `,
+        profile: () => `
+          <div class="card account-section">
+            <h3>Профиль</h3>
+            <div class="field-row"><span class="field-label">Игровой ник</span><span class="field-value"><input id="f-nick" value="${user.nick}" readonly></span></div>
+            <div class="field-row"><span class="field-label">Email</span><span class="field-value"><input id="f-email" type="email" value="${user.email}" placeholder="you@example.com"></span></div>
+            <div class="field-row"><span class="field-label">Discord</span><span class="field-value"><input id="f-discord" value="${user.discord}" placeholder="username"></span></div>
+            <div class="field-row"><span class="field-label"></span><span class="field-value"><button class="btn btn-primary" id="save-profile">Сохранить</button></span></div>
+          </div>
+        `,
+        security: () => `
+          <div class="card account-section">
+            <h3>Безопасность</h3>
+            <div class="field-row"><span class="field-label">Текущий пароль</span><span class="field-value"><input type="password" placeholder="••••••••"></span></div>
+            <div class="field-row"><span class="field-label">Новый пароль</span><span class="field-value"><input type="password" placeholder="не меньше 6 символов"></span></div>
+            <div class="field-row"><span class="field-label">Повторите новый</span><span class="field-value"><input type="password"></span></div>
+            <div class="field-row"><span class="field-label"></span><span class="field-value"><button class="btn btn-primary">Сменить пароль</button></span></div>
+          </div>
+          <div class="card account-section">
+            <h3>Двухфакторная защита</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">Подключите AuthMe 2FA, чтобы защитить аккаунт от угона.</p>
+            <button class="btn btn-ghost">Настроить 2FA</button>
+          </div>
+        `,
+      };
+
+      const main = document.getElementById('acc-main');
+      function setTab(tab) {
+        if (tab === 'logout') { logout(); return; }
+        main.innerHTML = tabs[tab]();
+        document.querySelectorAll('#acc-nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+        if (tab === 'profile') {
+          document.getElementById('save-profile').onclick = () => {
+            user.email = document.getElementById('f-email').value;
+            user.discord = document.getElementById('f-discord').value;
+            saveUser(user);
+            const btn = document.getElementById('save-profile');
+            btn.textContent = 'Сохранено ✓';
+            setTimeout(() => (btn.textContent = 'Сохранить'), 1500);
+          };
+        }
+      }
+      document.querySelectorAll('#acc-nav button').forEach(b => {
+        b.onclick = () => setTab(b.dataset.tab);
+      });
+      setTab('overview');
+    }
+
+    const u = getUser();
+    if (u) renderDashboard(u);
+    else renderLogin();
+  </script>
+</body>
+</html>
