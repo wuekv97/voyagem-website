@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="lb.title_tag">Лидерборд — voyageM!</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg?v=4">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=4">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=4">
+  <link rel="stylesheet" href="styles.css?v=17">
+  <script>
+    (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
+  </script>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div id="nav-host"></div>
+
+  <main>
+    <section class="hero" style="padding: 64px 0 20px;">
+      <div class="container">
+        <div class="hero-kicker">
+          <span class="hero-kicker-dot"></span>
+          <span data-i18n="lb.kicker">Обновляется каждые 30s</span>
+        </div>
+        <h1 style="font-size: clamp(36px, 5vw, 52px);" data-i18n-html="lb.title">Лидерборд <em>сезона</em></h1>
+        <p class="lead" data-i18n="lb.lead">Очки начисляются за добычу руд, рыбалку, и убийство мобов и боссов. Топ-игроки сезона получат уникальный лут и ник в Зале Славы.</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 16px;">
+      <div class="container">
+        <div class="lb-controls">
+          <div class="lb-period" role="tablist">
+            <button class="lb-period-btn active" data-period="allTime" data-i18n="lb.alltime">Всё время</button>
+            <button class="lb-period-btn" data-period="daily" data-i18n="lb.today">Сегодня</button>
+          </div>
+          <span class="lb-updated" id="lb-updated"></span>
+        </div>
+
+        <div id="lb-podium" class="lb-podium"></div>
+        <div id="lb-table" class="lb-table"></div>
+        <div id="lb-empty" class="lb-empty" style="display:none">
+          <p data-i18n="lb.empty">Пока никто не набил очков — будь первым!</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-host"></div>
+  <script src="i18n.js?v=17"></script>
+  <script src="partials.js?v=17"></script>
+  <script type="module" src="scene.js?v=17"></script>
+  <script>
+    mount('leaderboard.html');
+
+    let CURRENT = 'allTime';
+    let CACHED = null;
+
+    const nf = new Intl.NumberFormat(LANG === 'en' ? 'en-US' : 'ru-RU', { maximumFractionDigits: 0 });
+    const nf1 = new Intl.NumberFormat(LANG === 'en' ? 'en-US' : 'ru-RU', { maximumFractionDigits: 1 });
+    const fmt = (n) => {
+      const v = Number(n) || 0;
+      if (v >= 1000000) return nf1.format(v / 1000000) + 'M';
+      if (v >= 10000) return nf1.format(v / 1000) + 'k';
+      return nf.format(v);
+    };
+
+    function pointsFor(row) {
+      return CURRENT === 'daily' ? row.dailyPoints : row.totalPoints;
+    }
+
+    function render() {
+      if (!CACHED) return;
+      const rows = (CACHED[CURRENT] || []).filter(r => pointsFor(r) > 0);
+      const podiumEl = document.getElementById('lb-podium');
+      const tableEl = document.getElementById('lb-table');
+      const emptyEl = document.getElementById('lb-empty');
+
+      if (rows.length === 0) {
+        podiumEl.innerHTML = '';
+        tableEl.innerHTML = '';
+        emptyEl.style.display = 'block';
+        return;
+      }
+      emptyEl.style.display = 'none';
+
+      // Top 3 → podium
+      const top3 = rows.slice(0, 3);
+      const order = [1, 0, 2]; // visual order: 2nd, 1st, 3rd
+      podiumEl.innerHTML = order.map(i => {
+        const r = top3[i];
+        if (!r) return '<div class="lb-podium-slot"></div>';
+        const rank = i + 1;
+        const cls = `lb-podium-card lb-rank-${rank}`;
+        return `
+          <div class="lb-podium-slot lb-podium-slot-${rank}">
+            <div class="${cls}">
+              <span class="lb-medal">${rank === 1 ? '★' : rank === 2 ? '✦' : '✧'}</span>
+              <div class="lb-podium-avatar">
+                <img src="https://mc-heads.net/avatar/${r.name}/96" alt="" onerror="this.style.display='none'">
+              </div>
+              <div class="lb-podium-name">${r.name}</div>
+              <div class="lb-podium-points">${fmt(pointsFor(r))}</div>
+              <div class="lb-podium-rank">#${rank}</div>
+              <div class="lb-podium-meta">
+                <span>${fmt(r.mobKills)} mobs</span>
+                ${r.bossKills > 0 ? `<span>${fmt(r.bossKills)} boss</span>` : ''}
+                ${r.oresMined > 0 ? `<span>${fmt(r.oresMined)} ores</span>` : ''}
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+
+      // Rest 4+
+      const rest = rows.slice(3);
+      tableEl.innerHTML = rest.length === 0 ? '' : `
+        <div class="lb-row lb-row-head">
+          <span class="lb-rank-h">#</span>
+          <span class="lb-player-h" data-i18n="lb.col_player">Игрок</span>
+          <span class="lb-mob-h" data-i18n="lb.col_mobs">Мобы</span>
+          <span class="lb-boss-h" data-i18n="lb.col_boss">Боссы</span>
+          <span class="lb-ore-h" data-i18n="lb.col_ores">Руды</span>
+          <span class="lb-points-h" data-i18n="lb.col_points">Очки</span>
+        </div>
+        ${rest.map((r, i) => `
+          <div class="lb-row">
+            <span class="lb-rank">${i + 4}</span>
+            <span class="lb-player">
+              <img src="https://mc-heads.net/avatar/${r.name}/32" alt="" onerror="this.style.display='none'">
+              <span>${r.name}</span>
+            </span>
+            <span class="lb-mob">${fmt(r.mobKills)}</span>
+            <span class="lb-boss">${fmt(r.bossKills)}</span>
+            <span class="lb-ore">${fmt(r.oresMined)}</span>
+            <span class="lb-points">${fmt(pointsFor(r))}</span>
+          </div>`).join('')}`;
+
+      if (typeof applyI18n === 'function') applyI18n(tableEl);
+    }
+
+    async function fetchLeaderboard() {
+      try {
+        const res = await fetch('/api/leaderboard');
+        if (!res.ok) return;
+        CACHED = await res.json();
+        const upd = document.getElementById('lb-updated');
+        if (CACHED.updated) {
+          const d = new Date(CACHED.updated);
+          upd.textContent = `${t('lb.updated_at')} ${d.toLocaleTimeString(LANG === 'en' ? 'en-US' : 'ru-RU')}`;
+        }
+        render();
+      } catch {}
+    }
+
+    document.querySelectorAll('.lb-period-btn').forEach(b => {
+      b.onclick = () => {
+        document.querySelectorAll('.lb-period-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        CURRENT = b.dataset.period;
+        render();
+      };
+    });
+
+    fetchLeaderboard();
+    setInterval(fetchLeaderboard, 30000);
+  </script>
+</body>
+</html>
