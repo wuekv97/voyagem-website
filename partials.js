@@ -60,7 +60,6 @@ function renderNav(active) {
         </a>
         <div class="nav-links">${links}</div>
         <div class="nav-actions">
-          ${themeToggleHtml()}
           ${langToggleHtml()}
           ${action}
           <button class="nav-burger" onclick="openMobileNav()" aria-label="Menu" aria-expanded="false">
@@ -75,7 +74,6 @@ function renderNav(active) {
       </button>
       <nav class="mobile-nav-links">${mLinks}</nav>
       <div class="mobile-nav-action">
-        ${themeToggleHtml()}
         ${mAction}
       </div>
     </div>`;

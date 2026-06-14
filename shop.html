@@ -16,11 +16,11 @@
   <meta name="twitter:image" content="https://voyage-m.com/assets/og-image.png?v=5">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="design/system.css?v=38">
-  <link rel="stylesheet" href="design/components.css?v=38">
-  <link rel="stylesheet" href="styles.css?v=38">
-  <script>(function(){var s=localStorage.getItem('vm_theme');if(!s)s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=s;})();</script>
-  <script src="analytics.js?v=38"></script>
+  <link rel="stylesheet" href="design/system.css?v=41">
+  <link rel="stylesheet" href="design/components.css?v=41">
+  <link rel="stylesheet" href="styles.css?v=41">
+  <script>document.documentElement.dataset.theme='dark';</script>
+  <script src="analytics.js?v=41"></script>
   <style>
     .shop-wrap { max-width: 980px; margin: 0 auto; }
     .wallet-bar {
@@ -57,6 +57,10 @@
     .pass-perks li { display: flex; gap: 9px; font-size: 14px; color: var(--text-muted); line-height: 1.4; }
     .pass-perks li svg { flex-shrink: 0; color: var(--accent); margin-top: 2px; }
     .pass-card .btn { width: 100%; }
+    .pass-art { margin: -28px -28px 20px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0; border-bottom: 1px solid var(--border); }
+    .pass-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .pass-card .btn:disabled { opacity: .45; cursor: not-allowed; filter: grayscale(.35); }
+    .pass-card .btn:disabled:hover { transform: none; box-shadow: none; }
     .shop-msg { margin-top: 20px; text-align: center; font-size: 14px; min-height: 22px; }
     .shop-msg.ok { color: var(--success); } .shop-msg.err { color: var(--danger); }
     .shop-gate { text-align: center; padding: 60px 20px; }
@@ -93,11 +97,12 @@
 
           <div class="ref-row">
             <label for="ref-nick" data-i18n="shop.ref_label">Ник пригласившего (необязательно):</label>
-            <input type="text" id="ref-nick" maxlength="16" placeholder="ник реферала" spellcheck="false" autocomplete="off">
+            <input type="text" id="ref-nick" maxlength="16" data-i18n-placeholder="shop.ref_placeholder" placeholder="ник реферала" spellcheck="false" autocomplete="off">
           </div>
 
           <div class="pass-grid">
             <article class="pass-card" id="pass-1">
+              <div class="pass-art"><img src="assets/pass-base.jpg?v=41" alt="" loading="lazy"></div>
               <div class="pass-name" data-i18n="shop.tier1_name">Базовый пропуск</div>
               <div class="pass-price">$10</div>
               <div class="pass-coeff" data-i18n="shop.tier1_coeff">коэффициент 1.0x</div>
@@ -111,6 +116,7 @@
 
             <article class="pass-card featured" id="pass-2">
               <span class="pass-tag" data-i18n="shop.best">выгоднее</span>
+              <div class="pass-art"><img src="assets/pass-seeker.jpg?v=41" alt="" loading="lazy"></div>
               <div class="pass-name" data-i18n="shop.tier2_name">Пропуск искателя</div>
               <div class="pass-price">$15</div>
               <div class="pass-coeff" data-i18n="shop.tier2_coeff">коэффициент 1.25x</div>
@@ -131,9 +137,9 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=38"></script>
-  <script src="partials.js?v=38"></script>
-  <script type="module" src="scene.js?v=38"></script>
+  <script src="i18n.js?v=41"></script>
+  <script src="partials.js?v=41"></script>
+  <script type="module" src="scene.js?v=41"></script>
   <script>
     mount('/shop');
 
@@ -149,17 +155,26 @@
       loadWallet();
     }
 
+    const PASS_PRICE = { 1: 10, 2: 15 };
     async function loadWallet() {
       try {
         const r = await fetch('/api/wallet', { headers: { Authorization: 'Bearer ' + token } });
         if (r.status === 401) { localStorage.removeItem('vm_user_data'); location.href = '/account'; return; }
         const d = await r.json();
-        document.getElementById('wallet-balance').textContent = '$' + (d.balance || 0).toLocaleString('en-US');
-        // disable tiers the player already owns (current or lower)
+        const bal = d.balance || 0;
+        document.getElementById('wallet-balance').textContent = '$' + bal.toLocaleString('en-US');
         const tier = (d.pass && d.pass.tier) || 0;
         for (let tr = 1; tr <= 2; tr++) {
           const btn = document.querySelector(`.pass-card[id="pass-${tr}"] button`);
-          if (tier >= tr) { btn.disabled = true; btn.textContent = t('shop.owned'); }
+          if (tier >= tr) {
+            // already owns this tier (or higher)
+            btn.disabled = true; btn.textContent = t('shop.owned');
+          } else if (bal < PASS_PRICE[tr]) {
+            // not enough balance — lock the button
+            btn.disabled = true; btn.textContent = t('shop.insufficient');
+          } else {
+            btn.disabled = false; btn.textContent = t(tr === 1 ? 'shop.buy_t1' : 'shop.buy_t2');
+          }
         }
       } catch { document.getElementById('wallet-balance').textContent = '—'; }
     }
