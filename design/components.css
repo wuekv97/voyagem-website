@@ -1,0 +1,86 @@
+/* =========================================================================
+   voyageM! — shared component patterns (plain CSS, token-driven)
+   Drop into either repo AFTER linking styles.css. These are the canonical
+   looks for buttons, glass cards, inputs, pills and eyebrows. Both the
+   website and the launcher should converge on these.
+   ========================================================================= */
+
+/* ---- Buttons ---- */
+.vm-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 20px;border-radius:12px;min-height:44px;
+  font-family:var(--font-body);font-size:14px;font-weight:600;letter-spacing:-0.005em;
+  white-space:nowrap;cursor:pointer;border:1px solid transparent;
+  transition:transform .15s var(--ease),background-color .25s var(--ease),
+    border-color .25s var(--ease),color .25s var(--ease),box-shadow .25s var(--ease);
+}
+.vm-btn:active{transform:scale(.98);}
+.vm-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.vm-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;}
+.vm-btn-lg{padding:15px 26px;font-size:15px;min-height:52px;border-radius:14px;}
+
+.vm-btn-primary{
+  background:var(--accent);color:var(--accent-ink);
+  box-shadow:0 10px 30px -8px var(--accent-glow),inset 0 1px 0 rgba(255,255,255,.2);
+}
+.vm-btn-primary:hover:not(:disabled){background:var(--accent-hover);box-shadow:0 14px 36px -6px var(--accent-glow);}
+
+.vm-btn-ghost{
+  color:var(--text);border-color:var(--border-strong);background:var(--surface);
+  backdrop-filter:var(--blur-soft);-webkit-backdrop-filter:var(--blur-soft);
+}
+.vm-btn-ghost:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+
+/* Launcher action buttons — map the launcher's existing green/blue/amber here */
+.vm-btn-play{background:var(--play-grad);color:#fff;box-shadow:0 4px 20px rgba(34,197,94,.35);}
+.vm-btn-install{background:var(--install-grad);color:#fff;box-shadow:0 4px 20px rgba(59,130,246,.35);}
+.vm-btn-update{background:var(--update-grad);color:#fff;box-shadow:0 4px 20px rgba(245,158,11,.35);}
+.vm-btn-busy{background:var(--busy-grad);color:#fff;cursor:wait;}
+
+/* ---- Glass card (signature surface) ---- */
+.vm-card{
+  position:relative;overflow:hidden;border-radius:var(--radius-lg);padding:32px;
+  background:var(--surface);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  border:1px solid var(--border);box-shadow:var(--shadow-sm);
+  transition:border-color .25s var(--ease),transform .25s var(--ease),box-shadow .25s var(--ease);
+}
+.vm-card::before{ /* top hairline highlight */
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border-strong),transparent);
+}
+.vm-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow);}
+
+/* ---- Input ---- */
+.vm-input-wrap{
+  display:flex;align-items:center;gap:10px;padding:0 15px;border-radius:12px;
+  background:var(--surface-2);border:1px solid var(--border);
+  transition:border-color .15s var(--ease),box-shadow .15s var(--ease);
+}
+.vm-input-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+.vm-input{
+  flex:1;width:100%;padding:13px 0;background:none;border:none;outline:none;
+  color:var(--text);font-family:var(--font-body);font-size:15px;
+}
+.vm-input::placeholder{color:var(--text-dim);}
+
+/* ---- Status pill ---- */
+.vm-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;
+  font-family:var(--font-body);font-size:12px;font-weight:600;border:1px solid transparent;}
+.vm-pill .vm-dot{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor;}
+.vm-pill-online{background:rgba(52,211,153,.14);color:var(--success);border-color:rgba(52,211,153,.3);}
+.vm-pill-offline{background:rgba(248,113,113,.14);color:var(--danger);border-color:rgba(248,113,113,.3);}
+
+/* ---- Eyebrow (mono uppercase gold label) ---- */
+.vm-eyebrow{
+  display:inline-block;font-family:var(--font-mono);font-size:11px;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--accent);
+}
+.vm-eyebrow-pill{padding:5px 12px;border:1px solid var(--accent-glow);background:var(--accent-soft);border-radius:100px;}
+
+/* ---- Switch (launcher settings toggle) ---- */
+.vm-switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;}
+.vm-switch input{opacity:0;width:0;height:0;}
+.vm-switch-track{position:absolute;inset:0;cursor:pointer;background:var(--surface-3);border-radius:12px;transition:background .3s var(--ease);}
+.vm-switch-track::before{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.6);transition:transform .3s var(--ease);}
+.vm-switch input:checked + .vm-switch-track{background:var(--success);}
+.vm-switch input:checked + .vm-switch-track::before{transform:translateX(20px);background:#fff;}

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="ref.title_tag">Реферальная система — voyageM!</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=5">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/logo-192.png?v=5">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="voyageM!">
+  <meta property="og:title" content="voyageM! — Minecraft сервер">
+  <meta property="og:description" content="Премиум survival на фирменном генераторе мира. Всё добывается руками, призовой фонд сезона, кастомные подземелья.">
+  <meta property="og:image" content="https://voyage-m.com/assets/og-image.png?v=5">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://voyage-m.com/assets/og-image.png?v=5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="design/system.css?v=37">
+  <link rel="stylesheet" href="design/components.css?v=37">
+  <link rel="stylesheet" href="styles.css?v=37">
+  <script>(function(){var s=localStorage.getItem('vm_theme');if(!s)s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=s;})();</script>
+  <script src="analytics.js?v=37"></script>
+</head>
+<body>
+  <div id="nav-host"></div>
+
+  <main>
+    <section class="hero" style="padding: 56px 0 12px;">
+      <div class="container">
+        <div class="hero-kicker">
+          <span class="hero-kicker-dot"></span>
+          <span data-i18n="ref.kicker">Приведи друга — получи бонусы</span>
+        </div>
+        <h1 style="font-size: clamp(36px, 5vw, 52px);" data-i18n-html="ref.title">Реферальная <em>система</em></h1>
+        <p class="lead" data-i18n="ref.lead">Приглашай игроков, увеличивай свой множитель очков и забирай уникальные предметы кастомизации.</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 16px;">
+      <div class="container">
+
+        <div class="ref-code-card tick-card" id="ref-code-card"><span class="tick-tr"></span><span class="tick-bl"></span>
+          <div class="ref-code-side">
+            <div class="ref-code-label" data-i18n="ref.your_code_h">Твой реферальный код</div>
+            <div class="ref-code-value" id="ref-code-value">—</div>
+            <div class="ref-code-hint" id="ref-code-hint" data-i18n="ref.your_code_hint">Передай этот ник тому, кого приглашаешь — пусть укажет его в форме покупки пропуска.</div>
+          </div>
+          <div class="ref-code-actions">
+            <button class="btn btn-primary" id="ref-copy-btn" style="display:none;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:-3px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span id="ref-copy-label">Скопировать</span>
+            </button>
+            <a href="/account" class="btn btn-primary" id="ref-login-btn" data-i18n="ref.cta_login">Войти в кабинет</a>
+          </div>
+        </div>
+
+        <h3 class="ref-h" data-i18n="ref.bonus_h" style="margin-top:48px;">Что ты получаешь</h3>
+        <div class="ref-bonus-grid">
+          <div class="ref-bonus-card">
+            <div class="ref-bonus-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" stroke-linejoin="miter"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg></div>
+            <h4 data-i18n="ref.b1_t">+0.05x за каждого реферала</h4>
+            <p data-i18n="ref.b1_d">Коэффициент очков растёт у тебя и у приведённого игрока — обоих ждёт +5% к фарму.</p>
+          </div>
+          <div class="ref-bonus-card">
+            <div class="ref-bonus-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" stroke-linejoin="miter"><path d="M12 2 5 9v8l7 5 7-5V9l-7-7z"/><path d="M12 7v10M8 14l4 3 4-3"/></svg></div>
+            <h4 data-i18n="ref.b2_t">До +0.25x с базовым пропуском</h4>
+            <p data-i18n="ref.b2_d">Можно прокачать множитель до +25% — это до 5 успешных приглашений.</p>
+          </div>
+          <div class="ref-bonus-card">
+            <div class="ref-bonus-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" stroke-linejoin="miter"><path d="M12 3v18M3 12h18M6 6l12 12M18 6 6 18"/></svg></div>
+            <h4 data-i18n="ref.b3_t">Уникальный предмет кастомизации</h4>
+            <p data-i18n="ref.b3_d">Видимая на сервере награда, выделяющая тебя среди других игроков.</p>
+          </div>
+        </div>
+
+        <h3 class="ref-h" data-i18n="ref.rules_h" style="margin-top:48px;">Как это работает</h3>
+        <div class="docs-prose ref-rules" id="ref-rules">
+          <div class="docs-loading">…</div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-host"></div>
+  <script src="i18n.js?v=37"></script>
+  <script src="partials.js?v=37"></script>
+  <script type="module" src="scene.js?v=37"></script>
+  <script>
+    mount('/referrals');
+
+    function mdToHtml(md) {
+      const lines = md.replace(/\r\n/g, '\n').split('\n');
+      const out = [];
+      let i = 0;
+      const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const inline = s => esc(s)
+        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+        .replace(/_(.+?)_/g,'<em>$1</em>')
+        .replace(/`([^`]+)`/g,'<code>$1</code>');
+      while (i < lines.length) {
+        const line = lines[i];
+        const h = line.match(/^(#{1,6})\s+(.*)$/);
+        if (h) { out.push(`<h${h[1].length+1}>${inline(h[2])}</h${h[1].length+1}>`); i++; continue; }
+        if (/^\s*[-*]\s+/.test(line)) {
+          const items = [];
+          while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) { items.push(inline(lines[i].replace(/^\s*[-*]\s+/,''))); i++; }
+          out.push('<ul>' + items.map(x=>`<li>${x}</li>`).join('') + '</ul>');
+          continue;
+        }
+        if (/^\s*$/.test(line)) { i++; continue; }
+        const buf = [line]; i++;
+        while (i < lines.length && !/^\s*$/.test(lines[i]) && !/^#{1,6}\s/.test(lines[i]) && !/^\s*[-*]\s+/.test(lines[i])) {
+          buf.push(lines[i]); i++;
+        }
+        out.push('<p>' + inline(buf.join(' ')) + '</p>');
+      }
+      return out.join('\n');
+    }
+
+    async function loadRules() {
+      const host = document.getElementById('ref-rules');
+      try {
+        const dir = (typeof LANG !== 'undefined' && LANG === 'en') ? 'docs/en/' : 'docs/';
+        const r = await fetch(dir + encodeURIComponent('Реферальная система.md'));
+        const md = await r.text();
+        host.innerHTML = mdToHtml(md);
+      } catch (e) {
+        host.innerHTML = `<p style="color:var(--danger)">${e.message}</p>`;
+      }
+    }
+
+    function renderCode() {
+      const nick = localStorage.getItem('vm_user');
+      const value = document.getElementById('ref-code-value');
+      const hint = document.getElementById('ref-code-hint');
+      const copyBtn = document.getElementById('ref-copy-btn');
+      const loginBtn = document.getElementById('ref-login-btn');
+      if (nick) {
+        value.textContent = nick;
+        hint.textContent = t('ref.your_code_hint');
+        copyBtn.style.display = '';
+        loginBtn.style.display = 'none';
+        copyBtn.onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(nick);
+            const lbl = document.getElementById('ref-copy-label');
+            const prev = lbl.textContent;
+            lbl.textContent = '✓';
+            setTimeout(() => { lbl.textContent = prev; }, 1200);
+          } catch {}
+        };
+      } else {
+        value.textContent = '—';
+        hint.textContent = t('ref.login_to_see');
+        copyBtn.style.display = 'none';
+        loginBtn.style.display = '';
+      }
+    }
+
+    loadRules();
+    renderCode();
+  </script>
+</body>
+</html>

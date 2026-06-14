@@ -4,16 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title data-i18n="account.title_tag">Личный кабинет — voyageM!</title>
-  <link rel="icon" type="image/svg+xml" href="assets/logo.svg?v=4">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=4">
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=4">
-  <link rel="stylesheet" href="styles.css?v=17">
-  <script>
-    (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
-  </script>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=5">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/logo-192.png?v=5">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="voyageM!">
+  <meta property="og:title" content="voyageM! — Minecraft сервер">
+  <meta property="og:description" content="Премиум survival на фирменном генераторе мира. Всё добывается руками, призовой фонд сезона, кастомные подземелья.">
+  <meta property="og:image" content="https://voyage-m.com/assets/og-image.png?v=5">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://voyage-m.com/assets/og-image.png?v=5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="design/system.css?v=38">
+  <link rel="stylesheet" href="design/components.css?v=38">
+  <link rel="stylesheet" href="styles.css?v=38">
+  <script>(function(){var s=localStorage.getItem('vm_theme');if(!s)s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=s;})();</script>
+  <script src="analytics.js?v=38"></script>
 </head>
 <body>
-  <canvas id="bg-canvas"></canvas>
   <div id="nav-host"></div>
 
   <main>
@@ -21,15 +30,15 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=17"></script>
-  <script src="partials.js?v=17"></script>
-  <script type="module" src="scene.js?v=17"></script>
+  <script src="i18n.js?v=38"></script>
+  <script src="partials.js?v=38"></script>
+  <script type="module" src="scene.js?v=38"></script>
   <script type="module">
     import * as skinview3d from 'https://cdn.jsdelivr.net/npm/skinview3d@3.0.1/+esm';
     window.skinview3d = skinview3d;
   </script>
   <script>
-    mount('account.html');
+    mount('/account');
 
     const host = document.getElementById('account-host');
 
@@ -142,6 +151,7 @@
       bed:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>',
       moon:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
       door:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14"/><path d="M2 20h20"/><path d="M14 12v.01"/></svg>',
+      coin:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9h3.75a1.75 1.75 0 0 1 0 3.5H9.5h4"/></svg>',
     };
 
     function statCard(opts) {
@@ -219,7 +229,7 @@
           <div class="card account-section empty-state">
             <h3>${t('account.no_stats_title')}</h3>
             <p>${t('account.no_stats_lead')}</p>
-            <a class="btn btn-primary" href="download.html">${t('account.quick_dl')}</a>
+            <a class="btn btn-primary" href="/download">${t('account.quick_dl')}</a>
           </div>`;
         return;
       }
@@ -227,6 +237,18 @@
       // ---- Hero summary (3 prominent cards) ----
       const summary = `
         <section class="stats-summary">
+          ${featureCard({
+            icon: ICON.coin,
+            value: '<span id="wallet-balance-acc" style="color:var(--accent)">—</span>',
+            label: t('stat.wallet'),
+            sub: t('stat.wallet_sub'),
+          })}
+          ${featureCard({
+            icon: ICON.coin,
+            value: '<span id="points-balance">—</span>',
+            label: t('stat.points'),
+            sub: t('stat.points_sub'),
+          })}
           ${featureCard({
             icon: ICON.clock,
             value: fmtDuration(s.playSeconds),
@@ -331,14 +353,42 @@
             <h3>${t('account.quick_title')}</h3>
           </header>
           <div class="quick-grid">
-            <a class="btn btn-ghost" href="status.html">${t('account.quick_map')}</a>
-            <a class="btn btn-ghost" href="status.html">${t('account.quick_status')}</a>
-            <a class="btn btn-ghost" href="news.html">${t('account.quick_news')}</a>
-            <a class="btn btn-ghost" href="download.html">${t('account.quick_dl')}</a>
+            <a class="btn btn-ghost" href="/status">${t('account.quick_map')}</a>
+            <a class="btn btn-ghost" href="/status">${t('account.quick_status')}</a>
+            <a class="btn btn-ghost" href="/news">${t('account.quick_news')}</a>
+            <a class="btn btn-ghost" href="/download">${t('account.quick_dl')}</a>
           </div>
         </section>`;
 
       statsHost.innerHTML = summary + combat + movement + world + life + skin + quick;
+
+      // Points balance: live via RCON (auth) with leaderboard fallback
+      (async () => {
+        const el = document.getElementById('points-balance');
+        if (!el) return;
+        const nf = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 });
+        try {
+          if (user.token) {
+            const r = await fetch('/api/balance', { headers: { Authorization: 'Bearer ' + user.token } });
+            if (r.ok) { el.textContent = nf.format((await r.json()).balance); return; }
+          }
+          const lb = await fetch('/api/leaderboard').then(r => r.json());
+          const row = (lb.allTime || []).find(p =>
+            (p.name || '').toLowerCase() === user.nick.toLowerCase());
+          el.textContent = row ? nf.format(row.totalPoints ?? 0) : '0';
+        } catch { el.textContent = '—'; }
+      })();
+
+      // Wallet balance ($ credits, manual top-up)
+      (async () => {
+        const el = document.getElementById('wallet-balance-acc');
+        if (!el || !user.token) return;
+        try {
+          const r = await fetch('/api/wallet', { headers: { Authorization: 'Bearer ' + user.token } });
+          if (r.ok) { const d = await r.json(); el.textContent = '$' + (d.balance || 0).toLocaleString('en-US'); }
+          else el.textContent = '$0';
+        } catch { el.textContent = '—'; }
+      })();
       wireSkinUpload(user);
     }
 

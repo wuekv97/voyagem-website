@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="docs.title_tag">Документация — voyageM!</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=5">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/logo-192.png?v=5">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="voyageM!">
+  <meta property="og:title" content="voyageM! — Minecraft сервер">
+  <meta property="og:description" content="Премиум survival на фирменном генераторе мира. Всё добывается руками, призовой фонд сезона, кастомные подземелья.">
+  <meta property="og:image" content="https://voyage-m.com/assets/og-image.png?v=5">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://voyage-m.com/assets/og-image.png?v=5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="design/system.css?v=37">
+  <link rel="stylesheet" href="design/components.css?v=37">
+  <link rel="stylesheet" href="styles.css?v=37">
+  <script>(function(){var s=localStorage.getItem('vm_theme');if(!s)s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=s;})();</script>
+  <script src="analytics.js?v=37"></script>
+</head>
+<body>
+  <div id="nav-host"></div>
+
+  <main>
+    <section class="hero" style="padding: 56px 0 12px;">
+      <div class="container">
+        <div class="hero-kicker">
+          <span class="hero-kicker-dot"></span>
+          <span data-i18n="docs.kicker">Сезон · 10 дней</span>
+        </div>
+        <h1 style="font-size: clamp(36px, 5vw, 52px);" data-i18n-html="docs.title">Документация <em>voyageM!</em></h1>
+        <p class="lead" data-i18n="docs.lead">Всё о механиках сезона: подземелья, кастомы, очки, ивенты, пропуски и призовой фонд.</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 16px;">
+      <div class="container docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar">
+          <h4 data-i18n="docs.contents">Содержание</h4>
+          <nav class="docs-toc" id="docs-toc"></nav>
+        </aside>
+        <article class="docs-content" id="docs-content">
+          <div class="docs-loading">…</div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-host"></div>
+  <script src="i18n.js?v=37"></script>
+  <script src="partials.js?v=37"></script>
+  <script type="module" src="scene.js?v=37"></script>
+  <script>
+    mount('/docs');
+
+    // 8 sections — file → title shown in TOC + heading
+    const SVG = (p) => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" stroke-linejoin="miter">${p}</svg>`;
+    const ICONS = {
+      tower:  SVG('<path d="M6 21V9l3-3V3h6v3l3 3v12"/><path d="M6 13h12M10 21v-4h4v4"/>'),
+      spark:  SVG('<path d="M12 3v18M3 12h18"/><path d="M6 6l12 12M18 6L6 18"/>'),
+      target: SVG('<rect x="4" y="4" width="16" height="16"/><rect x="9" y="9" width="6" height="6"/>'),
+      flag:   SVG('<path d="M6 21V4M6 4h11l-2.5 4L17 12H6"/>'),
+      ticket: SVG('<path d="M3 8h18v3a2 2 0 0 0 0 2v3H3v-3a2 2 0 0 0 0-2V8z"/><path d="M9 8v8"/>'),
+      coin:   SVG('<rect x="4" y="4" width="16" height="16"/><path d="M12 8v8M9.5 10h3.5a1.5 1.5 0 0 1 0 3H9.5h4"/>'),
+      gear:   SVG('<rect x="9" y="9" width="6" height="6"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>'),
+      users:  SVG('<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.5a5 5 0 0 1 5 5v.5"/>'),
+    };
+    const EN_DOCS = (typeof LANG !== 'undefined' && LANG === 'en');
+    const DOCS_DIR = EN_DOCS ? 'docs/en/' : 'docs/';
+    const SECTIONS = [
+      { id: 'dungeons',  file: 'Voyage Dungeons.md',                      title: 'Voyage Dungeons',                                  icon: ICONS.tower },
+      { id: 'customs',   file: 'Voyage Customs.md',                       title: 'Voyage Customs',                                   icon: ICONS.spark },
+      { id: 'points',    file: 'Добыча очков и источники добычи.md',      title: EN_DOCS ? 'Points & Sources' : 'Очки и источники',  icon: ICONS.target },
+      { id: 'events',    file: 'Ивенты.md',                               title: EN_DOCS ? 'Events' : 'Ивенты',                      icon: ICONS.flag },
+      { id: 'passes',    file: 'Уровни пропуска.md',                      title: EN_DOCS ? 'Pass Tiers' : 'Уровни пропуска',         icon: ICONS.ticket },
+      { id: 'prize',     file: 'Распределение призового фонда.md',        title: EN_DOCS ? 'Prize Pool' : 'Призовой фонд',           icon: ICONS.coin },
+      { id: 'referrals', file: 'Реферальная система.md',                  title: EN_DOCS ? 'Referral Program' : 'Реферальная система', icon: ICONS.users },
+      { id: 'launcher',  file: 'Лаунчер.md',                              title: EN_DOCS ? 'Launcher' : 'Лаунчер',                   icon: ICONS.gear },
+    ];
+
+    // Minimal markdown → HTML renderer (good enough for our content)
+    function mdToHtml(md) {
+      const lines = md.replace(/\r\n/g, '\n').split('\n');
+      const out = [];
+      let i = 0;
+      function escapeHtml(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+      function inline(s) {
+        s = escapeHtml(s);
+        s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        s = s.replace(/__(.+?)__/g, '<strong>$1</strong>');
+        s = s.replace(/_(.+?)_/g, '<em>$1</em>');
+        s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+        s = s.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+        return s;
+      }
+      function isTable(line) { return /^\s*\|.*\|\s*$/.test(line); }
+      function isDelim(line) { return /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$/.test(line); }
+
+      while (i < lines.length) {
+        const line = lines[i];
+        // headings
+        const h = line.match(/^(#{1,6})\s+(.*)$/);
+        if (h) {
+          const level = h[1].length;
+          out.push(`<h${level + 1}>${inline(h[2])}</h${level + 1}>`); // shift +1 so md # → h2 (page already has h1)
+          i++; continue;
+        }
+        // horizontal rule
+        if (/^\s*---+\s*$/.test(line) && !isDelim(lines[i + 1] || '')) {
+          out.push('<hr>'); i++; continue;
+        }
+        // table
+        if (isTable(line) && isDelim(lines[i + 1] || '')) {
+          const header = line.trim().replace(/^\||\|$/g, '').split('|').map(s => s.trim());
+          i += 2;
+          const rows = [];
+          while (i < lines.length && isTable(lines[i])) {
+            rows.push(lines[i].trim().replace(/^\||\|$/g, '').split('|').map(s => s.trim()));
+            i++;
+          }
+          out.push('<div class="docs-table-wrap"><table><thead><tr>' +
+            header.map(h => `<th>${inline(h)}</th>`).join('') + '</tr></thead><tbody>' +
+            rows.map(r => '<tr>' + r.map(c => `<td>${inline(c)}</td>`).join('') + '</tr>').join('') +
+            '</tbody></table></div>');
+          continue;
+        }
+        // unordered list
+        if (/^\s*[-*]\s+/.test(line)) {
+          const items = [];
+          while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) {
+            items.push(inline(lines[i].replace(/^\s*[-*]\s+/, '')));
+            i++;
+          }
+          out.push('<ul>' + items.map(x => `<li>${x}</li>`).join('') + '</ul>');
+          continue;
+        }
+        // ordered list
+        if (/^\s*\d+\.\s+/.test(line)) {
+          const items = [];
+          while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) {
+            items.push(inline(lines[i].replace(/^\s*\d+\.\s+/, '')));
+            i++;
+          }
+          out.push('<ol>' + items.map(x => `<li>${x}</li>`).join('') + '</ol>');
+          continue;
+        }
+        // blank
+        if (/^\s*$/.test(line)) { i++; continue; }
+        // paragraph (consume until blank or block boundary)
+        const buf = [line];
+        i++;
+        while (i < lines.length && !/^\s*$/.test(lines[i]) && !/^(#{1,6})\s/.test(lines[i])
+               && !/^\s*[-*]\s+/.test(lines[i]) && !/^\s*\d+\.\s+/.test(lines[i]) && !isTable(lines[i])) {
+          buf.push(lines[i]); i++;
+        }
+        out.push('<p>' + inline(buf.join(' ')) + '</p>');
+      }
+      return out.join('\n');
+    }
+
+    async function loadDocs() {
+      const content = document.getElementById('docs-content');
+      const toc = document.getElementById('docs-toc');
+      try {
+        const sections = await Promise.all(SECTIONS.map(async s => {
+          const r = await fetch(DOCS_DIR + encodeURIComponent(s.file));
+          const md = await r.text();
+          return { ...s, md };
+        }));
+        content.innerHTML = sections.map(s => `
+          <section class="docs-section" id="${s.id}">
+            <header class="docs-section-head">
+              <span class="docs-section-emoji">${s.icon}</span>
+              <h2>${s.title}</h2>
+            </header>
+            <div class="docs-prose">${mdToHtml(s.md)}</div>
+          </section>
+        `).join('');
+        toc.innerHTML = sections.map(s => `
+          <a href="#${s.id}" data-id="${s.id}">
+            <span class="docs-toc-emoji">${s.icon}</span>
+            <span>${s.title}</span>
+          </a>
+        `).join('');
+
+        // Smooth-scroll on TOC click
+        toc.querySelectorAll('a').forEach(a => {
+          a.addEventListener('click', (e) => {
+            e.preventDefault();
+            const id = a.dataset.id;
+            const target = document.getElementById(id);
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            history.replaceState(null, '', '#' + id);
+          });
+        });
+
+        // ScrollSpy
+        const sectionsEl = [...document.querySelectorAll('.docs-section')];
+        const io = new IntersectionObserver((entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) {
+              toc.querySelectorAll('a').forEach(a => a.classList.toggle('active', a.dataset.id === e.target.id));
+            }
+          }
+        }, { rootMargin: '-30% 0px -60% 0px' });
+        sectionsEl.forEach(s => io.observe(s));
+
+        // Deep-link
+        if (location.hash) {
+          const t = document.getElementById(location.hash.slice(1));
+          if (t) setTimeout(() => t.scrollIntoView({ behavior: 'instant' }), 100);
+        }
+      } catch (e) {
+        content.innerHTML = `<p style="color:var(--danger)">${e.message}</p>`;
+      }
+    }
+    loadDocs();
+  </script>
+</body>
+</html>

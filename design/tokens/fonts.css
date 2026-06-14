@@ -1,0 +1,8 @@
+/* =========================================================================
+   voyageM! — Web fonts
+   All four families are served from Google Fonts (as in the live product).
+   Bodoni Moda = editorial display · Space Grotesk = headings/UI
+   Inter = body/UI · JetBrains Mono = eyebrows, meta, stats, code
+   ========================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Bodoni+Moda:ital,wght@0,500;0,600;0,700;0,800;1,500;1,700&family=JetBrains+Mono:wght@400;500&display=swap');

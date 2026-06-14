@@ -4,65 +4,200 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title data-i18n="shop.title_tag">Магазин — voyageM!</title>
-  <link rel="icon" type="image/svg+xml" href="assets/logo.svg?v=4">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=4">
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=4">
-  <link rel="stylesheet" href="styles.css?v=17">
-  <script>
-    (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
-  </script>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=5">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/logo-192.png?v=5">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="voyageM!">
+  <meta property="og:title" content="voyageM! — Minecraft сервер">
+  <meta property="og:description" content="Премиум survival на фирменном генераторе мира. Всё добывается руками, призовой фонд сезона, кастомные подземелья.">
+  <meta property="og:image" content="https://voyage-m.com/assets/og-image.png?v=5">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://voyage-m.com/assets/og-image.png?v=5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="design/system.css?v=38">
+  <link rel="stylesheet" href="design/components.css?v=38">
+  <link rel="stylesheet" href="styles.css?v=38">
+  <script>(function(){var s=localStorage.getItem('vm_theme');if(!s)s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=s;})();</script>
+  <script src="analytics.js?v=38"></script>
+  <style>
+    .shop-wrap { max-width: 980px; margin: 0 auto; }
+    .wallet-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+      padding: 18px 24px; margin-bottom: 28px;
+      background: var(--surface); -webkit-backdrop-filter: var(--blur-glass); backdrop-filter: var(--blur-glass);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+    }
+    .wallet-bar .wb-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--text-dim); }
+    .wallet-bar .wb-amount { font-family: var(--font-display); font-size: 34px; color: var(--accent); line-height: 1; }
+    .wallet-bar .wb-hint { font-size: 13px; color: var(--text-muted); max-width: 360px; }
+    .ref-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+    .ref-row label { font-size: 14px; color: var(--text-muted); }
+    .ref-row input {
+      flex: 1; min-width: 200px; max-width: 320px; padding: 12px 15px;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      color: var(--text); font-family: var(--font-body); font-size: 15px; outline: none;
+    }
+    .ref-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .pass-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 720px) { .pass-grid { grid-template-columns: 1fr; } }
+    .pass-card {
+      position: relative; display: flex; flex-direction: column; padding: 28px;
+      background: var(--surface); -webkit-backdrop-filter: var(--blur-glass); backdrop-filter: var(--blur-glass);
+      border: 1px solid var(--border); border-radius: var(--radius-lg); transition: border-color .25s var(--ease), transform .25s var(--ease);
+    }
+    .pass-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+    .pass-card.featured { border-color: var(--accent-glow); box-shadow: var(--glow-accent); }
+    .pass-tag { position: absolute; top: 16px; right: 16px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-ink); background: var(--accent); padding: 4px 10px; border-radius: var(--radius-pill); }
+    .pass-name { font-family: var(--font-head); font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+    .pass-price { font-family: var(--font-display); font-size: 40px; color: var(--accent); line-height: 1; margin: 8px 0 4px; }
+    .pass-coeff { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); letter-spacing: .1em; margin-bottom: 18px; }
+    .pass-perks { list-style: none; padding: 0; margin: 0 0 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .pass-perks li { display: flex; gap: 9px; font-size: 14px; color: var(--text-muted); line-height: 1.4; }
+    .pass-perks li svg { flex-shrink: 0; color: var(--accent); margin-top: 2px; }
+    .pass-card .btn { width: 100%; }
+    .shop-msg { margin-top: 20px; text-align: center; font-size: 14px; min-height: 22px; }
+    .shop-msg.ok { color: var(--success); } .shop-msg.err { color: var(--danger); }
+    .shop-gate { text-align: center; padding: 60px 20px; }
+  </style>
 </head>
 <body>
-  <canvas id="bg-canvas"></canvas>
   <div id="nav-host"></div>
 
   <main>
-    <section class="section shop-soon">
+    <section class="hero" style="padding: 56px 0 12px;">
       <div class="container">
-        <div class="shop-soon-card">
-          <div class="shop-soon-glyph">
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-              <line x1="3" y1="6" x2="21" y2="6"/>
-              <path d="M16 10a4 4 0 0 1-8 0"/>
-            </svg>
-          </div>
-          <span class="section-eyebrow" data-i18n="shop.eyebrow">marketplace</span>
-          <h1 data-i18n-html="shop.title">Магазин <em>скоро</em></h1>
-          <p class="lead" data-i18n="shop.lead">Готовим витрину с косметикой, аксессуарами и сезонными наборами. Никаких pay-to-win — только визуал и поддержка проекта.</p>
-          <div class="shop-soon-list">
-            <div class="shop-soon-item">
-              <span class="shop-soon-num">01</span>
-              <div>
-                <strong data-i18n="shop.item_cosmetic">Косметика</strong>
-                <p data-i18n="shop.item_cosmetic_desc">Шляпы, плащи, частицы, эмоции — отличайся в чате и на спавне.</p>
-              </div>
-            </div>
-            <div class="shop-soon-item">
-              <span class="shop-soon-num">02</span>
-              <div>
-                <strong data-i18n="shop.item_seasons">Сезонные наборы</strong>
-                <p data-i18n="shop.item_seasons_desc">Тематический лут на каждый сезон Terra и voyage dungeons.</p>
-              </div>
-            </div>
-            <div class="shop-soon-item">
-              <span class="shop-soon-num">03</span>
-              <div>
-                <strong data-i18n="shop.item_support">Поддержка проекта</strong>
-                <p data-i18n="shop.item_support_desc">Прямой донат, чтобы сервер жил, обновлялся и устраивал ивенты.</p>
-              </div>
-            </div>
-          </div>
-          <a href="download.html" class="btn btn-primary btn-lg btn-glow" data-i18n="shop.cta">А пока — играй</a>
+        <span class="vm-eyebrow" data-i18n="shop.eyebrow2">Магазин</span>
+        <h1 class="vm-serif" style="font-size: clamp(36px, 5vw, 56px); margin-top: 10px;" data-i18n-html="shop.title2">Пропуска <em>сезона</em></h1>
+        <p class="lead" data-i18n="shop.lead2">Пропуск даёт право участвовать в розыгрыше призового фонда и повышает коэффициент очков. Приведи друга при покупке — оба получите +0.05x.</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 24px;">
+      <div class="container shop-wrap">
+
+        <div class="shop-gate" id="shop-gate" hidden>
+          <h3 style="margin-bottom: 12px;" data-i18n="shop.need_login">Войди в аккаунт, чтобы купить пропуск</h3>
+          <a href="/account" class="btn btn-primary btn-lg" data-i18n="shop.go_login">Войти в кабинет</a>
         </div>
+
+        <div id="shop-main" hidden>
+          <div class="wallet-bar">
+            <div>
+              <div class="wb-label" data-i18n="shop.balance">Баланс</div>
+              <div class="wb-amount" id="wallet-balance">—</div>
+            </div>
+            <div class="wb-hint" data-i18n="shop.topup_hint">Баланс пополняется вручную после перевода — напиши админам в Discord, и они зачислят сумму на твой аккаунт.</div>
+          </div>
+
+          <div class="ref-row">
+            <label for="ref-nick" data-i18n="shop.ref_label">Ник пригласившего (необязательно):</label>
+            <input type="text" id="ref-nick" maxlength="16" placeholder="ник реферала" spellcheck="false" autocomplete="off">
+          </div>
+
+          <div class="pass-grid">
+            <article class="pass-card" id="pass-1">
+              <div class="pass-name" data-i18n="shop.tier1_name">Базовый пропуск</div>
+              <div class="pass-price">$10</div>
+              <div class="pass-coeff" data-i18n="shop.tier1_coeff">коэффициент 1.0x</div>
+              <ul class="pass-perks">
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="shop.tier1_p1">Участие в розыгрыше призового фонда</span></li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="shop.tier1_p2">Косметика с босса или из магазина</span></li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="shop.tier1_p3">Реф-бонус до +0.25x</span></li>
+              </ul>
+              <button class="btn btn-primary" data-tier="1" data-i18n="shop.buy_t1">Купить за $10</button>
+            </article>
+
+            <article class="pass-card featured" id="pass-2">
+              <span class="pass-tag" data-i18n="shop.best">выгоднее</span>
+              <div class="pass-name" data-i18n="shop.tier2_name">Пропуск искателя</div>
+              <div class="pass-price">$15</div>
+              <div class="pass-coeff" data-i18n="shop.tier2_coeff">коэффициент 1.25x</div>
+              <ul class="pass-perks">
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="shop.tier2_p1">Всё из базового + коэффициент 1.25x</span></li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="shop.tier2_p2">1 из 10 уникальных предметов кастомизации</span></li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="shop.tier2_p3">Кастомный префикс + инсайды разработки</span></li>
+              </ul>
+              <button class="btn btn-primary" data-tier="2" data-i18n="shop.buy_t2">Купить за $15</button>
+            </article>
+          </div>
+
+          <div class="shop-msg" id="shop-msg"></div>
+        </div>
+
       </div>
     </section>
   </main>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=17"></script>
-  <script src="partials.js?v=17"></script>
-  <script type="module" src="scene.js?v=17"></script>
-  <script>mount('shop.html');</script>
+  <script src="i18n.js?v=38"></script>
+  <script src="partials.js?v=38"></script>
+  <script type="module" src="scene.js?v=38"></script>
+  <script>
+    mount('/shop');
+
+    const ud = JSON.parse(localStorage.getItem('vm_user_data') || 'null');
+    const token = ud && ud.token;
+    const gate = document.getElementById('shop-gate');
+    const main = document.getElementById('shop-main');
+
+    if (!token) {
+      gate.hidden = false;
+    } else {
+      main.hidden = false;
+      loadWallet();
+    }
+
+    async function loadWallet() {
+      try {
+        const r = await fetch('/api/wallet', { headers: { Authorization: 'Bearer ' + token } });
+        if (r.status === 401) { localStorage.removeItem('vm_user_data'); location.href = '/account'; return; }
+        const d = await r.json();
+        document.getElementById('wallet-balance').textContent = '$' + (d.balance || 0).toLocaleString('en-US');
+        // disable tiers the player already owns (current or lower)
+        const tier = (d.pass && d.pass.tier) || 0;
+        for (let tr = 1; tr <= 2; tr++) {
+          const btn = document.querySelector(`.pass-card[id="pass-${tr}"] button`);
+          if (tier >= tr) { btn.disabled = true; btn.textContent = t('shop.owned'); }
+        }
+      } catch { document.getElementById('wallet-balance').textContent = '—'; }
+    }
+
+    document.querySelectorAll('.pass-card button[data-tier]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const tier = Number(btn.dataset.tier);
+        const referrer = document.getElementById('ref-nick').value.trim();
+        const msg = document.getElementById('shop-msg');
+        msg.className = 'shop-msg'; msg.textContent = '';
+        btn.disabled = true;
+        try {
+          const r = await fetch('/api/pass/buy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+            body: JSON.stringify({ tier, referrer }),
+          });
+          const d = await r.json();
+          if (r.ok) {
+            msg.className = 'shop-msg ok';
+            msg.textContent = t('shop.bought').replace('{c}', d.coeff) + (d.referralApplied ? ' ' + t('shop.ref_ok') : '');
+            loadWallet();
+          } else {
+            msg.className = 'shop-msg err';
+            const map = {
+              insufficient_funds: t('shop.err_funds').replace('{p}', '$' + (d.price || '')).replace('{b}', '$' + (d.balance || 0)),
+              already_have_pass: t('shop.err_have'),
+              invalid_tier: t('shop.err_tier'),
+              Unauthorized: t('shop.err_auth'),
+            };
+            msg.textContent = map[d.error] || (d.error || t('shop.err_generic'));
+            btn.disabled = false;
+          }
+        } catch {
+          msg.className = 'shop-msg err'; msg.textContent = t('shop.err_net'); btn.disabled = false;
+        }
+      });
+    });
+  </script>
 </body>
 </html>

@@ -4,16 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title data-i18n="status.title_tag">Статус серверов — voyageM!</title>
-  <link rel="icon" type="image/svg+xml" href="assets/logo.svg?v=4">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=4">
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=4">
-  <link rel="stylesheet" href="styles.css?v=17">
-  <script>
-    (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
-  </script>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=5">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/logo-192.png?v=5">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="voyageM!">
+  <meta property="og:title" content="voyageM! — Minecraft сервер">
+  <meta property="og:description" content="Премиум survival на фирменном генераторе мира. Всё добывается руками, призовой фонд сезона, кастомные подземелья.">
+  <meta property="og:image" content="https://voyage-m.com/assets/og-image.png?v=5">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://voyage-m.com/assets/og-image.png?v=5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="design/system.css?v=37">
+  <link rel="stylesheet" href="design/components.css?v=37">
+  <link rel="stylesheet" href="styles.css?v=37">
+  <script>(function(){var s=localStorage.getItem('vm_theme');if(!s)s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=s;})();</script>
+  <script src="analytics.js?v=37"></script>
 </head>
 <body>
-  <canvas id="bg-canvas"></canvas>
   <div id="nav-host"></div>
 
   <main>
@@ -33,7 +42,7 @@
               <div class="status-icon"><img src="assets/server-icon.png" alt="" onerror="this.style.display='none'"></div>
               <div class="status-main-title">
                 <h3>voyageM! Main <span class="pill online" id="main-pill"><span class="dot"></span><span id="main-pill-text" data-i18n="status.pill_check">проверка…</span></span></h3>
-                <p data-i18n="status.main_subtitle">Основной выживач · Terra</p>
+                <p data-i18n="status.main_subtitle">Основной выживач</p>
               </div>
             </div>
             <p style="color: var(--text-muted); font-size: 14px;" id="motd" data-i18n="status.motd_loading">Загружаем MOTD…</p>
@@ -42,7 +51,7 @@
               <div class="status-stat"><div class="status-stat-label" data-i18n="status.version">Версия</div><div class="status-stat-value" id="s-version">—</div></div>
             </div>
             <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
-              <a href="download.html" class="btn btn-primary" data-i18n="status.cta_download">Скачать лаунчер</a>
+              <a href="/download" class="btn btn-primary" data-i18n="status.cta_download">Скачать лаунчер</a>
               <a class="btn btn-ghost bluemap-link" target="_blank" rel="noopener noreferrer" data-i18n="status.open_map">Открыть карту</a>
             </div>
           </div>
@@ -92,11 +101,11 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=17"></script>
-  <script src="partials.js?v=17"></script>
-  <script type="module" src="scene.js?v=17"></script>
+  <script src="i18n.js?v=37"></script>
+  <script src="partials.js?v=37"></script>
+  <script type="module" src="scene.js?v=37"></script>
   <script>
-    mount('status.html');
+    mount('/status');
     document.querySelectorAll('.bluemap-link').forEach(a => a.href = BLUEMAP_URL);
 
     async function refresh() {

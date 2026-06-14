@@ -4,16 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title data-i18n="lb.title_tag">Лидерборд — voyageM!</title>
-  <link rel="icon" type="image/svg+xml" href="assets/logo.svg?v=4">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=4">
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=4">
-  <link rel="stylesheet" href="styles.css?v=17">
-  <script>
-    (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
-  </script>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=5">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/logo-192.png?v=5">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="voyageM!">
+  <meta property="og:title" content="voyageM! — Minecraft сервер">
+  <meta property="og:description" content="Премиум survival на фирменном генераторе мира. Всё добывается руками, призовой фонд сезона, кастомные подземелья.">
+  <meta property="og:image" content="https://voyage-m.com/assets/og-image.png?v=5">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://voyage-m.com/assets/og-image.png?v=5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="design/system.css?v=37">
+  <link rel="stylesheet" href="design/components.css?v=37">
+  <link rel="stylesheet" href="styles.css?v=37">
+  <script>(function(){var s=localStorage.getItem('vm_theme');if(!s)s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=s;})();</script>
+  <script src="analytics.js?v=37"></script>
 </head>
 <body>
-  <canvas id="bg-canvas"></canvas>
   <div id="nav-host"></div>
 
   <main>
@@ -47,12 +56,23 @@
     </section>
   </main>
 
+  <!-- Player profile modal -->
+  <div class="lb-modal" id="lb-modal" hidden>
+    <div class="lb-modal-scrim" data-close></div>
+    <div class="lb-modal-card" role="dialog" aria-modal="true">
+      <button class="lb-modal-close" data-close aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <div id="lb-modal-body"></div>
+    </div>
+  </div>
+
   <div id="footer-host"></div>
-  <script src="i18n.js?v=17"></script>
-  <script src="partials.js?v=17"></script>
-  <script type="module" src="scene.js?v=17"></script>
+  <script src="i18n.js?v=37"></script>
+  <script src="partials.js?v=37"></script>
+  <script type="module" src="scene.js?v=37"></script>
   <script>
-    mount('leaderboard.html');
+    mount('/leaderboard');
 
     let CURRENT = 'allTime';
     let CACHED = null;
@@ -70,9 +90,79 @@
       return CURRENT === 'daily' ? row.dailyPoints : row.totalPoints;
     }
 
+    // Mock filler so the layout always looks populated for visitors
+    const MOCK_NAMES = ['Voyager', 'CraftNoob', 'Pidor1', 'StoneCold', 'EnderMage', 'Saghzify',
+                       'BlockyJoe', 'AshenWolf', 'KingOfDirt', 'NoSleep', 'TerraKid', 'GhastBuster'];
+    const MOCK_SEED = 73;
+    function deterministic(seed, max) { return ((seed * 9301 + 49297) % 233280) % max; }
+    function generateMock(count, basePoints) {
+      const out = [];
+      const MOCK_MOBS = ['zombie','skeleton','creeper','spider','witch','pillager','blaze','enderman','phantom','wither_skeleton','drowned','husk','stray'];
+      const MOCK_PEACEFUL = ['cow','sheep','pig','chicken','villager','horse','cat','fox','rabbit','wolf'];
+      const MOCK_ORES = ['diamond_ore','iron_ore','gold_ore','coal_ore','copper_ore','emerald_ore','lapis_ore','redstone_ore','ancient_debris'];
+      const MOCK_BOSSES = ['voyage:fatling','voyage:crusher','voyage:grim_seraph'];
+      for (let i = 0; i < count; i++) {
+        const s = MOCK_SEED + i * 37;
+        const name = MOCK_NAMES[i % MOCK_NAMES.length];
+        const total = Math.max(0, basePoints - (i + 1) * (basePoints * 0.07) - deterministic(s, basePoints * 0.05));
+        const daily = Math.max(0, total * 0.01 + deterministic(s, total * 0.02));
+        const mobKills = 20 + deterministic(s + 1, 280);
+        const peacefulKills = deterministic(s + 2, 30);
+        const oresMined = deterministic(s + 3, 500);
+        const bossKills = deterministic(s + 4, 6);
+        const mobKillMap = {};
+        for (let j = 0; j < 4 + (i % 3); j++) {
+          mobKillMap[MOCK_MOBS[(s + j) % MOCK_MOBS.length]] = deterministic(s + j*7, mobKills / 2) + 1;
+        }
+        const peacefulKillMap = {};
+        for (let j = 0; j < 3; j++) {
+          peacefulKillMap[MOCK_PEACEFUL[(s + j) % MOCK_PEACEFUL.length]] = deterministic(s + j*5, peacefulKills / 2) + 1;
+        }
+        const oreMineMap = {};
+        for (let j = 0; j < 4; j++) {
+          oreMineMap[MOCK_ORES[(s + j) % MOCK_ORES.length]] = deterministic(s + j*3, oresMined / 2) + 1;
+        }
+        const bossKillMap = {};
+        for (let j = 0; j < Math.min(2, bossKills); j++) {
+          bossKillMap[MOCK_BOSSES[(s + j) % MOCK_BOSSES.length]] = deterministic(s + j*11, bossKills) + 1;
+        }
+        out.push({
+          uuid: 'mock-' + i,
+          name,
+          totalPoints: Math.round(total * 100) / 100,
+          dailyPoints: Math.round(daily * 100) / 100,
+          mobKills, peacefulKills, oresMined, bossKills,
+          mock: true,
+          breakdown: {
+            sourceTotals: {
+              hostile_mob: total * 0.45,
+              peaceful_mob: total * 0.05,
+              ore: total * 0.35,
+              boss: total * 0.10,
+              fish: total * 0.05,
+            },
+            mobKillMap, peacefulKillMap, oreMineMap, bossKillMap,
+            playerCoefficient: 1,
+            lastSourceType: 'ore',
+            lastSourceTarget: 'minecraft:diamond_ore',
+          },
+        });
+      }
+      return out;
+    }
+
     function render() {
       if (!CACHED) return;
-      const rows = (CACHED[CURRENT] || []).filter(r => pointsFor(r) > 0);
+      let rows = (CACHED[CURRENT] || []).filter(r => pointsFor(r) > 0);
+      const realCount = rows.length;
+      // Pad with mock players so the layout is always full and demo-quality
+      if (rows.length < 12) {
+        const base = Math.max(rows.length ? pointsFor(rows[rows.length - 1]) : 1000, 100);
+        const filler = generateMock(12 - rows.length, base);
+        rows = rows.concat(filler);
+        // Re-sort by current metric so mock entries blend in
+        rows.sort((a, b) => pointsFor(b) - pointsFor(a));
+      }
       const podiumEl = document.getElementById('lb-podium');
       const tableEl = document.getElementById('lb-table');
       const emptyEl = document.getElementById('lb-empty');
@@ -93,12 +183,14 @@
         if (!r) return '<div class="lb-podium-slot"></div>';
         const rank = i + 1;
         const cls = `lb-podium-card lb-rank-${rank}`;
+        const letter = (r.name[0] || '?').toUpperCase();
         return `
           <div class="lb-podium-slot lb-podium-slot-${rank}">
             <div class="${cls}">
-              <span class="lb-medal">${rank === 1 ? '★' : rank === 2 ? '✦' : '✧'}</span>
-              <div class="lb-podium-avatar">
-                <img src="https://mc-heads.net/avatar/${r.name}/96" alt="" onerror="this.style.display='none'">
+              <span class="lb-medal">${String(rank).padStart(2, '0')}</span>
+              <div class="lb-podium-avatar" data-letter="${letter}">
+                <img src="https://mc-heads.net/avatar/${r.name}/96" alt="" data-fb="0"
+                  onerror="if(!this.dataset.fb || this.dataset.fb==='0'){this.dataset.fb='1';this.src='https://mc-heads.net/avatar/MHF_Steve/96'}else{this.remove()}">
               </div>
               <div class="lb-podium-name">${r.name}</div>
               <div class="lb-podium-points">${fmt(pointsFor(r))}</div>
@@ -123,18 +215,24 @@
           <span class="lb-ore-h" data-i18n="lb.col_ores">Руды</span>
           <span class="lb-points-h" data-i18n="lb.col_points">Очки</span>
         </div>
-        ${rest.map((r, i) => `
-          <div class="lb-row">
+        ${rest.map((r, i) => {
+          const letter = (r.name[0] || '?').toUpperCase();
+          return `
+          <div class="lb-row${r.mock ? ' lb-row-mock' : ''}">
             <span class="lb-rank">${i + 4}</span>
             <span class="lb-player">
-              <img src="https://mc-heads.net/avatar/${r.name}/32" alt="" onerror="this.style.display='none'">
+              <span class="lb-player-avatar" data-letter="${letter}">
+                <img src="https://mc-heads.net/avatar/${r.name}/32" alt="" data-fb="0"
+                  onerror="if(!this.dataset.fb || this.dataset.fb==='0'){this.dataset.fb='1';this.src='https://mc-heads.net/avatar/MHF_Steve/32'}else{this.remove()}">
+              </span>
               <span>${r.name}</span>
             </span>
             <span class="lb-mob">${fmt(r.mobKills)}</span>
             <span class="lb-boss">${fmt(r.bossKills)}</span>
             <span class="lb-ore">${fmt(r.oresMined)}</span>
             <span class="lb-points">${fmt(pointsFor(r))}</span>
-          </div>`).join('')}`;
+          </div>`;
+        }).join('')}`;
 
       if (typeof applyI18n === 'function') applyI18n(tableEl);
     }
@@ -161,6 +259,147 @@
         render();
       };
     });
+
+    // ---- Profile modal ----
+    let DISPLAYED_ROWS = [];
+    const SOURCE_LABELS = {
+      hostile_mob: { ru: 'Враждебные мобы', en: 'Hostile mobs', color: '#e57373' },
+      peaceful_mob: { ru: 'Мирные мобы',   en: 'Peaceful mobs', color: '#81c784' },
+      ore:         { ru: 'Руды',           en: 'Ores',          color: '#64b5f6' },
+      boss:        { ru: 'Боссы',          en: 'Bosses',        color: '#e8b547' },
+      fish:        { ru: 'Рыба',           en: 'Fish',          color: '#4dd0e1' },
+      admin_add:   { ru: 'Админ',          en: 'Admin',         color: '#ba68c8' },
+      neutral_mob: { ru: 'Нейтралы',       en: 'Neutral',       color: '#a1887f' },
+    };
+    function srcLabel(key) { return (SOURCE_LABELS[key]?.[LANG]) || key.replace(/_/g, ' '); }
+    function srcColor(key) { return SOURCE_LABELS[key]?.color || '#9e9e9e'; }
+    function entityLabel(k) {
+      return k.replace(/^minecraft:/, '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+    function topList(map, max) {
+      return Object.entries(map || {})
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, max);
+    }
+    function openProfile(row, rank) {
+      const modal = document.getElementById('lb-modal');
+      const body = document.getElementById('lb-modal-body');
+      const br = row.breakdown || {};
+      const sources = Object.entries(br.sourceTotals || {})
+        .map(([k, v]) => ({ k, v: Number(v) }))
+        .filter(s => s.v > 0)
+        .sort((a, b) => b.v - a.v);
+      const totalSrc = sources.reduce((a, b) => a + b.v, 0) || 1;
+      const letter = (row.name[0] || '?').toUpperCase();
+
+      function statBlock(title, map, emptyText) {
+        const items = topList(map, 8);
+        if (items.length === 0) return `<div class="lb-prof-block lb-prof-block-empty"><h4>${title}</h4><p>${emptyText}</p></div>`;
+        const max = items[0][1];
+        return `<div class="lb-prof-block">
+          <h4>${title}</h4>
+          <div class="lb-prof-list">
+            ${items.map(([k, v]) => `
+              <div class="lb-prof-row">
+                <span class="lb-prof-key">${entityLabel(k)}</span>
+                <div class="lb-prof-bar"><div class="lb-prof-bar-fill" style="width:${(v / max * 100).toFixed(0)}%"></div></div>
+                <span class="lb-prof-val">${fmt(v)}</span>
+              </div>`).join('')}
+          </div>
+        </div>`;
+      }
+
+      body.innerHTML = `
+        <div class="lb-prof-head">
+          <div class="lb-prof-avatar" data-letter="${letter}">
+            <img src="https://mc-heads.net/avatar/${row.name}/128" alt="" data-fb="0"
+              onerror="if(!this.dataset.fb||this.dataset.fb==='0'){this.dataset.fb='1';this.src='https://mc-heads.net/avatar/MHF_Steve/128'}else{this.remove()}">
+          </div>
+          <div class="lb-prof-meta">
+            <span class="lb-prof-rank">#${rank}</span>
+            <h2>${row.name}${row.mock ? ' <span class="lb-prof-mock">demo</span>' : ''}</h2>
+            <div class="lb-prof-points">${fmt(row.totalPoints)} <span>${LANG === 'en' ? 'all-time points' : 'очков всего'}</span></div>
+            ${row.dailyPoints > 0 ? `<div class="lb-prof-daily">+${fmt(row.dailyPoints)} ${LANG === 'en' ? 'today' : 'сегодня'}</div>` : ''}
+          </div>
+        </div>
+
+        ${sources.length > 0 ? `
+        <section class="lb-prof-section">
+          <h3>${LANG === 'en' ? 'Points by source' : 'Очки по источникам'}</h3>
+          <div class="lb-prof-stacked">
+            ${sources.map(s => `<div style="width:${(s.v / totalSrc * 100).toFixed(2)}%; background:${srcColor(s.k)}" title="${srcLabel(s.k)}: ${fmt(s.v)}"></div>`).join('')}
+          </div>
+          <div class="lb-prof-legend">
+            ${sources.map(s => `
+              <div class="lb-prof-legend-item">
+                <span class="lb-prof-legend-dot" style="background:${srcColor(s.k)}"></span>
+                <span class="lb-prof-legend-key">${srcLabel(s.k)}</span>
+                <span class="lb-prof-legend-val">${fmt(s.v)}</span>
+              </div>`).join('')}
+          </div>
+        </section>` : ''}
+
+        <section class="lb-prof-section">
+          <h3>${LANG === 'en' ? 'Activity breakdown' : 'Активность'}</h3>
+          <div class="lb-prof-grid">
+            ${statBlock(LANG === 'en' ? 'Hostile kills' : 'Враждебные', br.mobKillMap, LANG === 'en' ? 'No kills yet' : 'Пока пусто')}
+            ${statBlock(LANG === 'en' ? 'Bosses defeated' : 'Боссы',   br.bossKillMap, LANG === 'en' ? 'No bosses yet' : 'Боссы не побеждены')}
+            ${statBlock(LANG === 'en' ? 'Ores mined' : 'Руды',         br.oreMineMap,  LANG === 'en' ? 'No ores mined' : 'Руды не добывались')}
+            ${statBlock(LANG === 'en' ? 'Peaceful kills' : 'Мирные',   br.peacefulKillMap, LANG === 'en' ? 'No peaceful kills' : 'Мирных мобов не било')}
+          </div>
+        </section>
+      `;
+
+      modal.hidden = false;
+      requestAnimationFrame(() => modal.classList.add('is-open'));
+      document.body.style.overflow = 'hidden';
+    }
+    function closeProfile() {
+      const modal = document.getElementById('lb-modal');
+      modal.classList.remove('is-open');
+      document.body.style.overflow = '';
+      setTimeout(() => { modal.hidden = true; }, 200);
+    }
+    document.getElementById('lb-modal').addEventListener('click', (e) => {
+      if (e.target.closest('[data-close]')) closeProfile();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !document.getElementById('lb-modal').hidden) closeProfile();
+    });
+
+    // Wire row clicks (delegated)
+    document.body.addEventListener('click', (e) => {
+      const podiumCard = e.target.closest('.lb-podium-card');
+      const tableRow = e.target.closest('.lb-row:not(.lb-row-head)');
+      const target = podiumCard || tableRow;
+      if (!target) return;
+      const slot = podiumCard?.closest('.lb-podium-slot');
+      let rank;
+      if (slot) {
+        rank = slot.classList.contains('lb-podium-slot-1') ? 1 : slot.classList.contains('lb-podium-slot-2') ? 2 : 3;
+      } else {
+        // table rows are 4+. Find index in current DISPLAYED_ROWS.
+        const tableEl = document.getElementById('lb-table');
+        const rows = [...tableEl.querySelectorAll('.lb-row:not(.lb-row-head)')];
+        rank = rows.indexOf(tableRow) + 4;
+      }
+      const row = DISPLAYED_ROWS[rank - 1];
+      if (row) openProfile(row, rank);
+    });
+
+    // Patch render() to track displayed rows
+    const _origRender = render;
+    render = function() {
+      _origRender();
+      if (!CACHED) return;
+      let rows = (CACHED[CURRENT] || []).filter(r => pointsFor(r) > 0);
+      if (rows.length < 12) {
+        const base = Math.max(rows.length ? pointsFor(rows[rows.length - 1]) : 1000, 100);
+        rows = rows.concat(generateMock(12 - rows.length, base));
+        rows.sort((a, b) => pointsFor(b) - pointsFor(a));
+      }
+      DISPLAYED_ROWS = rows;
+    };
 
     fetchLeaderboard();
     setInterval(fetchLeaderboard, 30000);

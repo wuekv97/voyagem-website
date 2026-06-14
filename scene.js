@@ -1,6 +1,9 @@
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isSmallScreen = () => matchMedia('(max-width: 768px)').matches;
+// Cap DPR lower on small screens for perf
+const capDPR = () => Math.min(window.devicePixelRatio, isSmallScreen() ? 1.25 : 1.5);
 const clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
 const DEG2RAD = Math.PI / 180;
 const S = 1 / 16;
@@ -122,97 +125,8 @@ const BG_FACTORIES = [
 // ============================================================
 
 function initBackground() {
-  const canvas = document.getElementById('bg-canvas');
-  if (!canvas) return;
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
-  camera.position.set(0, 0, 9);
-
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-
-  const ambient = new THREE.AmbientLight(0xffffff, 0.55);
-  scene.add(ambient);
-  const key = new THREE.DirectionalLight(0xfff2d0, 1.1);
-  key.position.set(5, 8, 6);
-  scene.add(key);
-  const rim = new THREE.DirectionalLight(0x8844cc, 0.5);
-  rim.position.set(-6, -2, -4);
-  scene.add(rim);
-
-  const blocks = [];
-  const count = window.innerWidth < 720 ? 9 : 16;
-  for (let i = 0; i < count; i++) {
-    const b = BG_FACTORIES[i % BG_FACTORIES.length]();
-    const scale = 0.4 + Math.random() * 0.9;
-    b.scale.setScalar(scale);
-    const radius = 4 + Math.random() * 5;
-    const theta = Math.random() * Math.PI * 2;
-    const phi = (Math.random() - 0.5) * Math.PI * 0.7;
-    b.position.set(
-      Math.cos(theta) * radius * Math.cos(phi),
-      Math.sin(phi) * radius + (Math.random() - 0.5) * 2,
-      Math.sin(theta) * radius * Math.cos(phi) - 4
-    );
-    b.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
-    b.userData = {
-      rotX: (Math.random()-0.5)*0.2,
-      rotY: (Math.random()-0.5)*0.25,
-      bobOffset: Math.random()*Math.PI*2,
-      bobAmp: 0.15 + Math.random()*0.25,
-    };
-    scene.add(b);
-    blocks.push(b);
-  }
-
-  const pointer = { x:0, y:0, tx:0, ty:0 };
-  window.addEventListener('pointermove', e => {
-    pointer.tx = (e.clientX/window.innerWidth)*2-1;
-    pointer.ty = (e.clientY/window.innerHeight)*2-1;
-  }, { passive: true });
-
-  const applyTheme = () => {
-    const light = document.documentElement.dataset.theme === 'light';
-    scene.fog = new THREE.Fog(light ? 0xF7F6F2 : 0x0B0B0E, 6, 22);
-    ambient.intensity = light ? 0.85 : 0.55;
-    key.intensity = light ? 0.85 : 1.1;
-  };
-  applyTheme();
-  document.addEventListener('themechange', applyTheme);
-
-  function resize() {
-    const w = canvas.clientWidth, h = canvas.clientHeight;
-    renderer.setSize(w, h, false);
-    camera.aspect = w/h;
-    camera.updateProjectionMatrix();
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  const clock = new THREE.Clock();
-  let running = true;
-  document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) clock.start(); });
-
-  function loop() {
-    requestAnimationFrame(loop);
-    if (!running) return;
-    const dt = Math.min(clock.getDelta(), 0.05);
-    const t = clock.elapsedTime;
-    pointer.x += (pointer.tx - pointer.x) * 0.04;
-    pointer.y += (pointer.ty - pointer.y) * 0.04;
-    camera.position.x = pointer.x * 0.6;
-    camera.position.y = -pointer.y * 0.4;
-    camera.lookAt(0, 0, -4);
-    for (const b of blocks) {
-      b.rotation.x += b.userData.rotX * dt;
-      b.rotation.y += b.userData.rotY * dt;
-      b.position.y += Math.sin(t*0.7 + b.userData.bobOffset) * b.userData.bobAmp * dt * 0.6;
-    }
-    renderer.render(scene, camera);
-  }
-  loop();
+  // Floating cube field removed — background is now pure CSS (vignette + grid).
+  return;
 }
 
 // ============================================================
@@ -367,7 +281,12 @@ function buildBBModelGroup(data) {
   function addElement(el, boneGroup, boneOrigin) {
     if (!el || el.export === false) return;
     const geo = buildElementGeometry(el, boneOrigin, texW, texH);
-    if (geo) boneGroup.add(new THREE.Mesh(geo, material));
+    if (!geo) return;
+    const mesh = new THREE.Mesh(geo, material);
+    // Bone-driven transforms move geometry outside its static bounding sphere,
+    // making Three.js cull meshes mid-animation (model "blinks"). Skip culling.
+    mesh.frustumCulled = false;
+    boneGroup.add(mesh);
   }
 
   function processItem(item, parentGroup, parentOrigin) {
@@ -465,7 +384,7 @@ async function initHero() {
   camera.lookAt(0, 1.2, 0);
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(capDPR());
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   // Crystal dungeon lighting
@@ -534,7 +453,7 @@ async function initHero() {
   scene.add(ring);
 
   // Particle sparkles
-  const pCount = 80;
+  const pCount = 40;
   const pPos = new Float32Array(pCount * 3);
   const pPhases = new Float32Array(pCount);
   for (let i = 0; i < pCount; i++) {
@@ -641,11 +560,13 @@ async function initHero() {
 
   const clock = new THREE.Clock();
   let running = true;
+  let visible = true;
   document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) clock.start(); });
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0 }).observe(canvas);
 
   function loop() {
     requestAnimationFrame(loop);
-    if (!running) return;
+    if (!running || !visible) return;
     const dt = Math.min(clock.getDelta(), 0.05);
     const t = clock.elapsedTime;
 
@@ -735,6 +656,7 @@ const MOB_REGISTRY = {
 };
 
 async function initMobPortrait(canvasId, mobKey) {
+  if (reduced) return; // honor prefers-reduced-motion
   const def = MOB_REGISTRY[mobKey];
   const canvas = document.getElementById(canvasId);
   if (!def || !canvas) return;
@@ -745,7 +667,7 @@ async function initMobPortrait(canvasId, mobKey) {
   camera.lookAt(...(def.target || [0, 1.1, 0]));
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(capDPR());
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   // Dramatic single-subject lighting

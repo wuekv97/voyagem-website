@@ -4,17 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>voyageM! — Minecraft Server</title>
-  <meta name="description" content="voyageM! — премиум survival-сервер Minecraft на Terra-генераторе. Без доната, с живым сообществом.">
-  <link rel="icon" type="image/svg+xml" href="assets/logo.svg?v=4">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=4">
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=4">
-  <link rel="stylesheet" href="styles.css?v=17">
-  <script>
-    (function(){ var s=localStorage.getItem('vm_theme'); if(!s) s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; document.documentElement.dataset.theme=s; })();
-  </script>
+  <meta name="description" content="voyageM! — премиум survival-сервер Minecraft на фирменном генераторе мира. Всё добывается руками, живое сообщество.">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=5">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/logo-192.png?v=5">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="voyageM!">
+  <meta property="og:title" content="voyageM! — Minecraft сервер">
+  <meta property="og:description" content="Премиум survival на фирменном генераторе мира. Всё добывается руками, призовой фонд сезона, кастомные подземелья.">
+  <meta property="og:image" content="https://voyage-m.com/assets/og-image.png?v=5">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://voyage-m.com/assets/og-image.png?v=5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="design/system.css?v=37">
+  <link rel="stylesheet" href="design/components.css?v=37">
+  <link rel="stylesheet" href="styles.css?v=37">
+  <script>(function(){var s=localStorage.getItem('vm_theme');if(!s)s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=s;})();</script>
+  <script src="analytics.js?v=37"></script>
 </head>
 <body>
-  <canvas id="bg-canvas"></canvas>
   <div id="nav-host"></div>
 
   <main>
@@ -27,16 +36,10 @@
             <span id="hero-status" data-i18n="hero.kicker_check">Проверка статуса…</span>
           </div>
           <h1 data-i18n-html="hero.title">Путешествие<br>в <em>новый</em> мир<br>Minecraft</h1>
-          <p class="lead" data-i18n="hero.lead">Премиум survival с генератором Terra. Без платных привилегий, без pay-to-win — только честная игра, продуманный мир и живое сообщество.</p>
           <div class="hero-cta">
-            <a href="download.html" class="btn btn-primary btn-lg btn-glow" data-i18n="hero.cta_download">Скачать лаунчер</a>
-            <a href="status.html" class="btn btn-ghost btn-lg" data-i18n="hero.cta_status">Статус серверов</a>
+            <a href="/download" class="btn btn-primary btn-lg btn-glow" data-i18n="hero.cta_download">Скачать лаунчер</a>
+            <a href="/status" class="btn btn-ghost btn-lg" data-i18n="hero.cta_status">Статус серверов</a>
           </div>
-          <ul class="hero-meta">
-            <li><span class="hero-meta-dot"></span><span data-i18n="hero.meta_paper">Paper 1.21.4</span></li>
-            <li><span class="hero-meta-dot"></span><span data-i18n="hero.meta_terra">Terra generator</span></li>
-            <li><span class="hero-meta-dot"></span><span data-i18n="hero.meta_authme">AuthMe + FastLogin</span></li>
-          </ul>
         </div>
         <div class="hero-showcase">
           <div class="hero-showcase-glow"></div>
@@ -48,102 +51,37 @@
           </div>
         </div>
       </div>
-      <a href="#mobs" class="scroll-indicator" aria-label="Scroll down">
+      <a href="#season" class="scroll-indicator" aria-label="Scroll down">
         <span data-i18n="hero.scroll">Прокрутить</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
       </a>
     </section>
 
-    <section class="section section-stats">
+    <section class="section section-stats" id="season">
       <div class="container">
-        <div class="stats">
-          <div class="stat"><div class="stat-value" id="stat-online"><em>—</em></div><div class="stat-label" data-i18n="stats.online">Игроков онлайн</div></div>
-          <div class="stat"><div class="stat-value">1.21.<em>4</em></div><div class="stat-label" data-i18n="stats.version">Версия Paper</div></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section mob-section" id="mobs">
-      <div class="container">
-        <div class="section-head section-head-center">
-          <div>
-            <span class="section-eyebrow" data-i18n="mobs.eyebrow">voyage dungeons</span>
-            <h2 data-i18n-html="mobs.title">Хранители <em>подземелий</em></h2>
-            <p data-i18n="mobs.subtitle">Двое из главных обитателей кастомного измерения voyage dungeons. С каждым обновлением — больше существ, лута и историй.</p>
+        <div class="sec-num"><b>01</b> / <span data-i18n="secnum.season">СЕЗОН</span></div>
+        <div class="prize-ribbon tick-card" id="prize-ribbon"><span class="tick-tr"></span><span class="tick-bl"></span>
+          <div class="prize-tile">
+            <span class="prize-label" data-i18n="prize.pool">Призовой фонд</span>
+            <span class="prize-value prize-value-gold" id="prize-pool">$—</span>
+            <span class="prize-sub" data-i18n="prize.sub_pool">базовый взнос + пропуски + покупки</span>
+          </div>
+          <div class="prize-tile">
+            <span class="prize-label" data-i18n="prize.total_points">Очков фармнуто</span>
+            <span class="prize-value" id="prize-total">—</span>
+            <span class="prize-sub" data-i18n="prize.sub_points">за всех игроков сезона</span>
+          </div>
+          <div class="prize-tile">
+            <span class="prize-label" data-i18n="prize.players">Активных игроков</span>
+            <span class="prize-value" id="prize-players">—</span>
+            <span class="prize-sub" data-i18n="prize.sub_players">с прогрессом в playerpoints</span>
+          </div>
+          <div class="prize-tile">
+            <span class="prize-label" data-i18n="prize.per_point">1 очко ≈</span>
+            <span class="prize-value" id="prize-per-point">—</span>
+            <span class="prize-sub" id="prize-per-point-sub">—</span>
           </div>
         </div>
-        <div class="mobs-grid">
-          <article class="mob-card mob-card-fatling">
-            <div class="mob-canvas-wrap">
-              <canvas id="mob-fatling-canvas" class="mob-canvas"></canvas>
-              <div class="mob-vignette"></div>
-            </div>
-            <div class="mob-info">
-              <span class="mob-tag" data-i18n="mobs.fatling_tag">обычный моб</span>
-              <h3>Fatling</h3>
-              <p data-i18n="mobs.fatling_desc">Толстый страж коридоров. Не быстрый, но один удар булавы валит на половину здоровья — лучше держать дистанцию.</p>
-              <div class="mob-stats">
-                <div><span data-i18n="mobs.stat_hp">HP</span><strong>60</strong></div>
-                <div><span data-i18n="mobs.stat_dmg">Урон</span><strong>8</strong></div>
-                <div><span data-i18n="mobs.stat_xp">XP</span><strong>15</strong></div>
-              </div>
-              <div class="mob-drops">
-                <span class="mob-drops-label" data-i18n="mobs.drops">Дроп</span>
-                <span class="mob-drop">Golden Pelt</span>
-                <span class="mob-drop">Crystal Shard</span>
-              </div>
-            </div>
-          </article>
-          <article class="mob-card mob-card-crusher">
-            <div class="mob-canvas-wrap">
-              <canvas id="mob-crusher-canvas" class="mob-canvas"></canvas>
-              <div class="mob-vignette"></div>
-            </div>
-            <div class="mob-info">
-              <span class="mob-tag" data-i18n="mobs.crusher_tag">обычный моб</span>
-              <h3>Crusher</h3>
-              <p data-i18n="mobs.crusher_desc">Бронированный громила с цепной булавой. Бьёт по площади и сбивает с ног — окружение становится твоим врагом.</p>
-              <div class="mob-stats">
-                <div><span data-i18n="mobs.stat_hp">HP</span><strong>90</strong></div>
-                <div><span data-i18n="mobs.stat_dmg">Урон</span><strong>14</strong></div>
-                <div><span data-i18n="mobs.stat_xp">XP</span><strong>25</strong></div>
-              </div>
-              <div class="mob-drops">
-                <span class="mob-drops-label" data-i18n="mobs.drops">Дроп</span>
-                <span class="mob-drop">Voidforged Chain</span>
-                <span class="mob-drop">Iron Plate</span>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <div class="boss-divider">
-          <span class="boss-divider-line"></span>
-          <span class="boss-divider-label" data-i18n="mobs.boss_eyebrow">final boss · sezon ✦</span>
-          <span class="boss-divider-line"></span>
-        </div>
-
-        <article class="boss-card mob-card mob-card-seraph">
-          <div class="mob-canvas-wrap boss-canvas-wrap">
-            <canvas id="mob-seraph-canvas" class="mob-canvas"></canvas>
-            <div class="mob-vignette"></div>
-          </div>
-          <div class="mob-info boss-info">
-            <span class="mob-tag mob-tag-boss" data-i18n="mobs.seraph_tag">финальный босс</span>
-            <h3>Grim Seraph</h3>
-            <p data-i18n="mobs.seraph_desc">Хранительница кристальных подземелий. Призывает осколки света, ставит барьеры и наносит чистый магический урон. Победителя ждёт лучший лут сезона.</p>
-            <div class="mob-stats boss-stats">
-              <div><span data-i18n="mobs.stat_hp">HP</span><strong>420</strong></div>
-              <div><span data-i18n="mobs.stat_dmg">Урон</span><strong>26</strong></div>
-              <div><span data-i18n="mobs.stat_xp">XP</span><strong>150</strong></div>
-            </div>
-            <div class="mob-drops">
-              <span class="mob-drops-label" data-i18n="mobs.drops">Дроп</span>
-              <span class="mob-drop">Seraph Feather</span>
-              <span class="mob-drop">Boss Token</span>
-            </div>
-          </div>
-        </article>
       </div>
     </section>
 
@@ -151,6 +89,7 @@
       <div class="container">
         <div class="section-head">
           <div>
+            <span class="sec-num"><b>02</b> / <span data-i18n="secnum.features">ОСОБЕННОСТИ</span></span>
             <h2 data-i18n-html="features.title">Что делает сервер <em>особенным</em></h2>
             <p data-i18n="features.subtitle">Мы убрали всё лишнее и оставили главное: чистый выживач, красивый мир и удобные инструменты.</p>
           </div>
@@ -177,26 +116,21 @@
                 <span class="bento-chip">macOS .dmg</span>
                 <span class="bento-chip bento-chip-mono">~30s install</span>
               </div>
-              <a href="download.html" class="bento-link" data-i18n="hero.cta_download">Скачать лаунчер →</a>
+              <a href="/download" class="bento-link" data-i18n="hero.cta_download">Скачать лаунчер →</a>
             </div>
           </article>
 
           <article class="bento-card bento-coreprotect" data-tilt>
             <span class="bento-num">02</span>
-            <h3 data-i18n="features.coreprotect_title">CoreProtect</h3>
-            <p data-i18n="features.coreprotect_desc">Каждое действие логируется. Грифер пойман — откат за пару кликов. Ваше строительство в безопасности.</p>
-            <div class="bento-rollback" aria-hidden="true">
-              <div class="bento-rollback-track">
-                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-              </div>
-              <div class="bento-rollback-cursor">◀ rollback</div>
-            </div>
+            <h3 data-i18n="features.customs_title">Voyage Customs</h3>
+            <p data-i18n="features.customs_desc">Нимб, RGB-кольца и 11 поясов с эффектами — аксессуары, которые выбиваются в игре и видны всем на сервере.</p>
+            <a href="/docs#customs" class="bento-link" data-i18n="features.more">Подробнее →</a>
           </article>
 
           <article class="bento-card bento-discord" data-tilt>
             <span class="bento-num">03</span>
-            <h3 data-i18n="features.discord_title">Discord сообщество</h3>
-            <p data-i18n="features.discord_desc">Голосовые каналы, общий чат, ивенты и помощь от админов в один клик.</p>
+            <h3 data-i18n="features.referral_title">Реферальная система</h3>
+            <p data-i18n="features.referral_desc">Пригласи друга — оба получите +0.05x к фарму очков, до +0.25x. Плюс уникальная косметика обоим.</p>
             <div class="bento-avatars" aria-hidden="true">
               <span class="bento-av" style="--i:0">U</span>
               <span class="bento-av" style="--i:1">M</span>
@@ -204,6 +138,7 @@
               <span class="bento-av" style="--i:3">+</span>
               <span class="bento-online-dot"></span>
             </div>
+            <a href="/referrals" class="bento-link" data-i18n="features.more">Подробнее →</a>
           </article>
 
           <article class="bento-card bento-dungeons" data-tilt>
@@ -228,11 +163,11 @@
 
           <article class="bento-card bento-p2w" data-tilt>
             <span class="bento-num">05</span>
-            <h3 data-i18n="features.p2w_title">Никакого P2W</h3>
-            <p data-i18n="features.p2w_desc">Все ресурсы добываются руками. Мы не продаём киты, флай и алмазы — только донатим на сервер, если хочется помочь.</p>
+            <h3 data-i18n="features.p2w_title">Честная экономика</h3>
+            <p data-i18n="features.p2w_desc">Все ресурсы добываются руками — киты, флай и алмазы не продаются. Пропуска влияют только на сезонные очки, не на выживание.</p>
             <div class="bento-p2w-display" aria-hidden="true">
               <span class="bento-p2w-zero">0</span>
-              <span class="bento-p2w-label">pay · to · win</span>
+              <span class="bento-p2w-label">kits · fly · diamonds</span>
               <svg class="bento-p2w-cross" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
                 <line x1="20" y1="20" x2="80" y2="80"/>
                 <line x1="80" y1="20" x2="20" y2="80"/>
@@ -249,9 +184,9 @@
         <div class="cta-card">
           <div>
             <h2 data-i18n-html="cta.title">Готов <em>исследовать</em>?</h2>
-            <p data-i18n="cta.lead">Скачай лаунчер — Java и моды установятся автоматически. Запусти и начни своё путешествие в Terra.</p>
+            <p data-i18n="cta.lead">Скачай лаунчер — Java и моды установятся автоматически. Запусти и начни своё путешествие.</p>
           </div>
-          <a href="download.html" class="btn btn-primary btn-lg btn-glow" data-i18n="hero.cta_download">Скачать лаунчер</a>
+          <a href="/download" class="btn btn-primary btn-lg btn-glow" data-i18n="hero.cta_download">Скачать лаунчер</a>
         </div>
       </div>
     </section>
@@ -259,34 +194,54 @@
 
   <div id="footer-host"></div>
 
-  <script src="i18n.js?v=17"></script>
-  <script src="partials.js?v=17"></script>
-  <script type="module" src="scene.js?v=17"></script>
+  <script src="i18n.js?v=37"></script>
+  <script src="partials.js?v=37"></script>
+  <script type="module" src="scene.js?v=37"></script>
   <script>
-    mount('index.html');
+    mount('/');
     (async () => {
       const s = await fetchServerStatus();
       const hero = document.getElementById('hero-status');
-      const stat = document.getElementById('stat-online');
       const n = s.players?.online ?? 0;
-      if (s.online) {
-        hero.textContent = t('hero.kicker_online', n);
-        stat.innerHTML = `<em>${n}</em>`;
-      } else {
-        hero.textContent = t('hero.kicker_offline');
-        stat.innerHTML = '<em>0</em>';
-      }
+      hero.textContent = s.online ? t('hero.kicker_online', n) : t('hero.kicker_offline');
     })();
-    // Mob portraits — load after first paint
-    requestAnimationFrame(() => {
-      const tryInit = () => {
-        if (typeof window.initMobPortrait !== 'function') return setTimeout(tryInit, 80);
-        window.initMobPortrait('mob-fatling-canvas', 'fatling');
-        window.initMobPortrait('mob-crusher-canvas', 'crusher');
-        window.initMobPortrait('mob-seraph-canvas', 'seraph');
-      };
-      tryInit();
-    });
+
+    // Prize ribbon — pulls totals from the leaderboard API
+    (async () => {
+      try {
+        const res = await fetch('/api/leaderboard');
+        if (!res.ok) return;
+        const d = await res.json();
+        const nfRu = LANG === 'en' ? 'en-US' : 'ru-RU';
+        const nf0 = new Intl.NumberFormat(nfRu, { maximumFractionDigits: 0 });
+        const nf2 = new Intl.NumberFormat(nfRu, { maximumFractionDigits: 2 });
+        const fmtCompact = (n) => {
+          if (n >= 1_000_000) return nf2.format(n / 1_000_000) + 'M';
+          if (n >= 10_000)   return nf2.format(n / 1_000) + 'k';
+          return nf0.format(n);
+        };
+        const fmtUsd = (n) => '$' + nf0.format(n);
+        const pool = d.prizePool?.total ?? 0;
+        const total = d.totalPointsAllPlayers ?? 0;
+        const active = d.activePlayers ?? 0;
+        document.getElementById('prize-pool').textContent = fmtUsd(pool);
+        document.getElementById('prize-total').textContent = fmtCompact(total);
+        document.getElementById('prize-players').textContent = nf0.format(active);
+        // value-per-point: dollars per single point
+        const perPoint = total > 0 ? pool / total : 0;
+        const perPointEl = document.getElementById('prize-per-point');
+        const perPointSub = document.getElementById('prize-per-point-sub');
+        if (perPoint >= 0.01) {
+          perPointEl.textContent = '$' + nf2.format(perPoint);
+          perPointSub.textContent = LANG === 'en' ? 'current payout per point' : 'выплата на 1 очко сейчас';
+        } else {
+          // express the rate as "1 point ≈ $X.XXXX" or as N points per $1
+          const ptsPerUsd = total / Math.max(pool, 1);
+          perPointEl.textContent = nf0.format(ptsPerUsd) + ' / $1';
+          perPointSub.textContent = LANG === 'en' ? 'points per dollar today' : 'очков на $1 сегодня';
+        }
+      } catch {}
+    })();
   </script>
 </body>
 </html>

@@ -1,0 +1,33 @@
+/* =========================================================================
+   voyageM! — Shadow, blur, motion tokens
+   Premium glassmorphism: blur + saturate, soft deep shadows, gold glows.
+   ========================================================================= */
+
+:root {
+  /* ---- Shadows (dark) ---- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 30px 80px rgba(0, 0, 0, 0.55);
+
+  /* ---- Accent glow shadows ---- */
+  --glow-accent: 0 0 60px rgba(232, 181, 71, 0.08);
+  --glow-accent-strong: 0 0 120px rgba(232, 181, 71, 0.20);
+
+  /* ---- Glass blur ---- */
+  --blur-glass: blur(20px) saturate(160%); /* @kind other */
+  --blur-nav: saturate(160%) blur(16px); /* @kind other */
+  --blur-soft: blur(12px); /* @kind other */
+
+  /* ---- Motion ---- */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);          /* @kind other */ /* default — soft overshoot out */
+  --ease-luxury: cubic-bezier(0.65, 0, 0.35, 1);   /* @kind other */ /* slow theme/luxury transitions */
+  --dur-fast: 0.15s; /* @kind other */
+  --dur: 0.25s; /* @kind other */
+  --dur-slow: 0.4s; /* @kind other */
+}
+
+[data-theme="light"] {
+  --shadow-sm: 0 1px 2px rgba(20, 18, 10, 0.06);
+  --shadow: 0 20px 60px rgba(50, 42, 18, 0.10);
+  --shadow-lg: 0 40px 120px rgba(50, 42, 18, 0.16);
+}
