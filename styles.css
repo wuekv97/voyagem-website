@@ -3319,3 +3319,41 @@ html { -webkit-text-size-adjust: 100%; }
   .footer-inner { text-align: left; }
   .footer-cols { grid-template-columns: 1fr; gap: 24px; }
 }
+
+/* ===== Season opening countdown (homepage hero) ===== */
+.season-countdown { margin-top: 30px; }
+.cd-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 13px;
+}
+.cd-eyebrow::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 10px var(--accent);
+  animation: cd-pulse 1.8s ease-in-out infinite;
+}
+@keyframes cd-pulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+.cd-clock { display: flex; align-items: flex-start; gap: 10px; }
+.cd-unit {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 64px; padding: 12px 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+}
+.cd-unit b {
+  font-family: var(--font-display); font-size: 30px; line-height: 1;
+  color: var(--text, currentColor); font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-semibold, 600);
+}
+.cd-unit span { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-top: 7px; }
+.cd-sep { font-size: 26px; line-height: 1; color: var(--text-muted); opacity: 0.4; padding-top: 12px; }
+.cd-live { display: none; font-family: var(--font-display); font-size: 26px; color: var(--accent); font-weight: var(--weight-semibold, 600); }
+.season-countdown.is-live .cd-clock { display: none; }
+.season-countdown.is-live .cd-live { display: inline-block; }
+@media (max-width: 560px) {
+  .cd-clock { gap: 6px; }
+  .cd-unit { min-width: 54px; padding: 10px 7px; }
+  .cd-unit b { font-size: 25px; }
+  .cd-sep { font-size: 22px; padding-top: 11px; }
+}
