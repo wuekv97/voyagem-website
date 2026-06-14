@@ -16,11 +16,11 @@
   <meta name="twitter:image" content="https://voyage-m.com/assets/og-image.png?v=5">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="design/system.css?v=39">
-  <link rel="stylesheet" href="design/components.css?v=39">
-  <link rel="stylesheet" href="styles.css?v=39">
+  <link rel="stylesheet" href="design/system.css?v=40">
+  <link rel="stylesheet" href="design/components.css?v=40">
+  <link rel="stylesheet" href="styles.css?v=40">
   <script>(function(){var s=localStorage.getItem('vm_theme');if(!s)s=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=s;})();</script>
-  <script src="analytics.js?v=39"></script>
+  <script src="analytics.js?v=40"></script>
 </head>
 <body>
   <div id="nav-host"></div>
@@ -30,40 +30,20 @@
       <div class="container">
         <div class="hero-kicker"><span class="hero-kicker-dot"></span><span data-i18n="download.kicker">Бесплатно</span></div>
         <h1 style="font-size: clamp(36px, 5vw, 52px);" data-i18n-html="download.title">Скачать <em>лаунчер</em></h1>
-        <p class="lead" data-i18n="download.lead">Устанавливает Java, моды и нужные файлы автоматически. Запустите и играйте.</p>
+        <p class="lead" data-i18n="download.lead">Устанавливает Java, моды и нужные файлы автоматически.</p>
       </div>
     </section>
 
     <section class="section" style="padding-top: 20px;">
       <div class="container">
-        <div class="download-grid">
-          <a class="card download-card" id="dl-windows" href="/dl/voyageM-Setup.exe">
-            <div class="download-icon">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-            </div>
-            <div>
-              <h3>Windows</h3>
-              <p data-i18n="download.windows_desc">Установщик .exe · x64</p>
-            </div>
-            <span class="btn btn-primary download-btn" data-i18n="download.btn">Скачать</span>
-          </a>
-          <a class="card download-card" href="/dl/voyageM.dmg">
-            <div class="download-icon">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75-.6 3.95-1.5A4.5 4.5 0 0 0 18 15a6 6 0 0 0-6-6 6 6 0 0 0-6 6 4.5 4.5 0 0 0 2.05 4.44C9.25 20.34 10.5 20.94 12 20.94z"/><path d="M12 3v5"/><path d="m8.5 5.5 3.5 2.5 3.5-2.5"/></svg>
-            </div>
-            <div>
-              <h3>macOS</h3>
-              <p data-i18n="download.macos_desc">Образ .dmg · Intel &amp; Apple Silicon</p>
-            </div>
-            <span class="btn btn-primary download-btn" data-i18n="download.btn">Скачать</span>
-          </a>
+        <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center; padding: 48px 36px;">
+          <div class="download-icon" style="margin: 0 auto 22px;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h2 style="font-size: 24px; margin-bottom: 12px;" data-i18n="download.locked_title">Сезон ещё не начался</h2>
+          <p style="color: var(--text-muted); font-size: 16px; max-width: 460px; margin: 0 auto 24px;" data-i18n="download.locked_desc">Скачивание лаунчера откроется со стартом сезона. Следите за новостями, чтобы не пропустить начало.</p>
+          <a href="/news" class="btn btn-ghost" data-i18n="download.locked_cta">Новости сезона</a>
         </div>
-        <p class="dl-mac-note" data-i18n="download.mac_gatekeeper">
-          Если macOS не даёт открыть — ПКМ по приложению → «Открыть».
-        </p>
-        <p style="text-align:center; color: var(--text-dim); font-size: 13px; margin-top: 18px;" data-i18n="download.requirements">
-          Требуется macOS 12+ или Windows 10+. Лицензия Minecraft не нужна — поддерживаем оба режима.
-        </p>
 
         <div class="card" style="margin-top: 48px; padding: 36px;">
           <h3 style="font-size: 20px; margin-bottom: 20px;" data-i18n="download.about_title">Что делает лаунчер</h3>
@@ -124,9 +104,9 @@
   </div>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=39"></script>
-  <script src="partials.js?v=39"></script>
-  <script type="module" src="scene.js?v=39"></script>
+  <script src="i18n.js?v=40"></script>
+  <script src="partials.js?v=40"></script>
+  <script type="module" src="scene.js?v=40"></script>
   <script>
     mount('/download');
     (function () {
