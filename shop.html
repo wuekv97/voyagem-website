@@ -16,21 +16,24 @@
   <meta name="twitter:image" content="https://voyage-m.com/assets/og-image.png?v=5">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="design/system.css?v=41">
-  <link rel="stylesheet" href="design/components.css?v=41">
-  <link rel="stylesheet" href="styles.css?v=41">
+  <link rel="stylesheet" href="design/system.css?v=42">
+  <link rel="stylesheet" href="design/components.css?v=42">
+  <link rel="stylesheet" href="styles.css?v=42">
   <script>document.documentElement.dataset.theme='dark';</script>
-  <script src="analytics.js?v=41"></script>
+  <script src="analytics.js?v=42"></script>
   <style>
     .shop-wrap { max-width: 980px; margin: 0 auto; }
     .wallet-bar {
       display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
-      padding: 18px 24px; margin-bottom: 28px;
-      background: var(--surface); -webkit-backdrop-filter: var(--blur-glass); backdrop-filter: var(--blur-glass);
-      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 24px 28px; margin-bottom: 32px; position: relative; overflow: hidden;
+      background: radial-gradient(130% 160% at 0% 0%, var(--accent-soft), transparent 55%), var(--surface);
+      -webkit-backdrop-filter: var(--blur-glass); backdrop-filter: var(--blur-glass);
+      border: 1px solid var(--accent-glow); border-radius: var(--radius-lg);
+      box-shadow: var(--glow-accent);
     }
-    .wallet-bar .wb-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--text-dim); }
-    .wallet-bar .wb-amount { font-family: var(--font-display); font-size: 34px; color: var(--accent); line-height: 1; }
+    .wallet-bar::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--accent-grad); }
+    .wallet-bar .wb-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--accent); opacity: .85; }
+    .wallet-bar .wb-amount { font-family: var(--font-display); font-size: 46px; color: var(--accent); line-height: 1; text-shadow: 0 2px 30px var(--accent-glow); }
     .wallet-bar .wb-hint { font-size: 13px; color: var(--text-muted); max-width: 360px; }
     .ref-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
     .ref-row label { font-size: 14px; color: var(--text-muted); }
@@ -48,16 +51,19 @@
       border: 1px solid var(--border); border-radius: var(--radius-lg); transition: border-color .25s var(--ease), transform .25s var(--ease);
     }
     .pass-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
-    .pass-card.featured { border-color: var(--accent-glow); box-shadow: var(--glow-accent); }
-    .pass-tag { position: absolute; top: 16px; right: 16px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-ink); background: var(--accent); padding: 4px 10px; border-radius: var(--radius-pill); }
-    .pass-name { font-family: var(--font-head); font-size: 22px; font-weight: 600; margin-bottom: 4px; }
-    .pass-price { font-family: var(--font-display); font-size: 40px; color: var(--accent); line-height: 1; margin: 8px 0 4px; }
-    .pass-coeff { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); letter-spacing: .1em; margin-bottom: 18px; }
+    .pass-card.featured { border-color: var(--accent); background: radial-gradient(120% 85% at 50% 0%, var(--accent-soft), transparent 62%), var(--surface); box-shadow: var(--glow-accent), 0 26px 64px -28px var(--accent-glow); }
+    .pass-tag { position: absolute; top: 16px; right: 16px; z-index: 2; font-family: var(--font-mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-ink); background: var(--accent-grad); padding: 5px 11px; border-radius: var(--radius-pill); box-shadow: 0 4px 16px var(--accent-glow); }
+    .pass-name { font-family: var(--font-head); font-size: 23px; font-weight: 600; margin-bottom: 4px; }
+    .pass-price { font-family: var(--font-display); font-size: 50px; color: var(--accent); line-height: 1; margin: 10px 0 6px; text-shadow: 0 2px 26px var(--accent-glow); }
+    .pass-coeff { display: inline-block; font-family: var(--font-mono); font-size: 11px; color: var(--accent); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 20px; padding: 4px 10px; border: 1px solid var(--accent-glow); border-radius: var(--radius-pill); background: var(--accent-soft); }
     .pass-perks { list-style: none; padding: 0; margin: 0 0 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
     .pass-perks li { display: flex; gap: 9px; font-size: 14px; color: var(--text-muted); line-height: 1.4; }
     .pass-perks li svg { flex-shrink: 0; color: var(--accent); margin-top: 2px; }
-    .pass-card .btn { width: 100%; }
-    .pass-art { margin: -28px -28px 20px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0; border-bottom: 1px solid var(--border); }
+    .pass-card .btn { width: 100%; padding: 15px; font-size: 15px; position: relative; overflow: hidden; }
+    .pass-card .btn:not(:disabled)::after { content: ''; position: absolute; top: 0; left: -60%; width: 45%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.5), transparent); transform: skewX(-18deg); transition: left .6s var(--ease); pointer-events: none; }
+    .pass-card .btn:not(:disabled):hover::after { left: 135%; }
+    .pass-art { margin: -28px -28px 20px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0; border-bottom: 1px solid var(--accent-glow); position: relative; }
+    .pass-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--surface) 2%, transparent 40%); pointer-events: none; }
     .pass-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .pass-card .btn:disabled { opacity: .45; cursor: not-allowed; filter: grayscale(.35); }
     .pass-card .btn:disabled:hover { transform: none; box-shadow: none; }
@@ -102,7 +108,7 @@
 
           <div class="pass-grid">
             <article class="pass-card" id="pass-1">
-              <div class="pass-art"><img src="assets/pass-base.jpg?v=41" alt="" loading="lazy"></div>
+              <div class="pass-art"><img src="assets/pass-base.jpg?v=42" alt="" loading="lazy"></div>
               <div class="pass-name" data-i18n="shop.tier1_name">Базовый пропуск</div>
               <div class="pass-price">$10</div>
               <div class="pass-coeff" data-i18n="shop.tier1_coeff">коэффициент 1.0x</div>
@@ -116,7 +122,7 @@
 
             <article class="pass-card featured" id="pass-2">
               <span class="pass-tag" data-i18n="shop.best">выгоднее</span>
-              <div class="pass-art"><img src="assets/pass-seeker.jpg?v=41" alt="" loading="lazy"></div>
+              <div class="pass-art"><img src="assets/pass-seeker.jpg?v=42" alt="" loading="lazy"></div>
               <div class="pass-name" data-i18n="shop.tier2_name">Пропуск искателя</div>
               <div class="pass-price">$15</div>
               <div class="pass-coeff" data-i18n="shop.tier2_coeff">коэффициент 1.25x</div>
@@ -137,9 +143,9 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=41"></script>
-  <script src="partials.js?v=41"></script>
-  <script type="module" src="scene.js?v=41"></script>
+  <script src="i18n.js?v=42"></script>
+  <script src="partials.js?v=42"></script>
+  <script type="module" src="scene.js?v=42"></script>
   <script>
     mount('/shop');
 
