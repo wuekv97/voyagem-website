@@ -10,6 +10,7 @@ const NAV_KEYS = [
   { href: '/referrals',   key: 'nav.referrals' },
   { href: '/download',    key: 'nav.launcher' },
   { href: '/shop',        key: 'nav.shop' },
+  { href: '/topup',       key: 'nav.topup' },
 ];
 
 // ---- Theme (light/dark) ----
