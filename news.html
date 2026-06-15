@@ -16,11 +16,11 @@
   <meta name="twitter:image" content="https://voyage-m.com/assets/og-image.png?v=5">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="design/system.css?v=37">
-  <link rel="stylesheet" href="design/components.css?v=37">
-  <link rel="stylesheet" href="styles.css?v=37">
+  <link rel="stylesheet" href="design/system.css?v=43">
+  <link rel="stylesheet" href="design/components.css?v=43">
+  <link rel="stylesheet" href="styles.css?v=43">
   <script>document.documentElement.dataset.theme='dark';</script>
-  <script src="analytics.js?v=37"></script>
+  <script src="analytics.js?v=43"></script>
 </head>
 <body>
   <div id="nav-host"></div>
@@ -42,16 +42,15 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=37"></script>
-  <script src="partials.js?v=37"></script>
-  <script type="module" src="scene.js?v=37"></script>
+  <script src="i18n.js?v=43"></script>
+  <script src="partials.js?v=43"></script>
+  <script type="module" src="scene.js?v=43"></script>
   <script>
     mount('/news');
 
     const NEWS_RU = [
       { date: '17 апр 2026', tag: 'news.tag_announce', title: 'Запуск нового сезона', excerpt: 'Новый мир с уникальным генератором, спавн у координат 0,0 и стартовые киты для первых 100 игроков. Сид 42 — тот самый ответ на всё.' },
       { date: '12 апр 2026', tag: 'news.tag_patch',    title: 'Обновление до Paper 1.21.4-232', excerpt: 'Перешли на свежую сборку. Исправили баги с загрузкой чанков на view-distance 16, улучшили производительность при 20+ игроках.' },
-      { date: '10 апр 2026', tag: 'news.tag_feat',     title: 'BlueMap теперь в реальном времени', excerpt: 'Живая карта мира обновляется автоматически. Смотрите построения друзей прямо в браузере — ссылка в разделе «Серверы».' },
       { date: '05 апр 2026', tag: 'news.tag_event',    title: 'Турнир «Мастер выживания»', excerpt: 'Каждую субботу в 20:00 — испытания на скорость и смекалку. Призы: VIP на месяц и место в Зале Славы.' },
       { date: '01 апр 2026', tag: 'news.tag_release',  title: 'FastLogin: поддержка пиратов включена', excerpt: 'Теперь на сервер можно заходить как с лицензионного аккаунта, так и без. Имена защищены паролем через AuthMe.' },
       { date: '28 мар 2026', tag: 'news.tag_admin',    title: 'LuckPerms + группы игроков', excerpt: 'Настроили систему прав. Админский состав получил отдельную группу, остальные игроки — стандартные права выживания.' },
@@ -60,7 +59,6 @@
     const NEWS_EN = [
       { date: 'Apr 17, 2026', tag: 'news.tag_announce', title: 'New season launch', excerpt: 'New world on our unique generator, spawn at 0,0, and starter kits for the first 100 players. Seed 42 — yes, that one.' },
       { date: 'Apr 12, 2026', tag: 'news.tag_patch',    title: 'Updated to Paper 1.21.4-232', excerpt: 'Switched to the latest build. Fixed chunk-load bugs at view-distance 16; better performance at 20+ players.' },
-      { date: 'Apr 10, 2026', tag: 'news.tag_feat',     title: 'BlueMap is now real-time', excerpt: 'The live world map updates automatically. Browse friends\' builds right in the browser — link in the "Servers" section.' },
       { date: 'Apr 05, 2026', tag: 'news.tag_event',    title: 'Tournament "Master of Survival"', excerpt: 'Every Saturday at 20:00 — speed and skill challenges. Prizes: VIP for a month and a slot in the Hall of Fame.' },
       { date: 'Apr 01, 2026', tag: 'news.tag_release',  title: 'FastLogin: cracked-client support enabled', excerpt: 'You can now join the server with a legit Mojang account or without one. Names are protected by an AuthMe password.' },
       { date: 'Mar 28, 2026', tag: 'news.tag_admin',    title: 'LuckPerms + player groups', excerpt: 'Set up the permission system. Admins got a dedicated group; everyone else has standard survival permissions.' },

@@ -2,8 +2,8 @@
 // Set POSTHOG_KEY to your project API key (starts with "phc_") to activate.
 // Until then this file no-ops, so it's safe to ship.
 (function () {
-  var POSTHOG_KEY  = '__POSTHOG_PROJECT_KEY__';      // <-- paste phc_... here
-  var POSTHOG_HOST = 'https://us.i.posthog.com';      // EU projects: https://eu.i.posthog.com
+  var POSTHOG_KEY  = 'phc_voSyNfzD7iF4Hr8wBzm8SXFVat33airytmteXqmDfkoa';   // project 201414
+  var POSTHOG_HOST = 'https://eu.i.posthog.com';      // EU Cloud
 
   if (POSTHOG_KEY.indexOf('phc_') !== 0) return;      // not configured — do nothing
 
