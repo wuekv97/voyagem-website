@@ -1,5 +1,5 @@
 // Shared nav/footer renderer + server status + theme + i18n
-const SERVER_IP = '158.220.89.78';
+const SERVER_IP = '45.89.143.136';
 const BLUEMAP_URL = `http://${SERVER_IP}:8100`;
 const DISCORD_URL = 'https://discord.gg/voyagem';
 
