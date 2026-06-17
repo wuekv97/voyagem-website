@@ -16,11 +16,11 @@
   <meta name="twitter:image" content="https://voyage-m.com/assets/og-image.png?v=5">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="design/system.css?v=43">
-  <link rel="stylesheet" href="design/components.css?v=43">
-  <link rel="stylesheet" href="styles.css?v=43">
+  <link rel="stylesheet" href="design/system.css?v=44">
+  <link rel="stylesheet" href="design/components.css?v=44">
+  <link rel="stylesheet" href="styles.css?v=44">
   <script>document.documentElement.dataset.theme='dark';</script>
-  <script src="analytics.js?v=43"></script>
+  <script src="analytics.js?v=44"></script>
 </head>
 <body>
   <div id="nav-host"></div>
@@ -69,6 +69,17 @@
           </div>
         </div>
 
+        <div class="status-card" id="perf-card" style="margin-top: 20px;">
+          <h4 style="margin-bottom: 16px;" data-i18n="perf.title">Производительность сервера</h4>
+          <div class="status-stats" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+            <div class="status-stat"><div class="status-stat-label">TPS</div><div class="status-stat-value" id="perf-tps">—</div></div>
+            <div class="status-stat"><div class="status-stat-label" data-i18n="perf.mspt">MSPT сред.</div><div class="status-stat-value" id="perf-mspt">—</div></div>
+            <div class="status-stat"><div class="status-stat-label">MSPT P95</div><div class="status-stat-value" id="perf-p95">—</div></div>
+            <div class="status-stat"><div class="status-stat-label">MSPT P99</div><div class="status-stat-value" id="perf-p99">—</div></div>
+          </div>
+          <p style="color: var(--text-muted); font-size: 13px; margin-top: 14px;" data-i18n="perf.note">20 TPS — идеально. MSPT ниже 50 мс — сервер успевает за тиком. Обновляется каждые 5 секунд.</p>
+        </div>
+
         <div class="status-card server-list-card">
           <h4 style="margin-bottom: 16px;" data-i18n="status.other">Другие серверы</h4>
           <div class="server-row">
@@ -89,9 +100,9 @@
   </main>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=43"></script>
-  <script src="partials.js?v=43"></script>
-  <script type="module" src="scene.js?v=43"></script>
+  <script src="i18n.js?v=44"></script>
+  <script src="partials.js?v=44"></script>
+  <script type="module" src="scene.js?v=44"></script>
   <script>
     mount('/status');
 
@@ -151,9 +162,27 @@
       }
     }
 
+    async function loadPerf() {
+      try {
+        const res = await fetch('/api/perf');
+        if (!res.ok) throw new Error();
+        const d = await res.json();
+        const GREEN = '#34D399', YELLOW = '#FBBF24', RED = '#F87171';
+        const set = (id, txt, color) => { const e = document.getElementById(id); if (e) { e.textContent = txt; if (color !== undefined) e.style.color = color; } };
+        set('perf-tps', d.tps != null ? d.tps.toFixed(1) : '—', d.tps == null ? '' : (d.tps >= 19.5 ? GREEN : d.tps >= 15 ? YELLOW : RED));
+        set('perf-mspt', d.mspt != null ? d.mspt.toFixed(1) + ' ms' : '—', d.mspt == null ? '' : (d.mspt < 40 ? GREEN : d.mspt < 50 ? YELLOW : RED));
+        set('perf-p95', d.p95 != null ? d.p95.toFixed(1) + ' ms' : '—');
+        set('perf-p99', d.p99 != null ? d.p99.toFixed(1) + ' ms' : '—');
+      } catch {
+        ['perf-tps', 'perf-mspt', 'perf-p95', 'perf-p99'].forEach(id => { const e = document.getElementById(id); if (e) e.textContent = '—'; });
+      }
+    }
+
     refresh();
     loadRegistered();
+    loadPerf();
     setInterval(refresh, 30000);
+    setInterval(loadPerf, 5000);
   </script>
 </body>
 </html>
