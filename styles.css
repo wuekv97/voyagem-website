@@ -2744,7 +2744,7 @@ canvas.profile-avatar { background: linear-gradient(135deg, var(--surface-2), va
 /* =========================================
    DOWNLOAD SECTION
    ========================================= */
-.download-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+.download-grid:not([hidden]) { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
 .download-card { display: flex; align-items: center; gap: 20px; padding: 28px 28px; text-decoration: none; transition: border-color .2s var(--ease), transform .2s var(--ease); cursor: pointer; }
 .download-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
 .download-card h3 { font-size: 18px; font-weight: var(--weight-semibold); margin-bottom: 4px; font-family: var(--font-head); }
