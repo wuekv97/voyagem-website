@@ -327,13 +327,8 @@
     render = function() {
       _origRender();
       if (!CACHED) return;
-      let rows = (CACHED[CURRENT] || []).filter(r => pointsFor(r) > 0);
-      if (rows.length < 12) {
-        const base = Math.max(rows.length ? pointsFor(rows[rows.length - 1]) : 1000, 100);
-        rows = rows.concat(generateMock(12 - rows.length, base));
-        rows.sort((a, b) => pointsFor(b) - pointsFor(a));
-      }
-      DISPLAYED_ROWS = rows;
+      // Real players only — keep DISPLAYED_ROWS in sync with what render() shows.
+      DISPLAYED_ROWS = (CACHED[CURRENT] || []).filter(r => pointsFor(r) > 0);
     };
 
     fetchLeaderboard();
