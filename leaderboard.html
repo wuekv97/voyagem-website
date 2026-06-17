@@ -90,79 +90,14 @@
       return CURRENT === 'daily' ? row.dailyPoints : row.totalPoints;
     }
 
-    // Mock filler so the layout always looks populated for visitors
-    const MOCK_NAMES = ['Voyager', 'CraftNoob', 'Pidor1', 'StoneCold', 'EnderMage', 'Saghzify',
-                       'BlockyJoe', 'AshenWolf', 'KingOfDirt', 'NoSleep', 'TerraKid', 'GhastBuster'];
-    const MOCK_SEED = 73;
-    function deterministic(seed, max) { return ((seed * 9301 + 49297) % 233280) % max; }
-    function generateMock(count, basePoints) {
-      const out = [];
-      const MOCK_MOBS = ['zombie','skeleton','creeper','spider','witch','pillager','blaze','enderman','phantom','wither_skeleton','drowned','husk','stray'];
-      const MOCK_PEACEFUL = ['cow','sheep','pig','chicken','villager','horse','cat','fox','rabbit','wolf'];
-      const MOCK_ORES = ['diamond_ore','iron_ore','gold_ore','coal_ore','copper_ore','emerald_ore','lapis_ore','redstone_ore','ancient_debris'];
-      const MOCK_BOSSES = ['voyage:fatling','voyage:crusher','voyage:grim_seraph'];
-      for (let i = 0; i < count; i++) {
-        const s = MOCK_SEED + i * 37;
-        const name = MOCK_NAMES[i % MOCK_NAMES.length];
-        const total = Math.max(0, basePoints - (i + 1) * (basePoints * 0.07) - deterministic(s, basePoints * 0.05));
-        const daily = Math.max(0, total * 0.01 + deterministic(s, total * 0.02));
-        const mobKills = 20 + deterministic(s + 1, 280);
-        const peacefulKills = deterministic(s + 2, 30);
-        const oresMined = deterministic(s + 3, 500);
-        const bossKills = deterministic(s + 4, 6);
-        const mobKillMap = {};
-        for (let j = 0; j < 4 + (i % 3); j++) {
-          mobKillMap[MOCK_MOBS[(s + j) % MOCK_MOBS.length]] = deterministic(s + j*7, mobKills / 2) + 1;
-        }
-        const peacefulKillMap = {};
-        for (let j = 0; j < 3; j++) {
-          peacefulKillMap[MOCK_PEACEFUL[(s + j) % MOCK_PEACEFUL.length]] = deterministic(s + j*5, peacefulKills / 2) + 1;
-        }
-        const oreMineMap = {};
-        for (let j = 0; j < 4; j++) {
-          oreMineMap[MOCK_ORES[(s + j) % MOCK_ORES.length]] = deterministic(s + j*3, oresMined / 2) + 1;
-        }
-        const bossKillMap = {};
-        for (let j = 0; j < Math.min(2, bossKills); j++) {
-          bossKillMap[MOCK_BOSSES[(s + j) % MOCK_BOSSES.length]] = deterministic(s + j*11, bossKills) + 1;
-        }
-        out.push({
-          uuid: 'mock-' + i,
-          name,
-          totalPoints: Math.round(total * 100) / 100,
-          dailyPoints: Math.round(daily * 100) / 100,
-          mobKills, peacefulKills, oresMined, bossKills,
-          mock: true,
-          breakdown: {
-            sourceTotals: {
-              hostile_mob: total * 0.45,
-              peaceful_mob: total * 0.05,
-              ore: total * 0.35,
-              boss: total * 0.10,
-              fish: total * 0.05,
-            },
-            mobKillMap, peacefulKillMap, oreMineMap, bossKillMap,
-            playerCoefficient: 1,
-            lastSourceType: 'ore',
-            lastSourceTarget: 'minecraft:diamond_ore',
-          },
-        });
-      }
-      return out;
-    }
+    // (Removed the mock/demo player generator — the leaderboard now shows only real
+    //  players from /api/leaderboard, and the empty-state when nobody has points.)
 
     function render() {
       if (!CACHED) return;
-      let rows = (CACHED[CURRENT] || []).filter(r => pointsFor(r) > 0);
-      const realCount = rows.length;
-      // Pad with mock players so the layout is always full and demo-quality
-      if (rows.length < 12) {
-        const base = Math.max(rows.length ? pointsFor(rows[rows.length - 1]) : 1000, 100);
-        const filler = generateMock(12 - rows.length, base);
-        rows = rows.concat(filler);
-        // Re-sort by current metric so mock entries blend in
-        rows.sort((a, b) => pointsFor(b) - pointsFor(a));
-      }
+      // Only real players from /api/leaderboard — no mock/demo filler. When nobody has
+      // points (fresh season), rows is empty and the empty-state below is shown.
+      const rows = (CACHED[CURRENT] || []).filter(r => pointsFor(r) > 0);
       const podiumEl = document.getElementById('lb-podium');
       const tableEl = document.getElementById('lb-table');
       const emptyEl = document.getElementById('lb-empty');
