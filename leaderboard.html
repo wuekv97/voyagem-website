@@ -4,23 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title data-i18n="lb.title_tag">Лидерборд — voyageM!</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=47">
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=47">
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/logo-192.png?v=47">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=48">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=48">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/logo-192.png?v=48">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="voyageM!">
   <meta property="og:title" content="voyageM! — Minecraft сервер">
   <meta property="og:description" content="Премиум survival на фирменном генераторе мира. Всё добывается руками, призовой фонд сезона, кастомные подземелья.">
-  <meta property="og:image" content="https://voyage-m.com/assets/og-image.png?v=47">
+  <meta property="og:image" content="https://voyage-m.com/assets/og-image.png?v=48">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://voyage-m.com/assets/og-image.png?v=47">
+  <meta name="twitter:image" content="https://voyage-m.com/assets/og-image.png?v=48">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="design/system.css?v=47">
-  <link rel="stylesheet" href="design/components.css?v=47">
-  <link rel="stylesheet" href="styles.css?v=47">
+  <link rel="stylesheet" href="design/system.css?v=48">
+  <link rel="stylesheet" href="design/components.css?v=48">
+  <link rel="stylesheet" href="styles.css?v=48">
   <script>document.documentElement.dataset.theme='dark';</script>
-  <script src="analytics.js?v=47"></script>
+  <script src="analytics.js?v=48"></script>
 </head>
 <body>
   <div id="nav-host"></div>
@@ -43,6 +43,10 @@
           <div class="lb-period" role="tablist">
             <button class="lb-period-btn active" data-period="allTime" data-i18n="lb.alltime">Всё время</button>
             <button class="lb-period-btn" data-period="daily" data-i18n="lb.today">Сегодня</button>
+          </div>
+          <div class="lb-filter" role="tablist">
+            <button class="lb-filter-btn active" data-filter="all" data-i18n="lb.view_all">Все</button>
+            <button class="lb-filter-btn" data-filter="pass" data-i18n="lb.view_pass">С пропуском</button>
           </div>
           <span class="lb-updated" id="lb-updated"></span>
         </div>
@@ -68,13 +72,14 @@
   </div>
 
   <div id="footer-host"></div>
-  <script src="i18n.js?v=47"></script>
-  <script src="partials.js?v=47"></script>
-  <script type="module" src="scene.js?v=47"></script>
+  <script src="i18n.js?v=48"></script>
+  <script src="partials.js?v=48"></script>
+  <script type="module" src="scene.js?v=48"></script>
   <script>
     mount('/leaderboard');
 
     let CURRENT = 'allTime';
+    let PASSONLY = false;
     let CACHED = null;
 
     const nf = new Intl.NumberFormat(LANG === 'en' ? 'en-US' : 'ru-RU', { maximumFractionDigits: 0 });
@@ -90,6 +95,15 @@
       return CURRENT === 'daily' ? row.dailyPoints : row.totalPoints;
     }
 
+    // Rows visible under the current period + pass filter (≥1 point; pass-only when toggled).
+    function visibleRows() {
+      return (CACHED?.[CURRENT] || []).filter(r => pointsFor(r) > 0 && (!PASSONLY || r.hasPass));
+    }
+    // Gold "✦ пропуск" pill for season-pass holders (BASIC/PREMIUM); empty otherwise.
+    function passBadge(r) {
+      return r.hasPass ? `<span class="lb-pass-badge" title="${t('lb.pass_holder')}">✦ ${t('lb.pass_badge')}</span>` : '';
+    }
+
     // (Removed the mock/demo player generator — the leaderboard now shows only real
     //  players from /api/leaderboard, and the empty-state when nobody has points.)
 
@@ -97,7 +111,7 @@
       if (!CACHED) return;
       // Only real players from /api/leaderboard — no mock/demo filler. When nobody has
       // points (fresh season), rows is empty and the empty-state below is shown.
-      const rows = (CACHED[CURRENT] || []).filter(r => pointsFor(r) > 0);
+      const rows = visibleRows();
       const podiumEl = document.getElementById('lb-podium');
       const tableEl = document.getElementById('lb-table');
       const emptyEl = document.getElementById('lb-empty');
@@ -127,7 +141,7 @@
                 <img src="https://mc-heads.net/avatar/${r.name}/96" alt="" data-fb="0"
                   onerror="if(!this.dataset.fb || this.dataset.fb==='0'){this.dataset.fb='1';this.src='https://mc-heads.net/avatar/MHF_Steve/96'}else{this.remove()}">
               </div>
-              <div class="lb-podium-name">${r.name}</div>
+              <div class="lb-podium-name">${r.name}${passBadge(r)}</div>
               <div class="lb-podium-points">${fmt(pointsFor(r))}</div>
               <div class="lb-podium-rank">#${rank}</div>
               <div class="lb-podium-meta">
@@ -160,7 +174,7 @@
                 <img src="https://mc-heads.net/avatar/${r.name}/32" alt="" data-fb="0"
                   onerror="if(!this.dataset.fb || this.dataset.fb==='0'){this.dataset.fb='1';this.src='https://mc-heads.net/avatar/MHF_Steve/32'}else{this.remove()}">
               </span>
-              <span>${r.name}</span>
+              <span>${r.name}${passBadge(r)}</span>
             </span>
             <span class="lb-mob">${fmt(r.mobKills)}</span>
             <span class="lb-boss">${fmt(r.bossKills)}</span>
@@ -191,6 +205,15 @@
         document.querySelectorAll('.lb-period-btn').forEach(x => x.classList.remove('active'));
         b.classList.add('active');
         CURRENT = b.dataset.period;
+        render();
+      };
+    });
+
+    document.querySelectorAll('.lb-filter-btn').forEach(b => {
+      b.onclick = () => {
+        document.querySelectorAll('.lb-filter-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        PASSONLY = b.dataset.filter === 'pass';
         render();
       };
     });
@@ -252,7 +275,7 @@
           </div>
           <div class="lb-prof-meta">
             <span class="lb-prof-rank">#${rank}</span>
-            <h2>${row.name}${row.mock ? ' <span class="lb-prof-mock">demo</span>' : ''}</h2>
+            <h2>${row.name}${passBadge(row)}${row.mock ? ' <span class="lb-prof-mock">demo</span>' : ''}</h2>
             <div class="lb-prof-points">${fmt(row.totalPoints)} <span>${LANG === 'en' ? 'all-time points' : 'очков всего'}</span></div>
             ${row.dailyPoints > 0 ? `<div class="lb-prof-daily">+${fmt(row.dailyPoints)} ${LANG === 'en' ? 'today' : 'сегодня'}</div>` : ''}
           </div>
@@ -327,8 +350,9 @@
     render = function() {
       _origRender();
       if (!CACHED) return;
-      // Real players only — keep DISPLAYED_ROWS in sync with what render() shows.
-      DISPLAYED_ROWS = (CACHED[CURRENT] || []).filter(r => pointsFor(r) > 0);
+      // Real players only — keep DISPLAYED_ROWS in sync with what render() shows
+      // (same period + pass filter), so row clicks map to the correct player.
+      DISPLAYED_ROWS = visibleRows();
     };
 
     fetchLeaderboard();

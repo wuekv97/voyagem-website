@@ -1532,7 +1532,7 @@ body > * { position: relative; z-index: 3; }
   margin-bottom: 36px;
   flex-wrap: wrap;
 }
-.lb-period {
+.lb-period, .lb-filter {
   display: inline-flex;
   padding: 4px;
   border: 1px solid var(--border);
@@ -1542,7 +1542,7 @@ body > * { position: relative; z-index: 3; }
   border-radius: var(--radius-pill);
   gap: 2px;
 }
-.lb-period-btn {
+.lb-period-btn, .lb-filter-btn {
   padding: 9px 20px;
   border-radius: var(--radius-pill);
   font-size: 13px;
@@ -1553,8 +1553,8 @@ body > * { position: relative; z-index: 3; }
   cursor: pointer;
   transition: color .2s var(--ease), background-color .2s var(--ease);
 }
-.lb-period-btn:hover { color: var(--text); }
-.lb-period-btn.active {
+.lb-period-btn:hover, .lb-filter-btn:hover { color: var(--text); }
+.lb-period-btn.active, .lb-filter-btn.active {
   color: var(--accent-ink);
   background: var(--accent);
 }
@@ -1564,6 +1564,26 @@ body > * { position: relative; z-index: 3; }
   letter-spacing: 0.08em;
   color: var(--text-dim);
 }
+/* Season-pass badge shown next to a player's nick */
+.lb-pass-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 7px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.lb-podium-card .lb-pass-badge { margin-left: 0; margin-top: 4px; }
 
 /* Podium */
 .lb-podium {
